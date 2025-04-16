@@ -1,0 +1,182 @@
+body {
+    font-family: 'Lora', serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    justify-content: space-between; padding-left: 20px; /* Tăng khoảng cách giữa menu và content */
+}
+
+.menu {
+    width: 30%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu button {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.menu button:hover {
+    background-color: #0056b3;
+}
+
+.content {
+    width: 70%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-info, .booking-history {
+    display: none;
+    width: 100%;
+    text-align: center;
+}
+
+.profile-info.active, .booking-history.active {
+    display: block;
+}
+
+.avatar {
+    width: 150px; /* Tăng kích thước avatar */
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 2px solid #007bff;
+}
+
+.info {
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    display: flex;
+    justify-content: space-between; /* Căn lề cho label và input */
+}
+
+.info label {
+    width: 30%; /* Chiều dài bằng nhau cho label */
+}
+
+.info input {
+    width: 65%; /* Chiều dài bằng nhau cho input */
+}
+
+.edit-button {
+    font-size: 0.8em;
+    padding: 5px 10px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+    background-color: #218838;
+}
+
+.cancel-button {
+    font-size: 0.8em;
+    padding: 5px 10px;
+    border: none;
+    background-color: #dc3545;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+    background-color: #c82333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+/* Hiệu ứng cho phần tử khi xuất hiện */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* Hiệu ứng cho phần tử khi biến mất */
+.fade-out {
+    animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+/* Định nghĩa các keyframes cho hiệu ứng */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Kích thước và kiểu cho nút Edit */
+.edit-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Kích thước cho avatar */
+.avatar {
+    width: 100px; /* Tăng kích thước avatar */
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa avatar và thông tin */
+}
+
+/* Khoảng cách giữa menu và nội dung */
+.menu {
+    margin-bottom: 30px; /* Tăng khoảng cách giữa menu và nội dung */
+}
+
+/* Khoảng cách giữa các thông tin */
+.info {
+    margin-bottom: 15px; /* Tăng khoảng cách giữa các thông tin */
+}
