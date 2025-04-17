@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -29,7 +30,7 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("username", username);
                 session.setAttribute("role", resultSet.getString("Role"));
-                response.sendRedirect("index.jsp"); // Chuyển hướng đến trang chủ
+                response.sendRedirect("homepage.jsp"); // Chuyển hướng đến trang homepage
             } else {
                 response.sendRedirect("login.jsp?error=Tài khoản hoặc mật khẩu không đúng");
             }

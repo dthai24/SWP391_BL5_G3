@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="css/style.css"> <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="css/style.css"> 
 </head>
 <body>
     <div class="login-container">
@@ -13,7 +13,7 @@
         <c:if test="${not empty param.error}">
             <div class="error">${param.error}</div>
         </c:if>
-        <form action="LoginServlet" method="post">
+        <form action="login" method="post">
             <label for="username">Tên Đăng Nhập:</label>
             <input type="text" id="username" name="username" required>
             <label for="password">Mật Khẩu:</label>
@@ -21,7 +21,7 @@
             <button type="submit">Đăng Nhập</button>
         </form>
 
-        <p>Chưa có tài khoản? <a href="register.jsp">Đăng Ký ngay</a></p> <!-- Link to registration page -->
+        <p>Chưa có tài khoản? <a href="register.jsp">Đăng Ký ngay</a></p> 
     </div>
 </body>
 </html>
