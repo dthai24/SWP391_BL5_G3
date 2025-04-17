@@ -29,7 +29,7 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("username", username);
                 session.setAttribute("role", resultSet.getString("Role"));
-                response.sendRedirect("myprofile.jsp"); 
+                response.sendRedirect("index.jsp"); // Chuyển hướng đến trang chủ
             } else {
                 response.sendRedirect("login.jsp?error=Tài khoản hoặc mật khẩu không đúng");
             }
