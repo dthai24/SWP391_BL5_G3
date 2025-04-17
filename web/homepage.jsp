@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="zxx">
 
@@ -24,21 +25,21 @@
     <link rel="stylesheet" href="css/magnific-popup.css" type="text/css">
     <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="css/style.css" type="text/css">
-     <meta charset="UTF-8">
-  <style>
-    a {
-      text-decoration: none;
-      color: black;
-    }
 
-    a:hover,
-    a:active,
-    a:focus,
-    a:visited {
-      color: black;
-      text-decoration: none;
-    }
-  </style>
+    <style>
+        a {
+            text-decoration: none;
+            color: black;
+        }
+
+        a:hover,
+        a:active,
+        a:focus,
+        a:visited {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
 
 </head>
 
@@ -57,7 +58,7 @@
         <div class="canvas-close">
             <i class="icon_close"></i>
         </div>
-        <div class="search-icon  search-switch">
+        <div class="search-icon search-switch">
             <i class="icon_search"></i>
         </div>
         <div class="header-configure-area">
@@ -75,18 +76,18 @@
         <nav class="mainmenu">
             <ul>
                 <li class="active"><a href="./index.html">Home</a></li>
-                <li><a href="./rooms.html">Rooms</a></li>
-                <li><a href="./about-us.html">About Us</a></li>
-                <li><a href="./pages.html">Pages</a>
+                <li><a href="./rooms.jsp">Rooms</a></li>
+                <li><a href="./about-us.jsp">About Us</a></li>
+                <li><a href="./pages.jsp">Pages</a>
                     <ul class="dropdown">
-                        <li><a href="./room-details.html">Room Details</a></li>
+                        <li><a href="./room-details.jsp">Room Details</a></li>
                         <li><a href="#">Deluxe Room</a></li>
                         <li><a href="#">Family Room</a></li>
                         <li><a href="#">Premium Room</a></li>
                     </ul>
                 </li>
-                <li><a href="./blog.html">News</a></li>
-                <li><a href="./contact.html">Contact</a></li>
+                <li><a href="./blog.jsp">News</a></li>
+                <li><a href="./contact.jsp">Contact</a></li>
             </ul>
         </nav>
         <div id="mobile-menu-wrap"></div>
@@ -99,7 +100,7 @@
         <ul class="top-widget">
             <li><i class="fa fa-phone"></i> (12) 345 67890</li>
             <li><i class="fa fa-envelope"></i> info.colorlib@gmail.com</li>
-        </ul>
+        </ </ul>
     </div>
     <!-- Offcanvas Menu Section End -->
 
@@ -124,9 +125,21 @@
                             </div>
                             <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
                             <div class="language-option">
-                                
-                                <a href="login.jsp">ĐĂNG NHẬP </a>
-                                
+                              <% 
+    String username = (String) session.getAttribute("username"); 
+    if (username != null) {
+%>
+ 
+                                <a href="myprofile.jsp"><%= username %></a> | 
+                                <a href="logout.jsp">Đăng Xuất</a>
+<% 
+    } else {
+%>
+    <a href="login.jsp">Đăng nhập</a>
+<% 
+    }
+%>
+
                             </div>
                         </div>
                     </div>
@@ -147,19 +160,19 @@
                         <div class="nav-menu">
                             <nav class="mainmenu">
                                 <ul>
-                                    <li class="active"><a href="./index.html">Home</a></li>
-                                    <li><a href="./rooms.html">Rooms</a></li>
-                                    <li><a href="./about-us.html">About Us</a></li>
-                                    <li><a href="./pages.html">Pages</a>
+                                    <li class="active"><a href="./index.jsp">Home</a></li>
+                                    <li><a href="./rooms.jsp">Rooms</a></li>
+                                    <li><a href="./about-us.jsp">About Us</a></li>
+                                    <li><a href="./pages.jsp">Pages</a>
                                         <ul class="dropdown">
-                                            <li><a href="./room-details.html">Room Details</a></li>
-                                            <li><a href="./blog-details.html">Blog Details</a></li>
+                                            <li><a href="./room-details.jsp">Room Details</a></li>
+                                            <li><a href="./blog-details.jsp">Blog Details</a></li>
                                             <li><a href="#">Family Room</a></li>
                                             <li><a href="#">Premium Room</a></li>
                                         </ul>
                                     </li>
-                                    <li><a href="./blog.html">News</a></li>
-                                    <li><a href="./contact.html">Contact</a></li>
+                                    <li><a href="./blog.jsp">News</a></li>
+                                    <li><a href="./contact.jsp">Contact</a></li>
                                 </ul>
                             </nav>
                             <div class="nav-right search-switch">
@@ -320,7 +333,7 @@
                         <h4>Bar & Drink</h4>
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
                             labore et dolore magna.</p>
-                    </div>
+                         </div>
                 </div>
             </div>
         </div>
