@@ -75,6 +75,8 @@
                         <th style="min-width:120px;">Vacancy Status</th>
                         <th>Description</th>
                         <th style="min-width:120px;">Price Override</th>
+                        <th style="min-width:140px;">Created At</th>
+                        <th style="min-width:140px;">Updated At</th>
                         <th style="min-width:110px;">Action</th>
                     </tr>
                 </thead>
@@ -95,6 +97,8 @@
                         <td style="font-weight: 600; color: #28a745;">
                             <%= room.getPriceOverride() %>₫
                         </td>
+                        <td><%= room.getCreatedAt() %></td>
+                        <td><%= room.getUpdatedAt() %></td>
                         <td>
                             <button type="button" class="btn btn-warning btn-sm edit-btn"
                                 data-roomid="<%= room.getRoomID() %>"
@@ -110,7 +114,7 @@
                     </tr>
                     <%  } 
                     } else { %>
-                    <tr><td colspan="6" class="text-center">Không có phòng nào.</td></tr>
+                    <tr><td colspan="8" class="text-center">Không có phòng nào.</td></tr>
                     <% } %>
                 </tbody>
             </table>
