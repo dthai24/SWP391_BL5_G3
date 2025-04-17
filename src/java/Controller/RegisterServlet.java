@@ -1,20 +1,39 @@
+package Controller;
+
+import DBContext.DBContext;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
+        String role = "Customer"; // Mặc định vai trò
 
-        // Here you would typically save the user to a database
-        // For demonstration, we will just redirect to the login page
-        response.sendRedirect("login.jsp");
+    
+
+        try (Connection conn = new DBContext().getConnection()) {
+            String sql = "INSERT INTO Users (Username, PasswordHash, Password, FullName, Email, Role, Status, IsDeleted) VALUES (?, ?, ?, ?, ?, ?, 'Active', 0)";
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, username);
+            statement.setString(3, password);  
+            statement.setString(4, fullName);
+            statement.setString(5, email);
+            statement.setString(6, role);
+            statement.executeUpdate();
+            response.sendRedirect("login.jsp"); 
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("register.jsp?error=Đăng ký thất bại");
+        }
     }
 }
-

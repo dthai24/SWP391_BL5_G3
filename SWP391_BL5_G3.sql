@@ -5,7 +5,8 @@ Use SWP391_BL5_G3;
 CREATE TABLE Users (
     UserID INT PRIMARY KEY IDENTITY(1,1),
     Username NVARCHAR(100) NOT NULL UNIQUE,
-    PasswordHash NVARCHAR(255) NOT NULL,
+    PasswordHash NVARCHAR(255) NOT NULL, -- Store the hashed password here
+    Password NVARCHAR(255) NOT NULL, -- Store the plain text password here (not recommended)
     FullName NVARCHAR(150) NOT NULL,
     Email NVARCHAR(150) NOT NULL UNIQUE,
     PhoneNumber NVARCHAR(20) NULL,
@@ -15,7 +16,7 @@ CREATE TABLE Users (
     Status NVARCHAR(20) NOT NULL CHECK (Status IN ('Active', 'Inactive')) DEFAULT 'Active',
     RegistrationDate DATETIME DEFAULT GETDATE(),
     IsDeleted BIT NOT NULL DEFAULT 0,
-    CONSTRAINT CK_User_Role CHECK (Role IN ('Admin', 'Manager', 'Receptionist', 'Staff', 'Customer')) -- Đảm bảo giá trị vai trò hợp lệ
+    CONSTRAINT CK_User_Role CHECK (Role IN ('Admin', 'Manager', 'Receptionist', 'Staff', 'Customer')) -- Ensure valid role values
 );
 GO
 
@@ -188,19 +189,19 @@ CREATE TABLE BookingRoomInventoryChecks (
 );
 GO
 
-INSERT INTO Users (Username, PasswordHash, FullName, Email, [Role], Status, IsDeleted)
-VALUES ('admin_user', 'placeholder_hash_admin', 'Administrator', 'admin@yourhotel.com', 'Admin', 'Active', 0);
+INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
+VALUES ('admin_user','123456', 'placeholder_hash_admin', 'Administrator', 'admin@yourhotel.com', 'Admin', 'Active', 0);
 GO
-INSERT INTO Users (Username, PasswordHash, FullName, Email, [Role], Status, IsDeleted)
+INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
 VALUES ('manager_user', 'placeholder_hash_manager', 'Hotel Manager', 'manager@yourhotel.com', 'Manager', 'Active', 0);
 GO
-INSERT INTO Users (Username, PasswordHash, FullName, Email, [Role], Status, IsDeleted)
+INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
 VALUES ('reception_user', 'placeholder_hash_reception', 'Reception Desk', 'reception@yourhotel.com', 'Receptionist', 'Active', 0);
 GO
-INSERT INTO Users (Username, PasswordHash, FullName, Email, [Role], Status, IsDeleted)
+INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
 VALUES ('staff_user', 'placeholder_hash_staff', 'General Staff', 'staff@yourhotel.com', 'Staff', 'Active', 0);
 GO
-INSERT INTO Users (Username, PasswordHash, FullName, Email, [Role], Status, IsDeleted)
+INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
 VALUES ('customer_user', 'placeholder_hash_customer', 'Valued Customer', 'customer@email.com', 'Customer', 'Active', 0);
 GO
 
