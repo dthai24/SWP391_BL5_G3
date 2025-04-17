@@ -1,22 +1,39 @@
 package Controller;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import DBContext.DBContext;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String password = request.getParameter("password"); // Sử dụng mật khẩu thường
+        String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
+        String role = "Customer"; // Vai trò mặc định
 
-        // Here you would typically save the user to a database
-        // For demonstration, we will just redirect to the login page
-        response.sendRedirect("login.jsp");
+        try (Connection conn = new DBContext().getConnection()) {
+            String sql = "INSERT INTO Users (Username, Password, FullName, Email, Role, Status, IsDeleted) VALUES (?, ?, ?, ?, ?, 'Active', 0)";
+            PreparedStatement statement = conn.prepareStatement(sql);
+            statement.setString(1, username);
+            statement.setString(2, password); // Lưu mật khẩu thường
+            statement.setString(3, fullName);
+            statement.setString(4, email);
+            statement.setString(5, role);
+            statement.executeUpdate();
+            response.sendRedirect("login.jsp"); // Chuyển hướng đến trang đăng nhập
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("register.jsp?error=Đăng ký thất bại");
+        }
     }
 }
-
