@@ -20,23 +20,32 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         try (Connection conn = new DBContext().getConnection()) {
-            String sql = "SELECT * FROM Users WHERE Username = ?";
+            String sql = "SELECT Password FROM Users WHERE Username = ?";
             PreparedStatement statement = conn.prepareStatement(sql);
             statement.setString(1, username);
             ResultSet resultSet = statement.executeQuery();
 
-            // Kiểm tra xem người dùng có tồn tại và so sánh mật khẩu
-            if (resultSet.next() && password.equals(resultSet.getString("Password"))) {
-                HttpSession session = request.getSession();
-                session.setAttribute("username", username);
-                session.setAttribute("role", resultSet.getString("Role"));
-                response.sendRedirect("homepage.jsp"); // Chuyển hướng đến trang homepage
+            if (resultSet.next()) {
+                String dbPassword = resultSet.getString("Password");
+                if (password.equals(dbPassword)) {
+                    // Đăng nhập thành công
+                    HttpSession session = request.getSession();
+                    session.setAttribute("username", username); // Lưu username vào session
+                    response.sendRedirect("homepage.jsp"); // Chuyển hướng đến trang chủ
+                } else {
+                    // Sai mật khẩu
+                    request.setAttribute("error", "Mật khẩu không đúng");
+                    request.getRequestDispatcher("login.jsp").forward(request, response);
+                }
             } else {
-                response.sendRedirect("login.jsp?error=Tài khoản hoặc mật khẩu không đúng");
+                // Không tìm thấy tài khoản
+                request.setAttribute("error", "Tài khoản không tồn tại");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("login.jsp?error=Đăng nhập thất bại");
+            request.setAttribute("error", "Đăng nhập thất bại do lỗi hệ thống");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 }
