@@ -11,14 +11,12 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
 </head>
 <body>
     <%
         List<Room> rooms = (List<Room>)request.getAttribute("rooms");
     %>
-    <div class="container mt-4">
-        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addRoomModal">Thêm phòng mới</button>
-    </div>
     <!-- Modal for Add Room -->
     <div class="modal fade" id="addRoomModal" tabindex="-1" role="dialog" aria-labelledby="addRoomModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -63,21 +61,24 @@
         </div>
       </div>
     </div>
-    <div style="max-width: 1100px; margin: 32px auto;">
+    <div style="max-width: 100vw; margin: 32px auto;">
       <div style="background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 6px 24px rgba(0,0,0,0.13);">
-        <h2 class="mb-4" style="font-weight: 700; color: #2d2d2d; letter-spacing: 1px;">Danh Sách Phòng</h2>
-        <div class="table-responsive mb-0">
-            <table class="table table-hover table-striped align-middle mb-0" style="background: #fff; border-radius: 10px; overflow: hidden;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 style="font-weight: 700; color: #2d2d2d; letter-spacing: 1px; margin-bottom: 0;">Danh Sách Phòng</h2>
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addRoomModal">Thêm phòng mới</button>
+        </div>
+        <div class="table-responsive mb-0" style="overflow-x:unset;">
+            <table id="room-datatable" class="table table-hover table-striped align-middle mb-0" style="background: #fff; border-radius: 10px; overflow: visible; table-layout: auto; width: 100%;">
                 <thead class="thead-dark" style="background: #343a40; color: #fff;">
                     <tr>
-                        <th style="min-width:110px;">Room Number</th>
-                        <th style="min-width:120px;">Category ID</th>
-                        <th style="min-width:120px;">Vacancy Status</th>
-                        <th>Description</th>
-                        <th style="min-width:120px;">Price Override</th>
-                        <th style="min-width:140px;">Created At</th>
-                        <th style="min-width:140px;">Updated At</th>
-                        <th style="min-width:110px;">Action</th>
+                        <th style="min-width:110px; white-space:nowrap;">Số phòng</th>
+                        <th style="min-width:120px; white-space:nowrap;">Loại phòng (ID)</th>
+                        <th style="min-width:120px; white-space:nowrap;">Trạng thái</th>
+                        <th style="min-width:150px; white-space:nowrap;">Mô tả</th>
+                        <th style="min-width:120px; white-space:nowrap;">Giá phòng</th>
+                        <th style="min-width:140px; white-space:nowrap;">Ngày tạo</th>
+                        <th style="min-width:140px; white-space:nowrap;">Ngày sửa</th>
+                        <th style="min-width:110px; white-space:nowrap;">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -166,7 +167,9 @@
         </div>
       </div>
     </div>
-    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script>
     $(document).ready(function(){
@@ -177,6 +180,19 @@
             $('#edit-vacancyStatus').val($(this).data('vacancystatus'));
             $('#edit-description').val($(this).data('description'));
             $('#edit-priceOverride').val($(this).data('priceoverride'));
+        });
+
+        $('#room-datatable').DataTable({
+            responsive: true,
+            paging: true,
+            ordering: true,
+            info: true,
+            columnDefs: [
+                { orderable: false, targets: -1 } // Disable sort for last column (Action)
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+            }
         });
     });
     </script>

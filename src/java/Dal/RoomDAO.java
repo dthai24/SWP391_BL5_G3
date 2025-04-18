@@ -1,4 +1,3 @@
-
 package Dal;
 
 import java.sql.*;
@@ -99,6 +98,37 @@ public class RoomDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Count total rooms (non-deleted)
+    public int countRooms() {
+        String sql = "SELECT COUNT(*) FROM Rooms WHERE isDeleted = 0";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Get rooms by page (non-deleted)
+    public List<Room> getRoomsByPage(int page, int pageSize) {
+        List<Room> rooms = new ArrayList<>();
+        String sql = "SELECT * FROM Rooms WHERE isDeleted = 0 ORDER BY roomID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, (page - 1) * pageSize);
+            statement.setInt(2, pageSize);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                rooms.add(mapResultSetToRoom(resultSet));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rooms;
     }
 
     // Helper method to map ResultSet to Room object
