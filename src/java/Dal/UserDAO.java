@@ -159,6 +159,36 @@ public class UserDAO {
         return users;
     }
 
+    // Pagination: List users with pagination
+    public List<User> listUsersWithPagination(int page, int pageSize) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE isDeleted = 0 ORDER BY userID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, (page - 1) * pageSize);
+            statement.setInt(2, pageSize);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                users.add(mapResultSetToUser(resultSet));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    // Update profile picture URL for a user
+    public boolean updateProfilePicture(int userID, String profilePictureURL) {
+        String sql = "UPDATE Users SET profilePictureURL = ? WHERE userID = ? AND isDeleted = 0";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, profilePictureURL);
+            statement.setInt(2, userID);
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Helper method to map ResultSet to User object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
         return new User(
@@ -177,29 +207,20 @@ public class UserDAO {
         );
     }
 
-    // Main method to test search, listAllUsers, and getUserById
+    // Main method to test new features
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
 
-        System.out.println("=== Testing listAllUsers ===");
-        List<User> allUsers = userDAO.listAllUsers();
-        for (User user : allUsers) {
+        // Testing pagination
+        System.out.println("=== Testing Pagination ===");
+        List<User> paginatedUsers = userDAO.listUsersWithPagination(1, 3);
+        for (User user : paginatedUsers) {
             System.out.println(user);
         }
 
-        int testUserId = 1; // Replace with an actual user ID from your database
-        System.out.println("\n=== Testing getUserById ===");
-        User userById = userDAO.getUserById(testUserId);
-        System.out.println(userById);
-
-        System.out.println("\n=== Testing searchUsers ===");
-        String keyword = "user"; // Replace with an actual keyword
-        String role = ""; // Replace with an actual role
-        String sortBy = "username";
-        String sortDirection = "asc";
-        List<User> searchedUsers = userDAO.searchUsers(keyword, role, sortBy, sortDirection);
-        for (User user : searchedUsers) {
-            System.out.println(user);
-        }
+        // Testing profile picture update
+        System.out.println("\n=== Testing Profile Picture Update ===");
+        boolean updated = userDAO.updateProfilePicture(1, "http://example.com/profile.jpg");
+        System.out.println("Update Successful: " + updated);
     }
 }
