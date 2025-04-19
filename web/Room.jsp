@@ -1,241 +1,200 @@
 <%@ page import="java.util.List" %>
-<%@ page import="Model.User" %>
+<%@ page import="Model.Room" %>
+<%@ page import="Dal.RoomDAO" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Danh Sách Người Dùng</title>
-        <!-- CSS -->
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
-    </head>
-    <body>
-        <%
-            // Lấy danh sách người dùng từ Servlet
-            List<User> users = (List<User>) request.getAttribute("users");
-        %>
-
-        <!-- Main Container -->
-        <div class="container mt-5">
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">Danh Sách Người Dùng</h3>
-                    <!-- Nút Thêm Người Dùng -->
-                    <button type="button" class="btn btn-light btn-sm" data-toggle="modal" data-target="#addUserModal">
-                        <i class="fa fa-plus"></i> Thêm Người Dùng
-                    </button>
-                </div>
-                <div class="card-body">
-                    <!-- Bảng Người Dùng -->
-                    <div class="table-responsive">
-                        <table id="user-datatable" class="table table-hover table-bordered">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>Avatar</th>
-                                    <th>ID</th>
-                                    <th>Tên Người Dùng</th>
-                                    <th>Email</th>
-                                    <th>Vai Trò</th>
-                                    <th>Trạng Thái</th>
-                                    <th>Hành Động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (users != null && !users.isEmpty()) {
-                                for (User user : users) { %>
-                                <tr>
-                                    <td>
-                                        <% if (user.getProfilePictureURL() != null && !user.getProfilePictureURL().isEmpty()) { %>
-                                        <img src="<%= user.getProfilePictureURL() %>" alt="Avatar" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
-                                        <% } else { %>
-                                        <img src="https://via.placeholder.com/50" alt="Default Avatar" class="img-fluid rounded-circle">
-                                        <% } %>
-                                    </td>
-                                    <td><%= user.getUserID() %></td>
-                                    <td><%= user.getUsername() %></td>
-                                    <td><%= user.getEmail() %></td>
-                                    <td><%= user.getRole() %></td>
-                                    <td>
-                                        <% if ("Active".equals(user.getStatus())) { %>
-                                        <span class="badge badge-success">Active</span>
-                                        <% } else { %>
-                                        <span class="badge badge-danger">Inactive</span>
-                                        <% } %>
-                                    </td>
-                                    <td>
-                                        <!-- Nút Chi Tiết -->
-                                        <button type="button" class="btn btn-info btn-sm detail-btn"
-                                                data-userid="<%= user.getUserID() %>"
-                                                data-username="<%= user.getUsername() %>"
-                                                data-fullname="<%= user.getFullName() %>"
-                                                data-email="<%= user.getEmail() %>"
-                                                data-role="<%= user.getRole() %>"
-                                                data-status="<%= user.getStatus() %>"
-                                                data-profilepictureurl="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://via.placeholder.com/150" %>"
-                                                data-toggle="modal" data-target="#detailUserModal">
-                                            <i class="fa fa-info-circle"></i> Chi Tiết
-                                        </button>
-                                        <!-- Nút Sửa -->
-                                        <button type="button" class="btn btn-warning btn-sm edit-btn"
-                                                data-userid="<%= user.getUserID() %>"
-                                                data-username="<%= user.getUsername() %>"
-                                                data-fullname="<%= user.getFullName() %>"
-                                                data-email="<%= user.getEmail() %>"
-                                                data-role="<%= user.getRole() %>"
-                                                data-status="<%= user.getStatus() %>"
-                                                data-profilepictureurl="<%= user.getProfilePictureURL() %>"
-                                                data-toggle="modal" data-target="#editUserModal">
-                                            <i class="fa fa-pencil-alt"></i> Sửa
-                                        </button>
-                                        <!-- Nút Xóa -->
-                                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-userid="<%= user.getUserID() %>">
-                                            <i class="fa fa-trash"></i> Xóa
-                                        </button>
-                                    </td>
-                                </tr>
-                                <% }
-                            } else { %>
-                                <tr>
-                                    <td colspan="7" class="text-center">Không có người dùng nào.</td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room List</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
+</head>
+<body>
+    <%
+        List<Room> rooms = (List<Room>)request.getAttribute("rooms");
+    %>
+    <!-- Modal for Add Room -->
+    <div class="modal fade" id="addRoomModal" tabindex="-1" role="dialog" aria-labelledby="addRoomModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form action="room" method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addRoomModalLabel">Thêm phòng mới</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Số phòng</label>
+                <input type="text" name="roomNumber" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label>Loại phòng (CategoryID)</label>
+                <input type="number" name="categoryID" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label>Trạng thái</label>
+                <select name="vacancyStatus" class="form-control">
+                  <option value="Vacant">Vacant</option>
+                  <option value="Occupied">Occupied</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Mô tả</label>
+                <input type="text" name="description" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Giá phòng</label>
+                <input type="number" name="priceOverride" class="form-control" required />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+              <button type="submit" class="btn btn-primary">Thêm mới</button>
+            </div>
+          </form>
         </div>
-
-        <!-- Modal Thêm Người Dùng -->
-        <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form action="user" method="post">
-                        <input type="hidden" name="action" value="add">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Thêm Người Dùng</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+      </div>
+    </div>
+    <div style="max-width: 100vw; margin: 32px auto;">
+      <div style="background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 6px 24px rgba(0,0,0,0.13);">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2 style="font-weight: 700; color: #2d2d2d; letter-spacing: 1px; margin-bottom: 0;">Danh Sách Phòng</h2>
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addRoomModal">Thêm phòng mới</button>
+        </div>
+        <div class="table-responsive mb-0" style="overflow-x:unset;">
+            <table id="room-datatable" class="table table-hover table-striped align-middle mb-0" style="background: #fff; border-radius: 10px; overflow: visible; table-layout: auto; width: 100%;">
+                <thead class="thead-dark" style="background: #343a40; color: #fff;">
+                    <tr>
+                        <th style="min-width:110px; white-space:nowrap;">Số phòng</th>
+                        <th style="min-width:120px; white-space:nowrap;">Loại phòng (ID)</th>
+                        <th style="min-width:120px; white-space:nowrap;">Trạng thái</th>
+                        <th style="min-width:150px; white-space:nowrap;">Mô tả</th>
+                        <th style="min-width:120px; white-space:nowrap;">Giá phòng</th>
+                        <th style="min-width:140px; white-space:nowrap;">Ngày tạo</th>
+                        <th style="min-width:140px; white-space:nowrap;">Ngày sửa</th>
+                        <th style="min-width:110px; white-space:nowrap;">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (rooms != null && !rooms.isEmpty()) {
+                        for(Room room : rooms) { %>
+                    <tr>
+                        <td style="font-weight: 600; color: #007bff;"><%= room.getRoomNumber() %></td>
+                        <td><%= room.getCategoryID() %></td>
+                        <td>
+                            <% if ("Vacant".equals(room.getVacancyStatus())) { %>
+                                <span class="badge badge-success">Vacant</span>
+                            <% } else { %>
+                                <span class="badge badge-danger">Occupied</span>
+                            <% } %>
+                        </td>
+                        <td><%= room.getDescription() %></td>
+                        <td style="font-weight: 600; color: #28a745;">
+                            <%= room.getPriceOverride() %>₫
+                        </td>
+                        <td><%= room.getCreatedAt() %></td>
+                        <td><%= room.getUpdatedAt() %></td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm edit-btn"
+                                data-roomid="<%= room.getRoomID() %>"
+                                data-roomnumber="<%= room.getRoomNumber() %>"
+                                data-categoryid="<%= room.getCategoryID() %>"
+                                data-vacancystatus="<%= room.getVacancyStatus() %>"
+                                data-description="<%= room.getDescription() %>"
+                                data-priceoverride="<%= room.getPriceOverride() %>"
+                                data-toggle="modal" data-target="#editRoomModal">
+                                <i class="fa fa-pencil"></i> Edit
                             </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>URL Ảnh:</label>
-                                <input type="url" name="imageUrl" class="form-control" placeholder="Nhập URL ảnh (tùy chọn)">
-                            </div>
-                            <div class="form-group">
-                                <label>Tên Người Dùng</label>
-                                <input type="text" name="username" class="form-control" placeholder="Nhập tên người dùng" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Họ Tên</label>
-                                <input type="text" name="fullName" class="form-control" placeholder="Nhập họ và tên" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" class="form-control" placeholder="Nhập email" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Vai Trò</label>
-                                <select name="role" class="form-control">
-                                    <option value="Admin">Admin</option>
-                                    <option value="Customer">Customer</option>
-                                    <option value="Staff">Staff</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Trạng Thái</label>
-                                <select name="status" class="form-control">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                            <button type="submit" class="btn btn-primary">Thêm Mới</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+                        </td>
+                    </tr>
+                    <%  } 
+                    } else { %>
+                    <tr><td colspan="8" class="text-center">Không có phòng nào.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
         </div>
-
-        <!-- Modal Sửa Người Dùng -->
-        <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form action="user" method="post">
-                        <input type="hidden" name="action" value="edit">
-                        <input type="hidden" name="userID" id="edit-userID">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Sửa Người Dùng</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>URL Avatar:</label>
-                                <input type="url" name="imageUrl" id="edit-imageUrl" class="form-control" placeholder="Nhập URL ảnh (tùy chọn)">
-                            </div>
-                            <div class="form-group">
-                                <label>Tên Người Dùng</label>
-                                <input type="text" name="username" id="edit-username" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Họ Tên</label>
-                                <input type="text" name="fullName" id="edit-fullname" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" name="email" id="edit-email" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Vai Trò</label>
-                                <select name="role" id="edit-role" class="form-control">
-                                    <option value="Admin">Admin</option>
-                                    <option value="Customer">Customer</option>
-                                    <option value="Staff">Staff</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Trạng Thái</label>
-                                <select name="status" id="edit-status" class="form-control">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                            <button type="submit" class="btn btn-primary">Lưu</button>
-                        </div>
-                    </form>
-                </div>
+      </div>
+    </div>
+    <!-- Modal for Edit Room -->
+    <div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog" aria-labelledby="editRoomModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form action="room" method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editRoomModalLabel">Cập nhật phòng</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
+            <div class="modal-body">
+              <input type="hidden" name="roomID" id="edit-roomID" />
+              <div class="form-group">
+                <label>Số phòng</label>
+                <input type="text" name="roomNumber" id="edit-roomNumber" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label>Loại phòng (CategoryID)</label>
+                <input type="number" name="categoryID" id="edit-categoryID" class="form-control" required />
+              </div>
+              <div class="form-group">
+                <label>Trạng thái</label>
+                <select name="vacancyStatus" id="edit-vacancyStatus" class="form-control">
+                  <option value="Vacant">Vacant</option>
+                  <option value="Occupied">Occupied</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Mô tả</label>
+                <input type="text" name="description" id="edit-description" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Giá phòng</label>
+                <input type="number" name="priceOverride" id="edit-priceOverride" class="form-control" required />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+              <button type="submit" class="btn btn-primary">Cập nhật</button>
+            </div>
+          </form>
         </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        $('.edit-btn').click(function(){
+            $('#edit-roomID').val($(this).data('roomid'));
+            $('#edit-roomNumber').val($(this).data('roomnumber'));
+            $('#edit-categoryID').val($(this).data('categoryid'));
+            $('#edit-vacancyStatus').val($(this).data('vacancystatus'));
+            $('#edit-description').val($(this).data('description'));
+            $('#edit-priceOverride').val($(this).data('priceoverride'));
+        });
 
-        <!-- JS -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
-        <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('.edit-btn').click(function () {
-                    $('#edit-userID').val($(this).data('userid'));
-                    $('#edit-username').val($(this).data('username'));
-                    $('#edit-fullname').val($(this).data('fullname'));
-                    $('#edit-email').val($(this).data('email'));
-                    $('#edit-role').val($(this).data('role'));
-                    $('#edit-status').val($(this).data('status'));
-                    $('#edit-imageUrl').val($(this).data('profilepictureurl'));
-                });
-                $('#user-datatable').DataTable();
-            });
-        </script>
-    </body>
+        $('#room-datatable').DataTable({
+            responsive: true,
+            paging: true,
+            ordering: true,
+            info: true,
+            columnDefs: [
+                { orderable: false, targets: -1 } // Disable sort for last column (Action)
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+            }
+        });
+    });
+    </script>
+</body>
 </html>

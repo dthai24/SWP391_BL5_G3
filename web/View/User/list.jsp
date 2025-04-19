@@ -51,7 +51,7 @@
                                         <% if (user.getProfilePictureURL() != null && !user.getProfilePictureURL().isEmpty()) { %>
                                         <img src="<%= user.getProfilePictureURL() %>" alt="Avatar" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
                                         <% } else { %>
-                                        <img src="https://media.tenor.com/k_UsDt9xfWIAAAAM/i-will-eat-you-cat.gif" alt="Default Avatar" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
+                                        <img src="https://media.tenor.com/k_UsDt9xfWIAAAAM/i-will-eat-you-cat.gif" alt="Default Avatar" class="img-fluid rounded-circle">
                                         <% } %>
                                     </td>
                                     <td><%= user.getUserID() %></td>
@@ -74,7 +74,7 @@
                                                 data-email="<%= user.getEmail() %>"
                                                 data-role="<%= user.getRole() %>"
                                                 data-status="<%= user.getStatus() %>"
-                                                data-profilepictureurl="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://media.tenor.com/k_UsDt9xfWIAAAAM/i-will-eat-you-cat.gif" %>"
+                                                data-profilepictureurl="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://via.placeholder.com/150" %>"
                                                 data-toggle="modal" data-target="#detailUserModal">
                                             <i class="fa fa-info-circle"></i> Chi Tiết
                                         </button>
@@ -86,6 +86,7 @@
                                                 data-email="<%= user.getEmail() %>"
                                                 data-role="<%= user.getRole() %>"
                                                 data-status="<%= user.getStatus() %>"
+                                                data-profilepictureurl="<%= user.getProfilePictureURL() %>"
                                                 data-toggle="modal" data-target="#editUserModal">
                                             <i class="fa fa-pencil-alt"></i> Sửa
                                         </button>
@@ -108,85 +109,50 @@
             </div>
         </div>
 
-        <!-- Modal Chi Tiết Người Dùng -->
-        <div class="modal fade" id="detailUserModal" tabindex="-1" role="dialog" aria-labelledby="detailUserModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="detailUserModalLabel">Chi Tiết Người Dùng</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="text-center">
-                            <img id="detail-profilepicture" src="" alt="User Avatar" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
-                        </div>
-                        <div class="form-group">
-                            <label>Tên Người Dùng:</label>
-                            <p id="detail-username" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Họ Tên:</label>
-                            <p id="detail-fullname" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Email:</label>
-                            <p id="detail-email" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Vai Trò:</label>
-                            <p id="detail-role" class="form-control-plaintext"></p>
-                        </div>
-                        <div class="form-group">
-                            <label>Trạng Thái:</label>
-                            <p id="detail-status" class="form-control-plaintext"></p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Modal Thêm Người Dùng -->
-        <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form action="user" method="post" enctype="multipart/form-data">
+                    <form action="user" method="post">
                         <input type="hidden" name="action" value="add">
-                        <div class="form-group text-center">
-                            <img src="<%= request.getContextPath() %>/css/images/default-avatar.png" 
-                                 class="img-thumbnail mb-2" style="width: 150px; height: 150px;">
-                            <input type="file" name="profilePicture" class="form-control-file" accept="image/*">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Thêm Người Dùng</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>Tên Người Dùng</label>
-                            <input type="text" name="username" class="form-control" placeholder="Nhập tên người dùng" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Họ Tên</label>
-                            <input type="text" name="fullName" class="form-control" placeholder="Nhập họ và tên" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" class="form-control" placeholder="Nhập email" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Vai Trò</label>
-                            <select name="role" class="form-control">
-                                <option value="Admin">Admin</option>
-                                <option value="Customer">Customer</option>
-                                <option value="Staff">Staff</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Trạng Thái</label>
-                            <select name="status" class="form-control">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>URL Ảnh:</label>
+                                <input type="url" name="imageUrl" class="form-control" placeholder="Nhập URL ảnh (tùy chọn)">
+                            </div>
+                            <div class="form-group">
+                                <label>Tên Người Dùng</label>
+                                <input type="text" name="username" class="form-control" placeholder="Nhập tên người dùng" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Họ Tên</label>
+                                <input type="text" name="fullName" class="form-control" placeholder="Nhập họ và tên" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="Nhập email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Vai Trò</label>
+                                <select name="role" class="form-control">
+                                    <option value="Admin">Admin</option>
+                                    <option value="Customer">Customer</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Trạng Thái</label>
+                                <select name="status" class="form-control">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -198,42 +164,50 @@
         </div>
 
         <!-- Modal Sửa Người Dùng -->
-        <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form action="user" method="post" enctype="multipart/form-data">
+                    <form action="user" method="post">
                         <input type="hidden" name="action" value="edit">
                         <input type="hidden" name="userID" id="edit-userID">
-                        <div class="form-group text-center">
-                            <img id="edit-profilepicture" src="" class="img-thumbnail mb-2" style="width: 150px; height: 150px;">
-                            <input type="file" name="profilePicture" class="form-control-file" accept="image/*">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Sửa Người Dùng</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>Tên Người Dùng</label>
-                            <input type="text" name="username" id="edit-username" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Họ Tên</label>
-                            <input type="text" name="fullName" id="edit-fullname" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" id="edit-email" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Vai Trò</label>
-                            <select name="role" id="edit-role" class="form-control">
-                                <option value="Admin">Admin</option>
-                                <option value="Customer">Customer</option>
-                                <option value="Staff">Staff</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Trạng Thái</label>
-                            <select name="status" id="edit-status" class="form-control">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>URL Ảnh:</label>
+                                <input type="url" name="imageUrl" id="edit-imageUrl" class="form-control" placeholder="Nhập URL ảnh (tùy chọn)">
+                            </div>
+                            <div class="form-group">
+                                <label>Tên Người Dùng</label>
+                                <input type="text" name="username" id="edit-username" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Họ Tên</label>
+                                <input type="text" name="fullName" id="edit-fullname" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" id="edit-email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Vai Trò</label>
+                                <select name="role" id="edit-role" class="form-control">
+                                    <option value="Admin">Admin</option>
+                                    <option value="Customer">Customer</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Trạng Thái</label>
+                                <select name="status" id="edit-status" class="form-control">
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -251,25 +225,6 @@
         <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
         <script>
             $(document).ready(function () {
-                // Xử lý nút Chi Tiết
-                $('.detail-btn').click(function () {
-                    $('#detail-profilepicture').attr('src', $(this).data('profilepictureurl'));
-                    $('#detail-username').text($(this).data('username'));
-                    $('#detail-fullname').text($(this).data('fullname'));
-                    $('#detail-email').text($(this).data('email'));
-                    $('#detail-role').text($(this).data('role'));
-                    $('#detail-status').text($(this).data('status'));
-                });
-
-                // Xử lý nút Xóa
-                $('.delete-btn').click(function () {
-                    let userID = $(this).data('userid');
-                    if (confirm('Bạn có chắc chắn muốn xóa người dùng này không?')) {
-                        window.location.href = `user?action=delete&userID=${userID}`;
-                    }
-                });
-
-                // Xử lý nút Sửa
                 $('.edit-btn').click(function () {
                     $('#edit-userID').val($(this).data('userid'));
                     $('#edit-username').val($(this).data('username'));
@@ -277,22 +232,9 @@
                     $('#edit-email').val($(this).data('email'));
                     $('#edit-role').val($(this).data('role'));
                     $('#edit-status').val($(this).data('status'));
-                    $('#edit-profilepicture').attr('src', $(this).data('profilepictureurl'));
+                    $('#edit-imageUrl').val($(this).data('profilepictureurl'));
                 });
-
-                // DataTable
-                $('#user-datatable').DataTable({
-                    responsive: true,
-                    paging: true,
-                    ordering: true,
-                    info: true,
-                    columnDefs: [
-                        {orderable: false, targets: -1}
-                    ],
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
-                    }
-                });
+                $('#user-datatable').DataTable();
             });
         </script>
     </body>
