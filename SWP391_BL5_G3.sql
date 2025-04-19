@@ -38,6 +38,16 @@ CREATE TABLE RoomCategories (
     IsDeleted BIT NOT NULL DEFAULT 0
 );
 GO
+-- Dữ liệu mẫu cho RoomCategories
+INSERT INTO RoomCategories (CategoryName, Description, BasePricePerNight)
+VALUES 
+(N'Premium King Room', N'Phòng cao cấp với giường king size', 200.00),
+(N'Deluxe Room', N'Phòng deluxe tiện nghi', 150.00),
+(N'Double Room', N'Phòng đôi dành cho hai người', 120.00),
+(N'Luxury Room', N'Phòng sang trọng với dịch vụ cao cấp', 250.00),
+(N'Room With View', N'Phòng có tầm nhìn đẹp', 180.00),
+(N'Small View', N'Phòng nhỏ có cửa sổ nhìn ra cảnh quan', 100.00);
+GO
 
 CREATE TABLE Rooms (
     RoomID INT PRIMARY KEY IDENTITY(1,1),
@@ -52,6 +62,23 @@ CREATE TABLE Rooms (
     FOREIGN KEY (CategoryID) REFERENCES RoomCategories(CategoryID) ON DELETE NO ACTION,
     CONSTRAINT CK_Room_VacancyStatus CHECK (VacancyStatus IN ('Vacant', 'Occupied'))
 );
+GO
+
+-- Dữ liệu mẫu cho Rooms
+INSERT INTO Rooms (RoomNumber, CategoryID, VacancyStatus, Description, PriceOverride, CreatedAt, UpdatedAt, IsDeleted)
+VALUES
+(N'101', 1, 'Vacant', N'Phòng Premium King tầng trệt, gần sảnh chính', 210.00, GETDATE(), GETDATE(), 0),
+(N'102', 1, 'Occupied', N'Phòng Premium King có ban công rộng', 220.00, GETDATE(), GETDATE(), 0),
+(N'201', 2, 'Vacant', N'Deluxe Room với view hồ bơi', 160.00, GETDATE(), GETDATE(), 0),
+(N'202', 2, 'Occupied', N'Deluxe Room nội khu yên tĩnh', 155.00, GETDATE(), GETDATE(), 0),
+(N'301', 3, 'Vacant', N'Double Room với 2 giường đơn', 125.00, GETDATE(), GETDATE(), 0),
+(N'302', 3, 'Occupied', N'Double Room có góc học tập', 130.00, GETDATE(), GETDATE(), 0),
+(N'401', 4, 'Vacant', N'Luxury Room tầng cao, trang bị hiện đại', 260.00, GETDATE(), GETDATE(), 0),
+(N'402', 4, 'Vacant', N'Luxury Room có bồn tắm jacuzzi', 270.00, GETDATE(), GETDATE(), 0),
+(N'501', 5, 'Occupied', N'Room With View nhìn ra biển', 185.00, GETDATE(), GETDATE(), 0),
+(N'502', 5, 'Vacant', N'Room With View hướng đồi thông', 180.00, GETDATE(), GETDATE(), 0),
+(N'601', 6, 'Vacant', N'Small View Room tiện nghi gọn nhẹ', 105.00, GETDATE(), GETDATE(), 0),
+(N'602', 6, 'Occupied', N'Small View Room dành cho khách công tác', 110.00, GETDATE(), GETDATE(), 0);
 GO
 
 CREATE TABLE RoomImages (
