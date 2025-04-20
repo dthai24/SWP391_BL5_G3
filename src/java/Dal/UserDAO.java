@@ -220,7 +220,7 @@ public class UserDAO {
 
         // Testing profile picture update
         System.out.println("\n=== Testing Profile Picture Update ===");
-        boolean updated = userDAO.updateProfilePicture(1, "http://example.com/profile.jpg");
+        boolean updated = userDAO.updateProfilePicture(5, "https://media.tenor.com/k_UsDt9xfWIAAAAM/i-will-eat-you-cat.gif");
         System.out.println("Update Successful: " + updated);
     }
 }

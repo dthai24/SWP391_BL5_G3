@@ -3,21 +3,21 @@ package Controller;
 import Dal.UserDAO;
 import Model.User;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
 
 /**
- * UserServlet - Handles user-related operations like listing, adding, editing, deleting, and viewing details of users.
+ * UserServlet - Handles user-related operations like listing, adding, editing,
+ * deleting, and viewing details of users.
  */
 @WebServlet(name = "UserServlet", urlPatterns = {"/user"})
-@MultipartConfig // For handling file uploads (e.g., profile picture)
 public class UserServlet extends HttpServlet {
 
     private UserDAO userDAO;
@@ -33,12 +33,14 @@ public class UserServlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null || action.equals("list")) {
             listUsers(request, response);
-        } else if ("edit".equals(action)) {
-            editUser(request, response);
-        } else if ("delete".equals(action)) {
-            deleteUser(request, response);
         } else if ("detail".equals(action)) {
             getUserDetail(request, response);
+        } else if ("edit".equals(action)) {
+            getUserEdit(request, response);
+        } else if ("add".equals(action)) {
+            getUserAdd(request, response);
+        } else if ("delete".equals(action)) {
+            deleteUser(request, response);
         }
     }
 
@@ -55,74 +57,144 @@ public class UserServlet extends HttpServlet {
 
     private void listUsers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<User> users = userDAO.listAllUsers();
-        request.setAttribute("users", users);
-        request.getRequestDispatcher("View/User/list.jsp").forward(request, response);
+        try {
+            List<User> users = userDAO.listAllUsers();
+            request.setAttribute("users", users);
+            request.getRequestDispatcher("View/User/list.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while listing users.");
+            request.getRequestDispatcher("View/Error.jsp").forward(request, response);
+        }
+    }
+
+    private void getUserAdd(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while displaying the add user page.");
+            listUsers(request, response);
+        }
     }
 
     private void addUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            // Lấy dữ liệu từ form
             String username = request.getParameter("username");
-            String password = request.getParameter("password");
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String address = request.getParameter("address");
             String role = request.getParameter("role");
             String status = request.getParameter("status");
-            String imageUrl = request.getParameter("imageUrl");
 
-            String profilePictureURL = null;
-            Part filePart = request.getPart("profilePicture");
+            // Validate dữ liệu
+            List<String> errors = validateUserInputs(username, null, fullName, email, phoneNumber, address, role, status, null, true);
 
-            // Check if user uploaded a file or provided a URL
-            if (filePart != null && filePart.getSize() > 0) {
-                profilePictureURL = handleFileUpload(filePart);
-            } else if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                profilePictureURL = imageUrl; // Use the provided URL
+            if (!errors.isEmpty()) {
+                // Nếu có lỗi, quay lại trang add.jsp với thông báo lỗi
+                request.setAttribute("errors", errors);
+                request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
+                return;
             }
 
+            // Tạo đối tượng User
             User user = new User();
             user.setUsername(username);
-            user.setPasswordHash(password);
             user.setFullName(fullName);
             user.setEmail(email);
+            user.setPhoneNumber(phoneNumber);
+            user.setAddress(address);
             user.setRole(role);
             user.setStatus(status);
-            user.setProfilePictureURL(profilePictureURL);
             user.setRegistrationDate(new Date());
 
+            // Thêm user vào cơ sở dữ liệu
             boolean isAdded = userDAO.addUser(user);
+
             if (isAdded) {
-                request.setAttribute("success", "Người dùng đã được thêm thành công.");
+                // Nếu thêm thành công, chuyển hướng về danh sách với thông báo thành công
+                response.sendRedirect(request.getContextPath() + "/user?action=list&success=User added successfully");
             } else {
-                request.setAttribute("error", "Thêm người dùng thất bại.");
+                // Nếu thêm thất bại, quay lại trang add.jsp với thông báo lỗi
+                request.setAttribute("error", "Failed to add user.");
+                request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi thêm người dùng.");
+            request.setAttribute("error", "An error occurred while adding the user.");
+            request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
         }
-        listUsers(request, response);
+    }
+
+    private void getUserEdit(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String userIDParam = request.getParameter("userID");
+            if (userIDParam == null || !userIDParam.matches("\\d+")) {
+                request.setAttribute("error", "Invalid user ID.");
+                listUsers(request, response);
+                return;
+            }
+
+            int userID = Integer.parseInt(userIDParam);
+            User user = userDAO.getUserById(userID);
+
+            if (user != null) {
+                request.setAttribute("userDetail", user);
+                request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while retrieving user details.");
+            listUsers(request, response);
+        }
     }
 
     private void editUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            int userID = Integer.parseInt(request.getParameter("userID"));
+            String userIDParam = request.getParameter("userID");
+            if (userIDParam == null || !userIDParam.matches("\\d+")) {
+                request.setAttribute("error", "Invalid user ID.");
+                listUsers(request, response);
+                return;
+            }
+
+            int userID = Integer.parseInt(userIDParam);
             String username = request.getParameter("username");
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String address = request.getParameter("address");
             String role = request.getParameter("role");
             String status = request.getParameter("status");
-            String imageUrl = request.getParameter("imageUrl");
+            String profilePictureURL = request.getParameter("profilePictureURL");
 
-            String profilePictureURL = null;
-            Part filePart = request.getPart("profilePicture");
+            List<String> errors = validateUserInputs(username, null, fullName, email, phoneNumber, address, role, status, profilePictureURL, false);
 
-            // Check if user uploaded a file or provided a URL
-            if (filePart != null && filePart.getSize() > 0) {
-                profilePictureURL = handleFileUpload(filePart);
-            } else if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                profilePictureURL = imageUrl; // Use the provided URL
+            if (!errors.isEmpty()) {
+                User userWithErrors = new User();
+                userWithErrors.setUserID(userID);
+                userWithErrors.setUsername(username);
+                userWithErrors.setFullName(fullName);
+                userWithErrors.setEmail(email);
+                userWithErrors.setPhoneNumber(phoneNumber);
+                userWithErrors.setAddress(address);
+                userWithErrors.setRole(role);
+                userWithErrors.setStatus(status);
+                userWithErrors.setProfilePictureURL(profilePictureURL);
+
+                request.setAttribute("errors", errors);
+                request.setAttribute("userDetail", userWithErrors);
+                request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
+                return;
             }
 
             User user = userDAO.getUserById(userID);
@@ -130,26 +202,29 @@ public class UserServlet extends HttpServlet {
                 user.setUsername(username);
                 user.setFullName(fullName);
                 user.setEmail(email);
+                user.setPhoneNumber(phoneNumber);
+                user.setAddress(address);
                 user.setRole(role);
                 user.setStatus(status);
-                if (profilePictureURL != null) {
-                    user.setProfilePictureURL(profilePictureURL);
-                }
+                user.setProfilePictureURL(profilePictureURL);
 
                 boolean isUpdated = userDAO.editUser(user);
                 if (isUpdated) {
-                    request.setAttribute("success", "Người dùng đã được cập nhật thành công.");
+                    response.sendRedirect(request.getContextPath() + "/user?action=list&success=User updated successfully");
                 } else {
-                    request.setAttribute("error", "Cập nhật người dùng thất bại.");
+                    request.setAttribute("error", "Failed to update user.");
+                    request.setAttribute("userDetail", user);
+                    request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
                 }
             } else {
-                request.setAttribute("error", "Người dùng không tồn tại.");
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi cập nhật người dùng.");
+            request.setAttribute("error", "An error occurred while updating the user.");
+            listUsers(request, response);
         }
-        listUsers(request, response);
     }
 
     private void deleteUser(HttpServletRequest request, HttpServletResponse response)
@@ -157,38 +232,73 @@ public class UserServlet extends HttpServlet {
         try {
             int userID = Integer.parseInt(request.getParameter("userID"));
             boolean isDeleted = userDAO.deleteUser(userID);
-            if (isDeleted) {
-                request.setAttribute("success", "Người dùng đã được xóa thành công.");
-            } else {
-                request.setAttribute("error", "Xóa người dùng thất bại.");
-            }
+            response.sendRedirect(request.getContextPath() + "/user?action=list&success="
+                    + (isDeleted ? "User deleted successfully" : "Failed to delete user"));
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Đã xảy ra lỗi khi xóa người dùng.");
+            response.sendRedirect(request.getContextPath() + "/user?action=list&error=An error occurred while deleting the user");
         }
-        listUsers(request, response);
     }
 
     private void getUserDetail(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int userID = Integer.parseInt(request.getParameter("userID"));
-        User user = userDAO.getUserById(userID);
-        if (user != null) {
-            request.setAttribute("userDetail", user);
-        } else {
-            request.setAttribute("error", "Người dùng không tồn tại.");
+        try {
+            int userID = Integer.parseInt(request.getParameter("userID"));
+            User user = userDAO.getUserById(userID);
+            if (user != null) {
+                request.setAttribute("userDetail", user);
+                request.getRequestDispatcher("View/User/detail.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while fetching user details.");
+            listUsers(request, response);
         }
-        request.getRequestDispatcher("View/User/detail.jsp").forward(request, response);
     }
 
-    private String handleFileUpload(Part filePart) throws IOException {
-        if (filePart != null && filePart.getSize() > 0) {
-            String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-            String uploadPath = getServletContext().getRealPath("") + "uploads/" + fileName;
-            filePart.write(uploadPath);
-            return "uploads/" + fileName;
+    private List<String> validateUserInputs(String username, String password, String fullName, String email, String phoneNumber, String address, String role, String status, String profilePictureURL, boolean isAdd) {
+        List<String> errors = new ArrayList<>();
+
+        if (username == null || username.trim().isEmpty() || username.length() < 3) {
+            errors.add("Username must be at least 3 characters long and not empty.");
         }
-        return null;
+
+        if (isAdd && (password == null || password.trim().isEmpty() || password.length() < 6 || !Pattern.compile("\\d").matcher(password).find())) {
+            errors.add("Password must be at least 6 characters long, not empty, and contain at least one digit.");
+        }
+
+        if (fullName == null || fullName.trim().isEmpty() || fullName.length() < 3) {
+            errors.add("Full name must be at least 3 characters long and not empty.");
+        }
+
+        if (email == null || email.trim().isEmpty() || !Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matcher(email).matches()) {
+            errors.add("Invalid or empty email.");
+        }
+
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !Pattern.compile("^\\+?[0-9]{10,15}$").matcher(phoneNumber).matches()) {
+            errors.add("Invalid phone number.");
+        }
+
+        if (address != null && address.trim().isEmpty()) {
+            errors.add("Address must not be empty if provided.");
+        }
+
+        if (profilePictureURL != null && !profilePictureURL.trim().isEmpty() && profilePictureURL.length() > 20000000) {
+            errors.add("Profile picture URL must be smaller than 20MB.");
+        }
+
+        if (!"Active".equals(status) && !"Inactive".equals(status)) {
+            errors.add("Status must be 'Active' or 'Inactive'.");
+        }
+
+        if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(role)) {
+            errors.add("Role must be one of: Admin, Customer, Manager, Staff, Receptionist.");
+        }
+
+        return errors;
     }
 
     @Override
