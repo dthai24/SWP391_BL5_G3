@@ -96,20 +96,21 @@
                         </td>
                         <td><%= room.getDescription() %></td>
                         <td style="font-weight: 600; color: #28a745;">
-                            <%= room.getPriceOverride() %>₫
+                            <%= room.getPriceOverride() %>$
                         </td>
                         <td><%= room.getCreatedAt() %></td>
                         <td><%= room.getUpdatedAt() %></td>
                         <td>
-                            <button type="button" class="btn btn-warning btn-sm edit-btn"
+                            <button type="button" class="btn btn-link p-0 edit-btn"
                                 data-roomid="<%= room.getRoomID() %>"
                                 data-roomnumber="<%= room.getRoomNumber() %>"
                                 data-categoryid="<%= room.getCategoryID() %>"
                                 data-vacancystatus="<%= room.getVacancyStatus() %>"
                                 data-description="<%= room.getDescription() %>"
                                 data-priceoverride="<%= room.getPriceOverride() %>"
-                                data-toggle="modal" data-target="#editRoomModal">
-                                <i class="fa fa-pencil"></i> Edit
+                                data-toggle="modal" data-target="#editRoomModal"
+                                title="Edit">
+                                <i class="fa fa-edit" style="color: #ffc107; font-size: 1.2rem;"></i>
                             </button>
                         </td>
                     </tr>
@@ -192,6 +193,28 @@
             ],
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+            }
+        });
+
+        // Validate RoomNumber chỉ chứa số và không trùng nhau 
+        var existingRoomNumbers = [];
+        $("#room-datatable tbody tr").each(function() {
+            var roomNumber = $(this).find("td").eq(0).text().trim();
+            if(roomNumber) existingRoomNumbers.push(roomNumber);
+        });
+        $("#addRoomModal form").on("submit", function(e) {
+            var roomNumber = $(this).find('[name="roomNumber"]').val().trim();
+            if (!/^\d+$/.test(roomNumber)) {
+                alert("Số phòng chỉ được chứa các số.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            if (existingRoomNumbers.includes(roomNumber)) {
+                alert("Số phòng đã tồn tại.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
             }
         });
     });

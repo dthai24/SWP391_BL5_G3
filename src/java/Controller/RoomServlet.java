@@ -28,25 +28,10 @@ public class RoomServlet extends HttpServlet {
                 // ignore, invalid id
             }
         }
-        // Pagination logic
-        int page = 1;
-        int pageSize = 10;
-        String pageParam = request.getParameter("page");
-        if (pageParam != null) {
-            try {
-                page = Integer.parseInt(pageParam);
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-        int totalRooms = roomDAO.countRooms();
-        int totalPages = (int) Math.ceil((double) totalRooms / pageSize);
-        if (page > totalPages && totalPages > 0) page = totalPages;
-        List<Room> rooms = roomDAO.getRoomsByPage(page, pageSize);
+        // Lấy toàn bộ danh sách phòng, không phân trang
+        List<Room> rooms = roomDAO.listAllRooms();
         request.setAttribute("rooms", rooms);
         request.setAttribute("editRoom", editRoom);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("Room.jsp").forward(request, response);
     }
 
@@ -63,6 +48,20 @@ public class RoomServlet extends HttpServlet {
         Date now = new Date();
         boolean isUpdate = roomIdParam != null && !roomIdParam.isEmpty();
         Room room = new Room();
+        // Validate RoomNumber chỉ chứa số
+        if (!roomNumber.matches("\\d+")) {
+            request.setAttribute("error", "RoomNumber chỉ được chứa các số.");
+            doGet(request, response);
+            return;
+        }
+        // Kiểm tra trùng RoomNumber khi thêm mới
+        if (!isUpdate) {
+            if (roomDAO.isRoomNumberExists(roomNumber)) {
+                request.setAttribute("error", "RoomNumber đã tồn tại.");
+                doGet(request, response);
+                return;
+            }
+        }
         if (isUpdate) {
             room.setRoomID(Integer.parseInt(roomIdParam));
             room.setUpdatedAt(now);

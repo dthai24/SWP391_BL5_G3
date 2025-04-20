@@ -131,6 +131,21 @@ public class RoomDAO {
         return rooms;
     }
 
+    // Kiểm tra RoomNumber đã tồn tại chưa
+    public boolean isRoomNumberExists(String roomNumber) {
+        String sql = "SELECT COUNT(*) FROM Rooms WHERE roomNumber = ? AND isDeleted = 0";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, roomNumber);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     // Helper method to map ResultSet to Room object
     private Room mapResultSetToRoom(ResultSet resultSet) throws SQLException {
         return new Room(
