@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UserServlet - Handles user-related operations like listing, adding, editing,
@@ -93,19 +95,12 @@ public class UserServlet extends HttpServlet {
             String address = request.getParameter("address");
             String role = request.getParameter("role");
             String status = request.getParameter("status");
+            String profilePictureURL = request.getParameter("profilePictureURL");
 
             // Validate dữ liệu
-            List<String> errors = validateUserInputs(
-                    username,
-                    password,
-                    fullName,
-                    email,
-                    phoneNumber,
-                    address,
-                    role,
-                    status,
-                    null,
-                    true
+            Map<String, String> errors = validateUserInputs(
+                    username, password, fullName, email, phoneNumber, address, role, status, profilePictureURL,
+                    true, null, null
             );
 
             if (!errors.isEmpty()) {
@@ -128,6 +123,7 @@ public class UserServlet extends HttpServlet {
             user.setAddress(address);
             user.setRole(role);
             user.setStatus(status);
+            user.setProfilePictureURL(profilePictureURL); // Thiết lập URL ảnh đại diện
             user.setRegistrationDate(new Date());
 
             // Thêm user vào cơ sở dữ liệu
@@ -212,7 +208,19 @@ public class UserServlet extends HttpServlet {
             String status = request.getParameter("status");
             String profilePictureURL = request.getParameter("profilePictureURL");
 
-            List<String> errors = validateUserInputs(username, null, fullName, email, phoneNumber, address, role, status, profilePictureURL, false);
+            // Lấy thông tin người dùng gốc từ cơ sở dữ liệu
+            User originalUser = userDAO.getUserById(userID);
+            if (originalUser == null) {
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
+                return;
+            }
+
+            // Validate dữ liệu
+            Map<String, String> errors = validateUserInputs(
+                    username, null, fullName, email, phoneNumber, address, role, status, profilePictureURL,
+                    false, originalUser.getUsername(), originalUser.getEmail()
+            );
 
             if (!errors.isEmpty()) {
                 User userWithErrors = new User();
@@ -232,28 +240,23 @@ public class UserServlet extends HttpServlet {
                 return;
             }
 
-            User user = userDAO.getUserById(userID);
-            if (user != null) {
-                user.setUsername(username);
-                user.setFullName(fullName);
-                user.setEmail(email);
-                user.setPhoneNumber(phoneNumber);
-                user.setAddress(address);
-                user.setRole(role);
-                user.setStatus(status);
-                user.setProfilePictureURL(profilePictureURL);
+            // Cập nhật thông tin người dùng
+            originalUser.setUsername(username);
+            originalUser.setFullName(fullName);
+            originalUser.setEmail(email);
+            originalUser.setPhoneNumber(phoneNumber);
+            originalUser.setAddress(address);
+            originalUser.setRole(role);
+            originalUser.setStatus(status);
+            originalUser.setProfilePictureURL(profilePictureURL);
 
-                boolean isUpdated = userDAO.editUser(user);
-                if (isUpdated) {
-                    response.sendRedirect(request.getContextPath() + "/user?action=list&success=User updated successfully");
-                } else {
-                    request.setAttribute("error", "Failed to update user.");
-                    request.setAttribute("userDetail", user);
-                    request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
-                }
+            boolean isUpdated = userDAO.editUser(originalUser);
+            if (isUpdated) {
+                response.sendRedirect(request.getContextPath() + "/user?action=list&success=User updated successfully");
             } else {
-                request.setAttribute("error", "User does not exist.");
-                listUsers(request, response);
+                request.setAttribute("error", "Failed to update user.");
+                request.setAttribute("userDetail", originalUser);
+                request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -294,43 +297,61 @@ public class UserServlet extends HttpServlet {
         }
     }
 
-    private List<String> validateUserInputs(String username, String password, String fullName, String email, String phoneNumber, String address, String role, String status, String profilePictureURL, boolean isAdd) {
-        List<String> errors = new ArrayList<>();
+    private Map<String, String> validateUserInputs(String username, String password, String fullName,
+            String email, String phoneNumber, String address,
+            String role, String status, String profilePictureURL,
+            boolean isAdd, String originalUsername, String originalEmail) {
+        Map<String, String> errors = new HashMap<>();
 
+        // Kiểm tra username
         if (username == null || username.trim().isEmpty() || username.length() < 3) {
-            errors.add("Username must be at least 3 characters long and not empty.");
+            errors.put("username", "Tên người dùng phải có ít nhất 3 ký tự và không được để trống.");
+        } else if (!username.equals(originalUsername) && userDAO.isUsernameTaken(username)) {
+            // Chỉ kiểm tra trùng lặp nếu username đã thay đổi
+            errors.put("username", "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
         }
 
+        // Kiểm tra mật khẩu
         if (isAdd && (password == null || password.trim().isEmpty() || password.length() < 6 || !Pattern.compile("\\d").matcher(password).find())) {
-            errors.add("Password must be at least 6 characters long, not empty, and contain at least one digit.");
+            errors.put("password", "Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
         }
 
+        // Kiểm tra họ tên
         if (fullName == null || fullName.trim().isEmpty() || fullName.length() < 3) {
-            errors.add("Full name must be at least 3 characters long and not empty.");
+            errors.put("fullName", "Họ tên phải có ít nhất 3 ký tự và không được để trống.");
         }
 
+        // Kiểm tra email
         if (email == null || email.trim().isEmpty() || !Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matcher(email).matches()) {
-            errors.add("Invalid or empty email.");
+            errors.put("email", "Email không hợp lệ hoặc để trống.");
+        } else if (!email.equals(originalEmail) && userDAO.isEmailTaken(email)) {
+            // Chỉ kiểm tra trùng lặp nếu email đã thay đổi
+            errors.put("email", "Email đã tồn tại. Vui lòng chọn email khác.");
         }
 
+        // Kiểm tra số điện thoại
         if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !Pattern.compile("^\\+?[0-9]{10,15}$").matcher(phoneNumber).matches()) {
-            errors.add("Invalid phone number.");
+            errors.put("phoneNumber", "Số điện thoại không hợp lệ.");
         }
 
+        // Kiểm tra địa chỉ
         if (address != null && address.trim().isEmpty()) {
-            errors.add("Address must not be empty if provided.");
+            errors.put("address", "Địa chỉ không được để trống nếu nhập.");
         }
 
-        if (profilePictureURL != null && !profilePictureURL.trim().isEmpty() && profilePictureURL.length() > 20000000) {
-            errors.add("Profile picture URL must be smaller than 20MB.");
-        }
-
+        // Kiểm tra trạng thái
         if (!"Active".equals(status) && !"Inactive".equals(status)) {
-            errors.add("Status must be 'Active' or 'Inactive'.");
+            errors.put("status", "Trạng thái phải là 'Active' hoặc 'Inactive'.");
         }
 
+        // Kiểm tra vai trò
         if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(role)) {
-            errors.add("Role must be one of: Admin, Customer, Manager, Staff, Receptionist.");
+            errors.put("role", "Vai trò không hợp lệ.");
+        }
+
+        // Kiểm tra URL ảnh đại diện
+        if (profilePictureURL != null && !profilePictureURL.trim().isEmpty() && profilePictureURL.length() > 20000000) {
+            errors.put("profilePictureURL", "URL ảnh đại diện phải nhỏ hơn 20MB.");
         }
 
         return errors;

@@ -1,3 +1,4 @@
+<%@ page import="java.util.Map" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="vi">
@@ -8,66 +9,118 @@
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
 </head>
 <body>
+<%
+    Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+%>
 <div class="container mt-5">
-    <!-- Hiển thị thông báo nếu có -->
-    <% String message = (String) request.getAttribute("success");
-       String error = (String) request.getAttribute("error");
-       if (message != null) { %>
-        <div class="alert alert-success"><%= message %></div>
-    <% } else if (error != null) { %>
-        <div class="alert alert-danger"><%= error %></div>
-    <% } %>
-
     <div class="card shadow-lg">
         <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
             <h3>Thêm Người Dùng</h3>
             <!-- Nút quay lại danh sách -->
-            <a href="<%= request.getContextPath() %>/user?action=list" class="btn btn-light btn-sm">Back to List</a>
+            <a href="<%= request.getContextPath() %>/user?action=list" class="btn btn-light btn-sm">Quay lại</a>
         </div>
         <div class="card-body">
             <form action="<%= request.getContextPath() %>/user" method="post">
                 <input type="hidden" name="action" value="add">
+
+                <!-- Tên Người Dùng -->
                 <div class="form-group">
-                    <label for="username">Tên Người Dùng</label>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên người dùng" required>
+                    <label>Tên Người Dùng</label>
+                    <input type="text" name="username" class="form-control <%= (errors != null && errors.containsKey("username")) ? "is-invalid" : "" %>" 
+                           value="<%= request.getParameter("username") != null ? request.getParameter("username") : "" %>" required>
+                    <% if (errors != null && errors.containsKey("username")) { %>
+                        <div class="invalid-feedback"><%= errors.get("username") %></div>
+                    <% } %>
                 </div>
+
+                <!-- Mật Khẩu -->
                 <div class="form-group">
-                    <label for="password">Mật Khẩu</label>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                    <label>Mật Khẩu</label>
+                    <input type="password" name="password" class="form-control <%= (errors != null && errors.containsKey("password")) ? "is-invalid" : "" %>" 
+                           required>
+                    <% if (errors != null && errors.containsKey("password")) { %>
+                        <div class="invalid-feedback"><%= errors.get("password") %></div>
+                    <% } %>
                 </div>
+
+                <!-- Họ Tên -->
                 <div class="form-group">
-                    <label for="fullName">Họ Tên</label>
-                    <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Nhập họ và tên" required>
+                    <label>Họ Tên</label>
+                    <input type="text" name="fullName" class="form-control <%= (errors != null && errors.containsKey("fullName")) ? "is-invalid" : "" %>" 
+                           value="<%= request.getParameter("fullName") != null ? request.getParameter("fullName") : "" %>" required>
+                    <% if (errors != null && errors.containsKey("fullName")) { %>
+                        <div class="invalid-feedback"><%= errors.get("fullName") %></div>
+                    <% } %>
                 </div>
+
+                <!-- Email -->
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="Nhập email" required>
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control <%= (errors != null && errors.containsKey("email")) ? "is-invalid" : "" %>" 
+                           value="<%= request.getParameter("email") != null ? request.getParameter("email") : "" %>" required>
+                    <% if (errors != null && errors.containsKey("email")) { %>
+                        <div class="invalid-feedback"><%= errors.get("email") %></div>
+                    <% } %>
                 </div>
+
+                <!-- Số Điện Thoại -->
                 <div class="form-group">
-                    <label for="phoneNumber">Số Điện Thoại</label>
-                    <input type="text" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="Nhập số điện thoại (tùy chọn)">
+                    <label>Số Điện Thoại</label>
+                    <input type="text" name="phoneNumber" class="form-control <%= (errors != null && errors.containsKey("phoneNumber")) ? "is-invalid" : "" %>" 
+                           value="<%= request.getParameter("phoneNumber") != null ? request.getParameter("phoneNumber") : "" %>">
+                    <% if (errors != null && errors.containsKey("phoneNumber")) { %>
+                        <div class="invalid-feedback"><%= errors.get("phoneNumber") %></div>
+                    <% } %>
                 </div>
+
+                <!-- Địa Chỉ -->
                 <div class="form-group">
-                    <label for="address">Địa Chỉ</label>
-                    <input type="text" id="address" name="address" class="form-control" placeholder="Nhập địa chỉ (tùy chọn)">
+                    <label>Địa Chỉ</label>
+                    <input type="text" name="address" class="form-control <%= (errors != null && errors.containsKey("address")) ? "is-invalid" : "" %>" 
+                           value="<%= request.getParameter("address") != null ? request.getParameter("address") : "" %>">
+                    <% if (errors != null && errors.containsKey("address")) { %>
+                        <div class="invalid-feedback"><%= errors.get("address") %></div>
+                    <% } %>
                 </div>
+
+                <!-- URL Ảnh -->
                 <div class="form-group">
-                    <label for="role">Vai Trò</label>
-                    <select id="role" name="role" class="form-control">
-                        <option value="Admin">Quản trị viên</option>
-                        <option value="Customer">Khách hàng</option>
-                        <option value="Staff">Nhân viên</option>
-                        <option value="Receptionist">Tiếp tân</option>
-                        <option value="Manager">Quản lý</option>
+                    <label>URL Ảnh Đại Diện</label>
+                    <input type="text" name="profilePictureURL" class="form-control <%= (errors != null && errors.containsKey("profilePictureURL")) ? "is-invalid" : "" %>" 
+                           placeholder="Nhập URL ảnh đại diện"
+                           value="<%= request.getParameter("profilePictureURL") != null ? request.getParameter("profilePictureURL") : "" %>">
+                    <% if (errors != null && errors.containsKey("profilePictureURL")) { %>
+                        <div class="invalid-feedback"><%= errors.get("profilePictureURL") %></div>
+                    <% } %>
+                </div>
+
+                <!-- Vai Trò -->
+                <div class="form-group">
+                    <label>Vai Trò</label>
+                    <select name="role" class="form-control <%= (errors != null && errors.containsKey("role")) ? "is-invalid" : "" %>">
+                        <option value="Admin" <%= "Admin".equals(request.getParameter("role")) ? "selected" : "" %>>Admin</option>
+                        <option value="Customer" <%= "Customer".equals(request.getParameter("role")) ? "selected" : "" %>>Customer</option>
+                        <option value="Staff" <%= "Staff".equals(request.getParameter("role")) ? "selected" : "" %>>Staff</option>
+                        <option value="Receptionist" <%= "Receptionist".equals(request.getParameter("role")) ? "selected" : "" %>>Receptionist</option>
+                        <option value="Manager" <%= "Manager".equals(request.getParameter("role")) ? "selected" : "" %>>Manager</option>
                     </select>
+                    <% if (errors != null && errors.containsKey("role")) { %>
+                        <div class="invalid-feedback"><%= errors.get("role") %></div>
+                    <% } %>
                 </div>
+
+                <!-- Trạng Thái -->
                 <div class="form-group">
-                    <label for="status">Trạng Thái</label>
-                    <select id="status" name="status" class="form-control">
-                        <option value="Active">Hoạt động</option>
-                        <option value="Inactive">Không hoạt động</option>
+                    <label>Trạng Thái</label>
+                    <select name="status" class="form-control <%= (errors != null && errors.containsKey("status")) ? "is-invalid" : "" %>">
+                        <option value="Active" <%= "Active".equals(request.getParameter("status")) ? "selected" : "" %>>Active</option>
+                        <option value="Inactive" <%= "Inactive".equals(request.getParameter("status")) ? "selected" : "" %>>Inactive</option>
                     </select>
+                    <% if (errors != null && errors.containsKey("status")) { %>
+                        <div class="invalid-feedback"><%= errors.get("status") %></div>
+                    <% } %>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Thêm Người Dùng</button>
             </form>
         </div>

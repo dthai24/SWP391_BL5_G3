@@ -22,8 +22,8 @@ public class UserDAO {
 
     // Add a new user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, passwordHash, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (username, passwordHash, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPasswordHash());
@@ -45,8 +45,8 @@ public class UserDAO {
 
     // Edit an existing user
     public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, passwordHash = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? " +
-                     "WHERE userID = ?";
+        String sql = "UPDATE Users SET username = ?, passwordHash = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? "
+                + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPasswordHash());
@@ -190,28 +190,58 @@ public class UserDAO {
         }
     }
 
+    public boolean isUsernameTaken(String username) {
+        String query = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, username);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Trả về true nếu username đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
+    }
+
+    public boolean isEmailTaken(String email) {
+        String query = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, email);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Trả về true nếu email đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
+    }
+
     // Helper method to map ResultSet to User object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
         return new User(
-            resultSet.getInt("userID"),
-            resultSet.getString("username"),
-            resultSet.getString("passwordHash"),
-            resultSet.getString("fullName"),
-            resultSet.getString("email"),
-            resultSet.getString("phoneNumber"),
-            resultSet.getString("address"),
-            resultSet.getString("role"),
-            resultSet.getString("profilePictureURL"),
-            resultSet.getString("status"),
-            resultSet.getDate("registrationDate"),
-            resultSet.getBoolean("isDeleted")
+                resultSet.getInt("userID"),
+                resultSet.getString("username"),
+                resultSet.getString("passwordHash"),
+                resultSet.getString("fullName"),
+                resultSet.getString("email"),
+                resultSet.getString("phoneNumber"),
+                resultSet.getString("address"),
+                resultSet.getString("role"),
+                resultSet.getString("profilePictureURL"),
+                resultSet.getString("status"),
+                resultSet.getDate("registrationDate"),
+                resultSet.getBoolean("isDeleted")
         );
     }
 
     // Main method to test new features
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
-        
+
         User newUser = new User();
         newUser.setUsername("testuser");
         newUser.setPasswordHash("hashedpassword123");

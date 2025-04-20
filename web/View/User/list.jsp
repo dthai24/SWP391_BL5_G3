@@ -30,7 +30,7 @@
                     <h3 class="mb-0">Danh Sách Người Dùng</h3>
                     <div>
                         <!-- Link đến add.jsp -->
-                        <a href="<%= request.getContextPath() %>/user?action=add" class="btn btn-light btn-sm">
+                        <a href="<%= request.getContextPath() %>/View/User/add.jsp" class="btn btn-light btn-sm">
                             <i class="fa fa-plus"></i> Thêm Người Dùng
                         </a>
                     </div>
