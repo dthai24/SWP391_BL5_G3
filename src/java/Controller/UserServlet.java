@@ -62,12 +62,46 @@ public class UserServlet extends HttpServlet {
     private void listUsers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            List<User> users = userDAO.listAllUsers();
+            // Nhận các tham số từ request
+            String keyword = request.getParameter("searchKeyword");
+            String role = request.getParameter("filterRole");
+            String sortBy = request.getParameter("sortField");
+            String sortDirection = request.getParameter("sortDir");
+            String pageParam = request.getParameter("page");
+            int page = (pageParam != null && pageParam.matches("\\d+")) ? Integer.parseInt(pageParam) : 1;
+            int pageSize = 5; // Số lượng người dùng mỗi trang
+
+            // Đếm tổng số người dùng
+            int totalUsers = userDAO.countUsers(keyword, role);
+            if (totalUsers == 0) {
+                request.setAttribute("error", "Không tìm thấy người dùng nào với điều kiện lọc hiện tại.");
+                request.getRequestDispatcher("View/Error.jsp").forward(request, response);
+                return;
+            }
+
+            // Tính tổng số trang
+            int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+            // Lấy danh sách người dùng
+            List<User> users = userDAO.searchAndListUsers(keyword, role, sortBy, sortDirection, page, pageSize);
+            if (users == null) {
+                throw new Exception("Danh sách người dùng trả về null.");
+            }
+
+            // Gửi dữ liệu đến JSP
             request.setAttribute("users", users);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("searchKeyword", keyword);
+            request.setAttribute("filterRole", role);
+            request.setAttribute("sortField", sortBy);
+            request.setAttribute("sortDir", sortDirection);
+
+            // Forward đến list.jsp
             request.getRequestDispatcher("View/User/list.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "An error occurred while listing users.");
+            request.setAttribute("error", "Lỗi xảy ra trong quá trình xử lý danh sách người dùng: " + e.getMessage());
             request.getRequestDispatcher("View/Error.jsp").forward(request, response);
         }
     }
@@ -330,11 +364,13 @@ public class UserServlet extends HttpServlet {
         }
 
         // Kiểm tra số điện thoại
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !Pattern.compile("^\\+?[0-9]{10,15}$").matcher(phoneNumber).matches()) {
-            errors.put("phoneNumber", "Số điện thoại không hợp lệ.");
-        }
-
-        // Kiểm tra địa chỉ
+        if (phoneNumber != null) { // Cho phép null
+            if (phoneNumber.trim().isEmpty()) {
+                errors.put("phoneNumber", "Số điện thoại không được để trống hoặc chỉ chứa khoảng trắng.");
+            } else if (!Pattern.compile("^[0-9]{10,11}$").matcher(phoneNumber).matches()) {
+                errors.put("phoneNumber", "Số điện thoại phải chứa 10 hoặc 11 chữ số.");
+            }
+        }        // Kiểm tra địa chỉ
         if (address != null && address.trim().isEmpty()) {
             errors.put("address", "Địa chỉ không được để trống nếu nhập.");
         }

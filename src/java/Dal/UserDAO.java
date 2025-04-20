@@ -108,48 +108,57 @@ public class UserDAO {
         return null;
     }
 
-    // Search, filter, and sort users
-    public List<User> searchUsers(String keyword, String role, String sortBy, String sortDirection) {
+    // Tìm kiếm, lọc, sắp xếp, và phân trang người dùng
+    public List<User> searchAndListUsers(String keyword, String role, String sortBy, String sortDirection, int page, int pageSize) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM Users WHERE isDeleted = 0";
 
-        // Add search criteria
+        // Thêm điều kiện tìm kiếm
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql += " AND (username LIKE ? OR fullName LIKE ? OR email LIKE ?)";
         }
 
-        // Add filter by role
+        // Thêm lọc theo vai trò
         if (role != null && !role.trim().isEmpty()) {
             sql += " AND role = ?";
         }
 
-        // Add sorting
+        // Thêm sắp xếp
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             sql += " ORDER BY " + sortBy;
 
-            // Add sorting direction
-            if (sortDirection != null && sortDirection.equalsIgnoreCase("desc")) {
+            if ("desc".equalsIgnoreCase(sortDirection)) {
                 sql += " DESC";
             } else {
                 sql += " ASC";
             }
+        } else {
+            sql += " ORDER BY userID ASC";
         }
+
+        // Phân trang
+        sql += " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             int paramIndex = 1;
 
-            // Set parameters for search criteria
+            // Gán tham số cho tìm kiếm
             if (keyword != null && !keyword.trim().isEmpty()) {
                 statement.setString(paramIndex++, "%" + keyword + "%");
                 statement.setString(paramIndex++, "%" + keyword + "%");
                 statement.setString(paramIndex++, "%" + keyword + "%");
             }
 
-            // Set parameter for role filter
+            // Gán tham số cho vai trò
             if (role != null && !role.trim().isEmpty()) {
                 statement.setString(paramIndex++, role);
             }
 
+            // Gán tham số cho phân trang
+            statement.setInt(paramIndex++, (page - 1) * pageSize);
+            statement.setInt(paramIndex++, pageSize);
+
+            System.out.println("Executing SQL: " + sql); // Log SQL query
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 users.add(mapResultSetToUser(resultSet));
@@ -160,21 +169,37 @@ public class UserDAO {
         return users;
     }
 
-    // Pagination: List users with pagination
-    public List<User> listUsersWithPagination(int page, int pageSize) {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM Users WHERE isDeleted = 0 ORDER BY userID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+    public int countUsers(String keyword, String role) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE isDeleted = 0";
+        List<Object> params = new ArrayList<>();
+
+        // Thêm điều kiện tìm kiếm
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += " AND (username LIKE ? OR fullName LIKE ? OR email LIKE ?)";
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+        }
+
+        // Thêm điều kiện lọc vai trò
+        if (role != null && !role.trim().isEmpty()) {
+            sql += " AND role = ?";
+            params.add(role);
+        }
+
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, (page - 1) * pageSize);
-            statement.setInt(2, pageSize);
+            for (int i = 0; i < params.size(); i++) {
+                statement.setObject(i + 1, params.get(i));
+            }
+
             ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                users.add(mapResultSetToUser(resultSet));
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return users;
+        return 0;
     }
 
     // Update profile picture URL for a user
@@ -241,36 +266,6 @@ public class UserDAO {
     // Main method to test new features
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
-
-        User newUser = new User();
-        newUser.setUsername("testuser");
-        newUser.setPasswordHash("hashedpassword123");
-        newUser.setFullName("Test User");
-        newUser.setEmail("testuser@example.com");
-        newUser.setPhoneNumber("0123456789");
-        newUser.setAddress("123 Test Street");
-        newUser.setRole("Customer");
-        newUser.setProfilePictureURL("https://example.com/profile.jpg");
-        newUser.setStatus("Active");
-        newUser.setRegistrationDate(Date.from(Instant.now()));
-        newUser.setIsDeleted(false);
-
-        // Gọi phương thức addUser để thêm người dùng
-        boolean isAdded = userDAO.addUser(newUser);
-
-        // Kiểm tra kết quả
-        if (isAdded) {
-            System.out.println("User was added successfully!");
-        } else {
-            System.out.println("Failed to add the user.");
-        }
-        // Testing pagination
-        System.out.println("=== Testing Pagination ===");
-        List<User> paginatedUsers = userDAO.listUsersWithPagination(1, 3);
-        for (User user : paginatedUsers) {
-            System.out.println(user);
-        }
-
         // Testing profile picture update
         System.out.println("\n=== Testing Profile Picture Update ===");
         boolean updated = userDAO.updateProfilePicture(5, "https://media.tenor.com/k_UsDt9xfWIAAAAM/i-will-eat-you-cat.gif");

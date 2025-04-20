@@ -9,12 +9,58 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Danh Sách Người Dùng</title>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <style>
+            /* Tăng hiệu ứng hover cho tiêu đề cột */
+            .sortable:hover {
+                text-decoration: underline;
+                cursor: pointer;
+            }
+
+            /* Căn chỉnh biểu tượng sort */
+            .sortable i {
+                margin-left: 5px;
+            }
+
+            /* Khoảng cách giữa các nút hành động */
+            .action-buttons a {
+                margin-right: 5px;
+            }
+        </style>
     </head>
     <body>
         <%
             List<User> users = (List<User>) request.getAttribute("users");
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); // Format for registration date
+            int currentPage = (int) request.getAttribute("currentPage");
+            int totalPages = (int) request.getAttribute("totalPages");
+            String sortField = (String) request.getAttribute("sortField");
+            String sortDir = (String) request.getAttribute("sortDir");
+            String filterRole = request.getParameter("filterRole");
+            String filterStatus = request.getParameter("filterStatus");
+            String searchKeyword = request.getParameter("searchKeyword");
+
+            // Chuyển đổi hướng sắp xếp mặc định cho lần nhấn tiếp theo
+            String nextSortDir = "asc".equals(sortDir) ? "desc" : "asc";
         %>
+
+        <%!
+            // Hàm hỗ trợ xây dựng URL động
+            String buildSortUrl(String field, String nextSortDir, String searchKeyword, String filterRole) {
+                StringBuilder url = new StringBuilder();
+                url.append("?action=list");
+                url.append("&sortField=").append(field);
+                url.append("&sortDir=").append(nextSortDir);
+                if (searchKeyword != null && !searchKeyword.isEmpty()) {
+                    url.append("&searchKeyword=").append(searchKeyword);
+                }
+                if (filterRole != null && !filterRole.isEmpty()) {
+                    url.append("&filterRole=").append(filterRole);
+                }
+                return url.toString();
+            }
+        %>
+
         <div class="container mt-5">
             <!-- Hiển thị thông báo nếu có -->
             <% String success = request.getParameter("success");
@@ -36,24 +82,110 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Bộ lọc và tìm kiếm -->
+                    <form method="get" action="<%= request.getContextPath() %>/user">
+                        <input type="hidden" name="action" value="list">
+                        <div class="row mb-3">
+                            <!-- Tìm kiếm -->
+                            <div class="col-md-4">
+                                <input type="text" name="searchKeyword" class="form-control" placeholder="Tìm kiếm tên hoặc email"
+                                       value="<%= searchKeyword != null ? searchKeyword : "" %>">
+                            </div>
+                            <!-- Lọc vai trò -->
+                            <div class="col-md-3">
+                                <select name="filterRole" class="form-control">
+                                    <option value="">Tất cả vai trò</option>
+                                    <option value="Admin" <%= "Admin".equals(filterRole) ? "selected" : "" %>>Admin</option>
+                                    <option value="Customer" <%= "Customer".equals(filterRole) ? "selected" : "" %>>Customer</option>
+                                    <option value="Staff" <%= "Staff".equals(filterRole) ? "selected" : "" %>>Staff</option>
+                                    <option value="Receptionist" <%= "Receptionist".equals(filterRole) ? "selected" : "" %>>Receptionist</option>
+                                    <option value="Manager" <%= "Manager".equals(filterRole) ? "selected" : "" %>>Manager</option>
+                                </select>
+                            </div>
+                            <!-- Lọc trạng thái -->
+                            <div class="col-md-3">
+                                <select name="filterStatus" class="form-control">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="Active" <%= "Active".equals(filterStatus) ? "selected" : "" %>>Hoạt động</option>
+                                    <option value="Inactive" <%= "Inactive".equals(filterStatus) ? "selected" : "" %>>Không hoạt động</option>
+                                </select>
+                            </div>
+                            <!-- Nút áp dụng và hủy -->
+                            <div class="col-md-2 d-flex">
+                                <button type="submit" class="btn btn-primary mr-2">Áp dụng</button>
+                                <a href="<%= request.getContextPath() %>/user?action=list" class="btn btn-secondary">Hủy</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Bảng danh sách người dùng -->
                     <table class="table table-hover table-bordered">
                         <thead>
                             <tr>
                                 <th>Avatar</th>
-                                <th>ID</th>
-                                <th>Tên Người Dùng</th>
-                                <th>Email</th>
+                                <th class="sortable">
+                                    <a href="<%= buildSortUrl("userID", nextSortDir, searchKeyword, filterRole) %>">
+                                        ID
+                                        <% if ("userID".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
+                                <th class="sortable">
+                                    <a href="<%= buildSortUrl("username", nextSortDir, searchKeyword, filterRole) %>">
+                                        Tên Người Dùng
+                                        <% if ("username".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
+                                <th class="sortable">
+                                    <a href="<%= buildSortUrl("email", nextSortDir, searchKeyword, filterRole) %>">
+                                        Email
+                                        <% if ("email".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
                                 <th>Số Điện Thoại</th>
-                                <th>Địa Chỉ</th>
-                                <th>Vai Trò</th>
-                                <th>Trạng Thái</th>
-                                <th>Ngày Đăng Ký</th>
+                                <th class="sortable">  
+                                    <a href="<%= buildSortUrl("address", nextSortDir, searchKeyword, filterRole) %>">
+                                        Địa chỉ
+                                        <% if ("address".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
+                                <th class="sortable">
+                                    <a href="<%= buildSortUrl("role", nextSortDir, searchKeyword, filterRole) %>">
+                                        Vai trò
+                                        <% if ("role".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
+                                <th class="sortable">
+                                    <a href="<%= buildSortUrl("status", nextSortDir, searchKeyword, filterRole) %>">
+                                        Trạng Thái
+                                        <% if ("status".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a href="<%= buildSortUrl("registrationDate", nextSortDir, searchKeyword, filterRole) %>">
+                                        Ngày Đăng Ký
+                                        <% if ("registrationDate".equals(sortField)) { %>
+                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
+                                        <% } %>
+                                    </a>
+                                </th>
                                 <th>Hành Động</th>
                             </tr>
                         </thead>
                         <tbody>
                             <% if (users != null && !users.isEmpty()) {
-                        for (User user : users) { %>
+                for (User user : users) { %>
                             <tr>
                                 <td>
                                     <img src="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://via.placeholder.com/50" %>" 
@@ -73,16 +205,13 @@
                                     <% } %>
                                 </td>
                                 <td><%= user.getRegistrationDate() != null ? dateFormat.format(user.getRegistrationDate()) : "N/A" %></td>
-                                <td>
-                                    <!-- Link đến detail.jsp -->
+                                <td class="action-buttons">
                                     <a href="<%= request.getContextPath() %>/user?action=detail&userID=<%= user.getUserID() %>" class="btn btn-info btn-sm">
                                         Chi Tiết
                                     </a>
-                                    <!-- Link đến edit.jsp -->
                                     <a href="<%= request.getContextPath() %>/user?action=edit&userID=<%= user.getUserID() %>" class="btn btn-warning btn-sm">
                                         <i class="fa fa-pencil-alt"></i> Sửa
                                     </a>
-                                    <!-- Xóa người dùng -->
                                     <a href="<%= request.getContextPath() %>/user?action=delete&userID=<%= user.getUserID() %>" 
                                        class="btn btn-danger btn-sm" 
                                        onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">
@@ -91,13 +220,26 @@
                                 </td>
                             </tr>
                             <% }
-                    } else { %>
+            } else { %>
                             <tr>
-                                <td colspan="10" class="text-center">Không có người dùng nào.</td>
+                                <td colspan="9" class="text-center">Không có người dùng nào.</td>
                             </tr>
                             <% } %>
                         </tbody>
                     </table>
+
+                    <!-- Phân trang -->
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            <% for (int i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= i == currentPage ? "active" : "" %>">
+                                <a class="page-link" href="?action=list&page=<%= i %><%= sortField != null ? "&sortField=" + sortField : "" %><%= sortDir != null ? "&sortDir=" + sortDir : "" %><%= filterRole != null ? "&filterRole=" + filterRole : "" %><%= filterStatus != null ? "&filterStatus=" + filterStatus : "" %><%= searchKeyword != null ? "&searchKeyword=" + searchKeyword : "" %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                            <% } %>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
