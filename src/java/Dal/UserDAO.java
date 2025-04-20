@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import Model.User;
 import DBContext.DBContext;
+import java.time.Instant;
 
 public class UserDAO {
 
@@ -210,7 +211,29 @@ public class UserDAO {
     // Main method to test new features
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
+        
+        User newUser = new User();
+        newUser.setUsername("testuser");
+        newUser.setPasswordHash("hashedpassword123");
+        newUser.setFullName("Test User");
+        newUser.setEmail("testuser@example.com");
+        newUser.setPhoneNumber("0123456789");
+        newUser.setAddress("123 Test Street");
+        newUser.setRole("Customer");
+        newUser.setProfilePictureURL("https://example.com/profile.jpg");
+        newUser.setStatus("Active");
+        newUser.setRegistrationDate(Date.from(Instant.now()));
+        newUser.setIsDeleted(false);
 
+        // Gọi phương thức addUser để thêm người dùng
+        boolean isAdded = userDAO.addUser(newUser);
+
+        // Kiểm tra kết quả
+        if (isAdded) {
+            System.out.println("User was added successfully!");
+        } else {
+            System.out.println("Failed to add the user.");
+        }
         // Testing pagination
         System.out.println("=== Testing Pagination ===");
         List<User> paginatedUsers = userDAO.listUsersWithPagination(1, 3);

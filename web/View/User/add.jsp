@@ -32,6 +32,10 @@
                     <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tên người dùng" required>
                 </div>
                 <div class="form-group">
+                    <label for="password">Mật Khẩu</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                </div>
+                <div class="form-group">
                     <label for="fullName">Họ Tên</label>
                     <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Nhập họ và tên" required>
                 </div>
