@@ -1,6 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Model.Room" %>
 <%@ page import="Dal.RoomDAO" %>
+<%@ page import="java.util.Map" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -101,6 +102,22 @@
                         <td><%= room.getCreatedAt() %></td>
                         <td><%= room.getUpdatedAt() %></td>
                         <td>
+                            <button type="button" class="btn btn-link p-0 view-btn" 
+                                data-roomid="<%= room.getRoomID() %>"
+                                data-roomnumber="<%= room.getRoomNumber() %>"
+                                data-categoryid="<%= room.getCategoryID() %>"
+                                data-vacancystatus="<%= room.getVacancyStatus() %>"
+                                data-description="<%= room.getDescription() %>"
+                                data-priceoverride="<%= room.getPriceOverride() %>"
+                                data-createdat="<%= room.getCreatedAt() %>"
+                                data-updatedat="<%= room.getUpdatedAt() %>"
+                                data-categoryname="<%= ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()) != null ? ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()).getCategoryName() : "" %>"
+                                data-categorydesc="<%= ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()) != null ? ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()).getDescription() : "" %>"
+                                data-categorybaseprice="<%= ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()) != null ? ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()).getBasePricePerNight() : "" %>"
+                                data-toggle="modal" data-target="#viewRoomModal"
+                                title="Xem chi tiết">
+                                <i class="fa fa-eye" style="color: #17a2b8; font-size: 1.2rem;"></i>
+                            </button>
                             <button type="button" class="btn btn-link p-0 edit-btn"
                                 data-roomid="<%= room.getRoomID() %>"
                                 data-roomnumber="<%= room.getRoomNumber() %>"
@@ -174,6 +191,40 @@
         </div>
       </div>
     </div>
+    <!-- Modal for View Room -->
+    <div class="modal fade" id="viewRoomModal" tabindex="-1" role="dialog" aria-labelledby="viewRoomModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewRoomModalLabel">Chi tiết phòng</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h6>Thông tin phòng</h6>
+            <ul class="list-group mb-3">
+              <li class="list-group-item"><b>Số phòng:</b> <span id="view-roomNumber"></span></li>
+              <li class="list-group-item"><b>Trạng thái:</b> <span id="view-vacancyStatus"></span></li>
+              <li class="list-group-item"><b>Mô tả:</b> <span id="view-description"></span></li>
+              <li class="list-group-item"><b>Giá phòng:</b> <span id="view-priceOverride"></span></li>
+              <li class="list-group-item"><b>Ngày tạo:</b> <span id="view-createdAt"></span></li>
+              <li class="list-group-item"><b>Ngày sửa:</b> <span id="view-updatedAt"></span></li>
+            </ul>
+            <h6>Thông tin loại phòng </h6>
+            <ul class="list-group">
+              <li class="list-group-item"><b>CategoryID:</b> <span id="view-categoryID"></span></li>
+              <li class="list-group-item"><b>Tên loại phòng:</b> <span id="view-categoryName"></span></li>
+              <li class="list-group-item"><b>Mô tả loại phòng:</b> <span id="view-categoryDesc"></span></li>
+              <li class="list-group-item"><b>Giá gốc/đêm:</b> <span id="view-categoryBasePrice"></span></li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
@@ -187,6 +238,19 @@
             $('#edit-vacancyStatus').val($(this).data('vacancystatus'));
             $('#edit-description').val($(this).data('description'));
             $('#edit-priceOverride').val($(this).data('priceoverride'));
+        });
+
+        $('.view-btn').click(function(){
+            $('#view-roomNumber').text($(this).data('roomnumber'));
+            $('#view-vacancyStatus').text($(this).data('vacancystatus'));
+            $('#view-description').text($(this).data('description'));
+            $('#view-priceOverride').text($(this).data('priceoverride'));
+            $('#view-createdAt').text($(this).data('createdat'));
+            $('#view-updatedAt').text($(this).data('updatedat'));
+            $('#view-categoryID').text($(this).data('categoryid'));
+            $('#view-categoryName').text($(this).data('categoryname'));
+            $('#view-categoryDesc').text($(this).data('categorydesc'));
+            $('#view-categoryBasePrice').text($(this).data('categorybaseprice'));
         });
 
         $('#room-datatable').DataTable({
