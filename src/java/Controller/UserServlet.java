@@ -73,14 +73,23 @@ public class UserServlet extends HttpServlet {
 
             // Đếm tổng số người dùng
             int totalUsers = userDAO.countUsers(keyword, role);
-            if (totalUsers == 0) {
-                request.setAttribute("error", "Không tìm thấy người dùng nào với điều kiện lọc hiện tại.");
-                request.getRequestDispatcher("View/Error.jsp").forward(request, response);
-                return;
-            }
 
             // Tính tổng số trang
             int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+            // Kiểm tra nếu không có người dùng nào
+            if (totalUsers == 0) {
+                request.setAttribute("users", null); // Không có người dùng
+                request.setAttribute("currentPage", 1);
+                request.setAttribute("totalPages", 0);
+                request.setAttribute("searchKeyword", keyword);
+                request.setAttribute("filterRole", role);
+                request.setAttribute("sortField", sortBy);
+                request.setAttribute("sortDir", sortDirection);
+                request.setAttribute("error", "Không tìm thấy người dùng nào với điều kiện lọc hiện tại.");
+                request.getRequestDispatcher("View/User/list.jsp").forward(request, response);
+                return;
+            }
 
             // Lấy danh sách người dùng
             List<User> users = userDAO.searchAndListUsers(keyword, role, sortBy, sortDirection, page, pageSize);
@@ -105,7 +114,6 @@ public class UserServlet extends HttpServlet {
             request.getRequestDispatcher("View/Error.jsp").forward(request, response);
         }
     }
-
     private void getUserAdd(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
