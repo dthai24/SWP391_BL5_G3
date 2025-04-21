@@ -3,3 +3,4 @@
 /dist/
 /src/java/DBContext
 src/java/DBContext/DBContext.java
+nbproject/project.properties

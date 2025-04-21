@@ -325,6 +325,10 @@ public class UserDAO {
         );
     }
 
+    public List<User> searchUsers(String searchTerm, String role, String sortBy, String sortDirection) {
+        return searchAndListUsers(searchTerm, role, sortBy, sortDirection, 1, Integer.MAX_VALUE);
+    }
+
     // Main method to test new features
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
