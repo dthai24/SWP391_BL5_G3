@@ -12,9 +12,10 @@ public class UserDAO {
     private Connection connection;
 
     // Constructor to initialize the connection using DBContext
-    public UserDAO() {
+   public UserDAO() {
         try {
-            this.connection = new DBContext().getConnection();
+            DBContext db = new DBContext();
+            connection = db.getConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -41,6 +42,67 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+ public User login(String username, String password) {
+        String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                    rs.getInt("UserID"),
+                    rs.getString("Username"),
+                    rs.getString("Password"),
+                    rs.getString("FullName"),
+                    rs.getString("Email"),
+                    rs.getString("PhoneNumber"),
+                    rs.getString("Address"),
+                    rs.getString("Role"),
+                    rs.getString("ProfilePictureURL"),
+                    rs.getString("Status"),
+                    rs.getDate("RegistrationDate"),
+                    rs.getBoolean("IsDeleted")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+ public boolean checkExist(String username, String email) {
+        String sql = "SELECT 1 FROM Users WHERE Username = ? OR Email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, email);
+            return ps.executeQuery().next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+  public boolean register(User user) {
+        String sql = "INSERT INTO Users (Username, Password, FullName, Email, PhoneNumber, Address, Role, ProfilePictureURL, Status, RegistrationDate, IsDeleted) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPasswordHash());
+            statement.setString(3, user.getFullName());
+            statement.setString(4, user.getEmail());
+            statement.setString(5, user.getPhoneNumber());
+            statement.setString(6, user.getAddress());
+            statement.setString(7, user.getRole());
+            statement.setString(8, user.getProfilePictureURL());
+            statement.setString(9, user.getStatus());
+            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
+            statement.setBoolean(11, user.getIsDeleted());
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     // Edit an existing user

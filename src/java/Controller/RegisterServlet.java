@@ -1,6 +1,8 @@
 package Controller;
 
 import DBContext.DBContext;
+import Dal.UserDAO;
+import Model.User;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,26 +16,41 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String username = request.getParameter("username");
-        String password = request.getParameter("password"); // Sử dụng mật khẩu thường
+        String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
-        String role = "Customer"; // Vai trò mặc định
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
 
-        try (Connection conn = new DBContext().getConnection()) {
-            String sql = "INSERT INTO Users (Username, Password, FullName, Email, Role, Status, IsDeleted) VALUES (?, ?, ?, ?, ?, 'Active', 0)";
-            PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, username);
-            statement.setString(2, password); // Lưu mật khẩu thường
-            statement.setString(3, fullName);
-            statement.setString(4, email);
-            statement.setString(5, role);
-            statement.executeUpdate();
-            response.sendRedirect("login.jsp"); // Chuyển hướng đến trang đăng nhập
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("register.jsp?error=Đăng ký thất bại");
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPasswordHash(password);
+        newUser.setFullName(fullName);
+        newUser.setEmail(email);
+        newUser.setPhoneNumber(phone);
+        newUser.setAddress(address);
+        newUser.setRole("Customer");
+        newUser.setProfilePictureURL(null);
+        newUser.setStatus("Active");
+        newUser.setRegistrationDate(new java.util.Date());
+        newUser.setIsDeleted(false);
+
+        UserDAO dao = new UserDAO();
+        if (dao.checkExist(username, email)) {
+            request.setAttribute("error", "Username hoặc email đã tồn tại.");
+            request.getRequestDispatcher("register.jsp").forward(request, response);
+            return;
+        }
+
+        if (dao.register(newUser)) {
+            response.sendRedirect("login.jsp");
+        } else {
+            request.setAttribute("error", "Đăng ký thất bại.");
+            request.getRequestDispatcher("register.jsp").forward(request, response);
         }
     }
 }
