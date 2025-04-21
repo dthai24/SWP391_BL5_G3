@@ -112,6 +112,12 @@
                                 title="Edit">
                                 <i class="fa fa-edit" style="color: #ffc107; font-size: 1.2rem;"></i>
                             </button>
+                            <form method="post" action="room" class="d-inline delete-room-form" style="display:inline;">
+                                <input type="hidden" name="deleteRoomID" value="<%= room.getRoomID() %>" />
+                                <button type="submit" class="btn btn-link p-0 delete-btn" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa phòng này?');">
+                                    <i class="fa fa-trash" style="color: #dc3545; font-size: 1.2rem;"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     <%  } 

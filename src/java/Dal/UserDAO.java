@@ -23,11 +23,11 @@ public class UserDAO {
 
     // Add a new user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, passwordHash, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) "
+        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -88,7 +88,7 @@ public class UserDAO {
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -107,11 +107,11 @@ public class UserDAO {
 
     // Edit an existing user
     public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, passwordHash = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? "
+        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? "
                 + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -312,7 +312,7 @@ public class UserDAO {
         return new User(
                 resultSet.getInt("userID"),
                 resultSet.getString("username"),
-                resultSet.getString("passwordHash"),
+                resultSet.getString("password"),
                 resultSet.getString("fullName"),
                 resultSet.getString("email"),
                 resultSet.getString("phoneNumber"),

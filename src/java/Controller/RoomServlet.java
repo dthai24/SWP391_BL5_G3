@@ -39,6 +39,17 @@ public class RoomServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         RoomDAO roomDAO = new RoomDAO();
+        String deleteRoomIdParam = request.getParameter("deleteRoomID");
+        if (deleteRoomIdParam != null && !deleteRoomIdParam.isEmpty()) {
+            try {
+                int deleteRoomId = Integer.parseInt(deleteRoomIdParam);
+                roomDAO.deleteRoom(deleteRoomId);
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+            response.sendRedirect("room");
+            return;
+        }
         String roomIdParam = request.getParameter("roomID");
         String roomNumber = request.getParameter("roomNumber");
         String categoryID = request.getParameter("categoryID");
