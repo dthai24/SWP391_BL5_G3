@@ -103,13 +103,13 @@
                                 </select>
                             </div>
                             <!-- Lọc trạng thái -->
-                            <div class="col-md-3">
+<!--                            <div class="col-md-3">
                                 <select name="filterStatus" class="form-control">
                                     <option value="">Tất cả trạng thái</option>
                                     <option value="Active" <%= "Active".equals(filterStatus) ? "selected" : "" %>>Hoạt động</option>
                                     <option value="Inactive" <%= "Inactive".equals(filterStatus) ? "selected" : "" %>>Không hoạt động</option>
                                 </select>
-                            </div>
+                            </div>-->
                             <!-- Nút áp dụng và hủy -->
                             <div class="col-md-2 d-flex">
                                 <button type="submit" class="btn btn-primary mr-2">Áp dụng</button>
