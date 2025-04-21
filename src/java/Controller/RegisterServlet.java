@@ -28,7 +28,7 @@ public class RegisterServlet extends HttpServlet {
 
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPasswordHash(password);
+        newUser.setPassword(password);
         newUser.setFullName(fullName);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phone);

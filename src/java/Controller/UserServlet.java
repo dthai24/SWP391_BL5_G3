@@ -144,13 +144,10 @@ public class UserServlet extends HttpServlet {
                 return;
             }
 
-            // Băm mật khẩu trước khi lưu
-            String hashedPassword = hashPassword(password);
-
             // Tạo đối tượng User
             User user = new User();
             user.setUsername(username);
-            user.setPasswordHash(hashedPassword); // Lưu mật khẩu băm
+            user.setPassword(password);
             user.setFullName(fullName);
             user.setEmail(email);
             user.setPhoneNumber(phoneNumber);
@@ -177,22 +174,6 @@ public class UserServlet extends HttpServlet {
             request.setAttribute("error", "An unexpected error occurred: " + e.getMessage());
             request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
         }
-    }
-// Hàm băm mật khẩu
-
-// Hàm băm mật khẩu
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hash = md.digest(password.getBytes());
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 
     private void getUserEdit(HttpServletRequest request, HttpServletResponse response)
