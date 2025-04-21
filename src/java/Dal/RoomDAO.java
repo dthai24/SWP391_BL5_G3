@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import Model.Room;
 import DBContext.DBContext;
+import java.math.BigDecimal;
 
 public class RoomDAO {
 
@@ -160,6 +161,20 @@ public class RoomDAO {
             resultSet.getBoolean("isDeleted")
         );
     }
+    
+    public BigDecimal getRoomCategoryBasePrice(int categoryID) {
+    String sql = "SELECT BasePricePerNight FROM RoomCategories WHERE CategoryID = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, categoryID);
+        ResultSet rs = statement.executeQuery();
+        if (rs.next()) {
+            return rs.getBigDecimal("BasePricePerNight");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return BigDecimal.ZERO; 
+}
 
     // Main method to test listAllRooms and getRoomById
     public static void main(String[] args) {
