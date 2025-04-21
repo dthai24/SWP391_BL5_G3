@@ -13,6 +13,17 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
+    <style>
+        .room-status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .status-vacant { background-color: #28A745; color: #fff; }
+        .status-occupied { background-color: #DC3545; color: #fff; }
+        .info-label { font-weight: 600; }
+    </style>
 </head>
 <body>
     <%
@@ -235,39 +246,75 @@
     </div>
     <!-- Modal for View Room -->
     <div class="modal fade" id="viewRoomModal" tabindex="-1" role="dialog" aria-labelledby="viewRoomModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="viewRoomModalLabel">Chi tiết phòng</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-md-6">
-                <h6>Thông tin phòng</h6>
-                <ul class="list-group mb-3">
-                  <li class="list-group-item"><b>Số phòng:</b> <span id="view-roomNumber"></span></li>
-                  <li class="list-group-item"><b>Trạng thái:</b> <span id="view-vacancyStatus"></span></li>
-                  <li class="list-group-item"><b>Mô tả:</b> <span id="view-description"></span></li>
-                  <li class="list-group-item"><b>Giá phòng:</b> <span id="view-priceOverride"></span></li>
-                  <li class="list-group-item"><b>Ngày tạo:</b> <span id="view-createdAt"></span></li>
-                  <li class="list-group-item"><b>Ngày sửa:</b> <span id="view-updatedAt"></span></li>
-                </ul>
-              </div>
-              <div class="col-md-6">
-                <h6>Thông tin loại phòng</h6>
-                <ul class="list-group mb-3">
-                  <li class="list-group-item"><b>Tên loại phòng:</b> <span id="view-categoryName"></span></li>
-                  <li class="list-group-item"><b>Mô tả loại phòng:</b> <span id="view-categoryDesc"></span></li>
-                  <li class="list-group-item"><b>Giá gốc/đêm:</b> <span id="view-categoryBasePrice"></span></li>
-                </ul>
+          <div class="card shadow-sm m-0">
+            <div class="card-header thead-dark text-white d-flex justify-content-between align-items-center" style="background: #343a40;">
+              <h5 class="mb-0">Phòng <span id="view-roomNumber"></span></h5>
+              <button type="button" class="btn btn-sm btn-light" data-dismiss="modal">
+                <span style="font-weight:bold; color:#222;">X</span> Đóng
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="row g-4">
+                <!-- Left Column: Room Info -->
+                <div class="col-md-6">
+                  <div class="card mb-3">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">Thông tin phòng</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Số phòng:</div>
+                        <div class="col-md-7"><span id="view-roomNumber-info"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Trạng thái:</div>
+                        <div class="col-md-7"><span id="view-vacancyStatus-info"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Mô tả:</div>
+                        <div class="col-md-7"><span id="view-description"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Giá phòng:</div>
+                        <div class="col-md-7"><span id="view-priceOverride"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Ngày tạo:</div>
+                        <div class="col-md-7"><span id="view-createdAt"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Ngày sửa:</div>
+                        <div class="col-md-7"><span id="view-updatedAt"></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Right Column: Room Category Info -->
+                <div class="col-md-6">
+                  <div class="card mb-3">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">Thông tin loại phòng</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Tên loại phòng:</div>
+                        <div class="col-md-7"><span id="view-categoryName"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Mô tả loại phòng:</div>
+                        <div class="col-md-7"><span id="view-categoryDesc"></span></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-5 info-label">Giá gốc/đêm:</div>
+                        <div class="col-md-7"><span id="view-categoryBasePrice"></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
           </div>
         </div>
       </div>
@@ -355,7 +402,11 @@
 
         $('.view-btn').click(function(){
             $('#view-roomNumber').text($(this).data('roomnumber'));
-            $('#view-vacancyStatus').text($(this).data('vacancystatus'));
+            $('#view-roomNumber-info').text($(this).data('roomnumber'));
+            var status = $(this).data('vacancystatus');
+            var statusHtml = '<span class="room-status status-' + status.toLowerCase() + '">' + status + '</span>';
+            $('#view-vacancyStatus').text(status);
+            $('#view-vacancyStatus-info').html(statusHtml);
             $('#view-description').text($(this).data('description'));
             $('#view-priceOverride').text($(this).data('priceoverride'));
             $('#view-createdAt').text($(this).data('createdat'));
