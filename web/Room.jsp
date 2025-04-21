@@ -17,6 +17,7 @@
 <body>
     <%
         List<Room> rooms = (List<Room>)request.getAttribute("rooms");
+        Map<Integer, Model.RoomCategory> catMap = (Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap");
     %>
     <!-- Modal for Add Room -->
     <div class="modal fade" id="addRoomModal" tabindex="-1" role="dialog" aria-labelledby="addRoomModalLabel" aria-hidden="true">
@@ -35,8 +36,14 @@
                 <input type="text" name="roomNumber" class="form-control" required />
               </div>
               <div class="form-group">
-                <label>Loại phòng (CategoryID)</label>
-                <input type="number" name="categoryID" class="form-control" required />
+                <label>Loại phòng</label>
+                <select name="categoryID" class="form-control" required>
+                  <% if (catMap != null) {
+                       for (Model.RoomCategory cat : catMap.values()) { %>
+                         <option value="<%= cat.getCategoryID() %>"><%= cat.getCategoryName() %></option>
+                  <%   }
+                     } %>
+                </select>
               </div>
               <div class="form-group">
                 <label>Trạng thái</label>
@@ -66,14 +73,41 @@
       <div style="background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 6px 24px rgba(0,0,0,0.13);">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 style="font-weight: 700; color: #2d2d2d; letter-spacing: 1px; margin-bottom: 0;">Danh Sách Phòng</h2>
-          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addRoomModal">Thêm phòng mới</button>
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addRoomModal">
+            <i class="fa fa-plus"></i> Thêm Phòng Mới
+          </button>
         </div>
+        <!-- Filter form -->
+        <form method="get" action="room" class="form-inline mb-3" id="room-filter-form">
+          <div class="form-group mr-2">
+            <label for="filterCategory" class="mr-2">Loại phòng</label>
+            <select name="filterCategory" id="filterCategory" class="form-control">
+              <option value="">Tất cả</option>
+              <% if (catMap != null) {
+                   for (Model.RoomCategory cat : catMap.values()) { %>
+                     <option value="<%= cat.getCategoryID() %>" <%= request.getParameter("filterCategory") != null && request.getParameter("filterCategory").equals(String.valueOf(cat.getCategoryID())) ? "selected" : "" %>><%= cat.getCategoryName() %></option>
+              <%   }
+                 } %>
+            </select>
+          </div>
+          <div class="form-group mr-2">
+            <label for="filterStatus" class="mr-2">Trạng thái</label>
+            <select name="filterStatus" id="filterStatus" class="form-control">
+              <option value="">Tất cả</option>
+              <option value="Vacant" <%= "Vacant".equals(request.getParameter("filterStatus")) ? "selected" : "" %>>Vacant</option>
+              <option value="Occupied" <%= "Occupied".equals(request.getParameter("filterStatus")) ? "selected" : "" %>>Occupied</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+          <a href="room" class="btn btn-secondary">Hủy</a>
+        </form>
+        <!-- End filter form -->
         <div class="table-responsive mb-0" style="overflow-x:unset;">
             <table id="room-datatable" class="table table-hover table-striped align-middle mb-0" style="background: #fff; border-radius: 10px; overflow: visible; table-layout: auto; width: 100%;">
                 <thead class="thead-dark" style="background: #343a40; color: #fff;">
                     <tr>
                         <th style="min-width:110px; white-space:nowrap;">Số phòng</th>
-                        <th style="min-width:120px; white-space:nowrap;">Loại phòng (ID)</th>
+                        <th style="min-width:120px; white-space:nowrap;">Loại phòng</th>
                         <th style="min-width:120px; white-space:nowrap;">Trạng thái</th>
                         <th style="min-width:150px; white-space:nowrap;">Mô tả</th>
                         <th style="min-width:120px; white-space:nowrap;">Giá phòng</th>
@@ -87,7 +121,9 @@
                         for(Room room : rooms) { %>
                     <tr>
                         <td style="font-weight: 600; color: #007bff;"><%= room.getRoomNumber() %></td>
-                        <td><%= room.getCategoryID() %></td>
+                        <td>
+                            <%= catMap.get(room.getCategoryID()) != null ? catMap.get(room.getCategoryID()).getCategoryName() : "" %>
+                        </td>
                         <td>
                             <% if ("Vacant".equals(room.getVacancyStatus())) { %>
                                 <span class="badge badge-success">Vacant</span>
@@ -111,9 +147,9 @@
                                 data-priceoverride="<%= room.getPriceOverride() %>"
                                 data-createdat="<%= room.getCreatedAt() %>"
                                 data-updatedat="<%= room.getUpdatedAt() %>"
-                                data-categoryname="<%= ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()) != null ? ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()).getCategoryName() : "" %>"
-                                data-categorydesc="<%= ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()) != null ? ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()).getDescription() : "" %>"
-                                data-categorybaseprice="<%= ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()) != null ? ((Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap")).get(room.getCategoryID()).getBasePricePerNight() : "" %>"
+                                data-categoryname="<%= catMap.get(room.getCategoryID()) != null ? catMap.get(room.getCategoryID()).getCategoryName() : "" %>"
+                                data-categorydesc="<%= catMap.get(room.getCategoryID()) != null ? catMap.get(room.getCategoryID()).getDescription() : "" %>"
+                                data-categorybaseprice="<%= catMap.get(room.getCategoryID()) != null ? catMap.get(room.getCategoryID()).getBasePricePerNight() : "" %>"
                                 data-toggle="modal" data-target="#viewRoomModal"
                                 title="Xem chi tiết">
                                 <i class="fa fa-eye" style="color: #17a2b8; font-size: 1.2rem;"></i>
@@ -164,8 +200,14 @@
                 <input type="text" name="roomNumber" id="edit-roomNumber" class="form-control" required />
               </div>
               <div class="form-group">
-                <label>Loại phòng (CategoryID)</label>
-                <input type="number" name="categoryID" id="edit-categoryID" class="form-control" required />
+                <label>Loại phòng</label>
+                <select name="categoryID" id="edit-categoryID" class="form-control" required>
+                  <% if (catMap != null) {
+                       for (Model.RoomCategory cat : catMap.values()) { %>
+                         <option value="<%= cat.getCategoryID() %>"><%= cat.getCategoryName() %></option>
+                  <%   }
+                     } %>
+                </select>
               </div>
               <div class="form-group">
                 <label>Trạng thái</label>
@@ -202,22 +244,27 @@
             </button>
           </div>
           <div class="modal-body">
-            <h6>Thông tin phòng</h6>
-            <ul class="list-group mb-3">
-              <li class="list-group-item"><b>Số phòng:</b> <span id="view-roomNumber"></span></li>
-              <li class="list-group-item"><b>Trạng thái:</b> <span id="view-vacancyStatus"></span></li>
-              <li class="list-group-item"><b>Mô tả:</b> <span id="view-description"></span></li>
-              <li class="list-group-item"><b>Giá phòng:</b> <span id="view-priceOverride"></span></li>
-              <li class="list-group-item"><b>Ngày tạo:</b> <span id="view-createdAt"></span></li>
-              <li class="list-group-item"><b>Ngày sửa:</b> <span id="view-updatedAt"></span></li>
-            </ul>
-            <h6>Thông tin loại phòng </h6>
-            <ul class="list-group">
-              <li class="list-group-item"><b>CategoryID:</b> <span id="view-categoryID"></span></li>
-              <li class="list-group-item"><b>Tên loại phòng:</b> <span id="view-categoryName"></span></li>
-              <li class="list-group-item"><b>Mô tả loại phòng:</b> <span id="view-categoryDesc"></span></li>
-              <li class="list-group-item"><b>Giá gốc/đêm:</b> <span id="view-categoryBasePrice"></span></li>
-            </ul>
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Thông tin phòng</h6>
+                <ul class="list-group mb-3">
+                  <li class="list-group-item"><b>Số phòng:</b> <span id="view-roomNumber"></span></li>
+                  <li class="list-group-item"><b>Trạng thái:</b> <span id="view-vacancyStatus"></span></li>
+                  <li class="list-group-item"><b>Mô tả:</b> <span id="view-description"></span></li>
+                  <li class="list-group-item"><b>Giá phòng:</b> <span id="view-priceOverride"></span></li>
+                  <li class="list-group-item"><b>Ngày tạo:</b> <span id="view-createdAt"></span></li>
+                  <li class="list-group-item"><b>Ngày sửa:</b> <span id="view-updatedAt"></span></li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6>Thông tin loại phòng</h6>
+                <ul class="list-group mb-3">
+                  <li class="list-group-item"><b>Tên loại phòng:</b> <span id="view-categoryName"></span></li>
+                  <li class="list-group-item"><b>Mô tả loại phòng:</b> <span id="view-categoryDesc"></span></li>
+                  <li class="list-group-item"><b>Giá gốc/đêm:</b> <span id="view-categoryBasePrice"></span></li>
+                </ul>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -231,9 +278,75 @@
     <script src="js/bootstrap.min.js"></script>
     <script>
     $(document).ready(function(){
+        // Validate RoomNumber chỉ chứa số, không khoảng trắng, không trùng nhau, không để trống
+        var existingRoomNumbers = [];
+        $("#room-datatable tbody tr").each(function() {
+            var roomNumber = $(this).find("td").eq(0).text().trim();
+            if(roomNumber) existingRoomNumbers.push(roomNumber);
+        });
+        // Thêm phòng
+        $("#addRoomModal form").on("submit", function(e) {
+            var roomNumber = $(this).find('[name="roomNumber"]').val();
+            if (!roomNumber || roomNumber.trim() === "") {
+                alert("Số phòng không được để trống.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            if (/\s/.test(roomNumber)) {
+                alert("Số phòng không được chứa khoảng trắng.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            if (!/^\d+$/.test(roomNumber)) {
+                alert("Số phòng chỉ được chứa các số.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            if (existingRoomNumbers.includes(roomNumber)) {
+                alert("Số phòng đã tồn tại.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+        });
+        // Sửa phòng
+        $("#editRoomModal form").on("submit", function(e) {
+            var roomNumber = $(this).find('[name="roomNumber"]').val();
+            var oldRoomNumber = $('#edit-roomNumber').data('old');
+            if (!roomNumber || roomNumber.trim() === "") {
+                alert("Số phòng không được để trống.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            if (/\s/.test(roomNumber)) {
+                alert("Số phòng không được chứa khoảng trắng.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            if (!/^\d+$/.test(roomNumber)) {
+                alert("Số phòng chỉ được chứa các số.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+            // Nếu đổi số phòng, kiểm tra trùng
+            if (roomNumber !== oldRoomNumber && existingRoomNumbers.includes(roomNumber)) {
+                alert("Số phòng đã tồn tại.");
+                $(this).find('[name="roomNumber"]').focus();
+                e.preventDefault();
+                return false;
+            }
+        });
+        // Khi mở modal sửa, lưu số phòng cũ vào data-old
         $('.edit-btn').click(function(){
             $('#edit-roomID').val($(this).data('roomid'));
             $('#edit-roomNumber').val($(this).data('roomnumber'));
+            $('#edit-roomNumber').data('old', $(this).data('roomnumber'));
             $('#edit-categoryID').val($(this).data('categoryid'));
             $('#edit-vacancyStatus').val($(this).data('vacancystatus'));
             $('#edit-description').val($(this).data('description'));
@@ -247,7 +360,6 @@
             $('#view-priceOverride').text($(this).data('priceoverride'));
             $('#view-createdAt').text($(this).data('createdat'));
             $('#view-updatedAt').text($(this).data('updatedat'));
-            $('#view-categoryID').text($(this).data('categoryid'));
             $('#view-categoryName').text($(this).data('categoryname'));
             $('#view-categoryDesc').text($(this).data('categorydesc'));
             $('#view-categoryBasePrice').text($(this).data('categorybaseprice'));
@@ -263,28 +375,6 @@
             ],
             language: {
                 url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
-            }
-        });
-
-        // Validate RoomNumber chỉ chứa số và không trùng nhau 
-        var existingRoomNumbers = [];
-        $("#room-datatable tbody tr").each(function() {
-            var roomNumber = $(this).find("td").eq(0).text().trim();
-            if(roomNumber) existingRoomNumbers.push(roomNumber);
-        });
-        $("#addRoomModal form").on("submit", function(e) {
-            var roomNumber = $(this).find('[name="roomNumber"]').val().trim();
-            if (!/^\d+$/.test(roomNumber)) {
-                alert("Số phòng chỉ được chứa các số.");
-                $(this).find('[name="roomNumber"]').focus();
-                e.preventDefault();
-                return false;
-            }
-            if (existingRoomNumbers.includes(roomNumber)) {
-                alert("Số phòng đã tồn tại.");
-                $(this).find('[name="roomNumber"]').focus();
-                e.preventDefault();
-                return false;
             }
         });
     });
