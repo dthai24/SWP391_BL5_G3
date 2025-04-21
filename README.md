@@ -2,6 +2,7 @@
 Demo query phân biệt Customers và Employees
 
 -- Lấy thông tin người dùng và xác định họ là nhân viên hay khách hàng
+```
 SELECT 
     u.UserID,
     u.Username,
@@ -16,8 +17,11 @@ FROM Users u
 LEFT JOIN Employees e ON u.UserID = e.EmployeeID
 LEFT JOIN Customers c ON u.UserID = c.CustomerID
 WHERE u.IsDeleted = 0
+```
 
 -- Demo UsersDAO
+
+```
 public List<UserDetails> getAllUsers() {
     List<UserDetails> users = new ArrayList<>();
     Connection conn = null;
@@ -70,3 +74,4 @@ private boolean isCustomer(int userId) {
 private String getEmployeeRole(int userId) {
     // Lấy vai trò nhân viên
 }
+```
