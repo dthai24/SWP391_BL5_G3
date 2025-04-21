@@ -1,245 +1,573 @@
-Create Database SWP391_BL5_G3;
+CREATE DATABASE [SWP391_BL5_G3]
+USE [SWP391_BL5_G3]
 GO
-
-Use SWP391_BL5_G3; 
-CREATE TABLE Users (
-    UserID INT PRIMARY KEY IDENTITY(1,1),
-    Username NVARCHAR(100) NOT NULL UNIQUE,
-	Password NVARCHAR(255) NOT NULL, -- Lưu mật khẩu thông thường
-    PasswordHash NVARCHAR(255) NOT NULL, -- Store the hashed password here
-    FullName NVARCHAR(150) NOT NULL,
-    Email NVARCHAR(150) NOT NULL UNIQUE,
-    PhoneNumber NVARCHAR(20) NULL,
-    Address NVARCHAR(255) NULL,
-    Role NVARCHAR(50) NOT NULL,
-    ProfilePictureURL NVARCHAR(255) NULL,
-    Status NVARCHAR(20) NOT NULL CHECK (Status IN ('Active', 'Inactive')) DEFAULT 'Active',
-    RegistrationDate DATETIME DEFAULT GETDATE(),
-    IsDeleted BIT NOT NULL DEFAULT 0,
-    CONSTRAINT CK_User_Role CHECK (Role IN ('Admin', 'Manager', 'Receptionist', 'Staff', 'Customer')) -- Đảm bảo giá trị vai trò hợp lệ
-);
+/****** Object:  Table [dbo].[BookingRoomInventoryChecks]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-
-CREATE TABLE RoomCategories (
-    CategoryID INT PRIMARY KEY IDENTITY(1,1),
-    CategoryName NVARCHAR(100) NOT NULL,
-    Description NVARCHAR(MAX) NULL,
-    BasePricePerNight DECIMAL(10, 2) NOT NULL,
-    IsDeleted BIT NOT NULL DEFAULT 0
-);
+SET QUOTED_IDENTIFIER ON
 GO
-
-CREATE TABLE Rooms (
-    RoomID INT PRIMARY KEY IDENTITY(1,1),
-    RoomNumber NVARCHAR(20) NOT NULL UNIQUE,
-    CategoryID INT NOT NULL,
-    VacancyStatus NVARCHAR(20) NOT NULL DEFAULT 'Vacant',
-    Description NVARCHAR(MAX) NULL,
-    PriceOverride DECIMAL(10, 2) NULL,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    IsDeleted BIT NOT NULL DEFAULT 0,
-	FOREIGN KEY (CategoryID) REFERENCES RoomCategories(CategoryID) ON DELETE NO ACTION,
-    CONSTRAINT CK_Room_VacancyStatus CHECK (VacancyStatus IN ('Vacant', 'Occupied'))
-    FOREIGN KEY (CategoryID) REFERENCES RoomCategories(CategoryID) ON DELETE NO ACTION, -- Không xóa loại phòng nếu còn phòng tồn tại
-    CONSTRAINT CK_Room_VacancyStatus CHECK (VacancyStatus IN ('Vacant', 'Occupied')) -- Đảm bảo giá trị trạng thái phòng hợp lệ
-);
+CREATE TABLE [dbo].[BookingRoomInventoryChecks](
+	[CheckID] [int] IDENTITY(1,1) NOT NULL,
+	[BookingRoomID] [int] NOT NULL,
+	[ItemID] [int] NOT NULL,
+	[CheckType] [nvarchar](10) NOT NULL,
+	[ItemStatus] [nvarchar](50) NOT NULL,
+	[QuantityChecked] [int] NULL,
+	[ChargeApplied] [decimal](10, 2) NULL,
+	[Notes] [nvarchar](max) NULL,
+	[CheckedByUserID] [int] NULL,
+	[CheckTimestamp] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CheckID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-
-CREATE TABLE RoomImages (
-    ImageID INT PRIMARY KEY IDENTITY(1,1),
-    RoomCategoryID INT NOT NULL,
-    ImageUrl NVARCHAR(255) NOT NULL,
-    IsMain BIT NOT NULL DEFAULT 0,
-    UploadedAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (RoomCategoryID) REFERENCES RoomCategories(CategoryID) ON DELETE CASCADE
-);
+/****** Object:  Table [dbo].[BookingRooms]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-
-CREATE TABLE Services (
-    ServiceID INT PRIMARY KEY IDENTITY(1,1),
-    ServiceName NVARCHAR(100) NOT NULL,
-    Description NVARCHAR(MAX) NULL,
-    Price DECIMAL(10, 2) NOT NULL,
-    ImageURL NVARCHAR(255) NULL,
-    IsAvailable BIT DEFAULT 1,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    IsDeleted BIT NOT NULL DEFAULT 0
-);
+SET QUOTED_IDENTIFIER ON
 GO
-
-CREATE TABLE Bookings (
-    BookingID INT PRIMARY KEY IDENTITY(1,1),
-    CustomerID INT NOT NULL,
-    CheckInDate DATE NOT NULL,
-    CheckOutDate DATE NOT NULL,
-    NumberOfGuests INT NOT NULL,
-    Notes NVARCHAR(MAX) NULL,
-    TotalPrice DECIMAL(12, 2) NULL,
-    Status NVARCHAR(50) NOT NULL CHECK (Status IN ('Pending', 'Confirmed', 'Cancelled', 'Completed')) DEFAULT 'Pending',
-    BookingDate DATETIME DEFAULT GETDATE(),
-    UpdatedAt DATETIME DEFAULT GETDATE(),
-    IsDeleted BIT NOT NULL DEFAULT 0,
-    FOREIGN KEY (CustomerID) REFERENCES Users(UserID) ON DELETE NO ACTION, -- Không xóa người dùng nếu họ có đặt phòng đang hoạt động
-    CONSTRAINT CK_Booking_CheckOutDate CHECK (CheckOutDate > CheckInDate) -- Đảm bảo ngày trả phòng sau ngày nhận phòng
-);
+CREATE TABLE [dbo].[BookingRooms](
+	[BookingRoomID] [int] IDENTITY(1,1) NOT NULL,
+	[BookingID] [int] NOT NULL,
+	[RoomID] [int] NOT NULL,
+	[PriceAtBooking] [decimal](10, 2) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[BookingRoomID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-
-CREATE TABLE BookingRooms (
-    BookingRoomID INT PRIMARY KEY IDENTITY(1,1),
-    BookingID INT NOT NULL,
-    RoomID INT NOT NULL,
-    PriceAtBooking DECIMAL(10, 2) NULL,
-    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE CASCADE, -- Nếu xóa đặt phòng, xóa luôn các phòng được gán
-    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID) ON DELETE NO ACTION, -- Không xóa phòng nếu nó là một phần của lịch sử đặt phòng
-    CONSTRAINT UQ_Booking_Room UNIQUE (BookingID, RoomID) -- Ngăn chặn việc thêm cùng một phòng hai lần vào cùng một đặt phòng
-);
+/****** Object:  Table [dbo].[Bookings]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-
-CREATE TABLE BookingServices (
-    BookingServiceID INT PRIMARY KEY IDENTITY(1,1),
-    BookingID INT NOT NULL,
-    ServiceID INT NOT NULL,
-    Quantity INT NOT NULL DEFAULT 1,
-    PriceAtBooking DECIMAL(10, 2) NOT NULL,
-    ServiceDate DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE CASCADE, -- Nếu xóa đặt phòng, xóa luôn các dịch vụ được gán
-    FOREIGN KEY (ServiceID) REFERENCES Services(ServiceID) ON DELETE NO ACTION -- Không xóa định nghĩa dịch vụ nếu nó được sử dụng trong các đặt phòng
-);
+SET QUOTED_IDENTIFIER ON
 GO
-
-CREATE TABLE Payments (
-    PaymentID INT PRIMARY KEY IDENTITY(1,1),
-    BookingID INT NOT NULL,
-    Amount DECIMAL(12, 2) NOT NULL,
-    PaymentMethod NVARCHAR(50) NOT NULL,
-    PaymentStatus NVARCHAR(50) NOT NULL,
-    TransactionID NVARCHAR(255) NULL,
-    PaymentDate DATETIME DEFAULT GETDATE(),
-    ProcessedByUserID INT NULL,
-    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE NO ACTION, -- Giữ lại lịch sử thanh toán ngay cả khi đặt phòng bị xóa
-    FOREIGN KEY (ProcessedByUserID) REFERENCES Users(UserID) ON DELETE SET NULL -- Nếu xóa người dùng nhân viên, giữ lại bản ghi thanh toán nhưng xóa liên kết
-);
+CREATE TABLE [dbo].[Bookings](
+	[BookingID] [int] IDENTITY(1,1) NOT NULL,
+	[CustomerID] [int] NOT NULL,
+	[CheckInDate] [date] NOT NULL,
+	[CheckOutDate] [date] NOT NULL,
+	[NumberOfGuests] [int] NOT NULL,
+	[Notes] [nvarchar](max) NULL,
+	[TotalPrice] [decimal](12, 2) NULL,
+	[Status] [nvarchar](50) NOT NULL,
+	[BookingDate] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[BookingID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-
-CREATE TABLE Feedbacks (
-    FeedbackID INT PRIMARY KEY IDENTITY(1,1),
-    BookingID INT NULL,
-    CustomerID INT NOT NULL,
-    Rating INT NULL CHECK (Rating >= 1 AND Rating <= 5), -- Đảm bảo khoảng giá trị đánh giá
-    Comment NVARCHAR(MAX) NULL,
-    SubmissionDate DATETIME DEFAULT GETDATE(),
-    IsApproved BIT DEFAULT 0,
-    Response NVARCHAR(MAX) NULL,
-    RespondedByUserID INT NULL,
-    ResponseDate DATETIME NULL,
-    IsDeleted BIT NOT NULL DEFAULT 0,
-    FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID) ON DELETE SET NULL, -- Giữ lại phản hồi ngay cả khi đặt phòng bị xóa, xóa liên kết
-    FOREIGN KEY (CustomerID) REFERENCES Users(UserID) ON DELETE NO ACTION, -- Giữ lại phản hồi ngay cả khi khách hàng bị xóa
-    FOREIGN KEY (RespondedByUserID) REFERENCES Users(UserID) ON DELETE SET NULL -- Nếu xóa người dùng nhân viên, giữ lại phản hồi nhưng xóa liên kết
-);
+/****** Object:  Table [dbo].[BookingServices]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-
-CREATE TABLE PasswordResetTokens (
-    TokenID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT NOT NULL,
-    TokenValue NVARCHAR(255) NOT NULL UNIQUE,
-    ExpiryDate DATETIME NOT NULL,
-    IsUsed BIT NOT NULL DEFAULT 0,
-    CreatedAt DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE -- Nếu người dùng bị xóa, xóa luôn các token đặt lại mật khẩu liên quan
-);
+SET QUOTED_IDENTIFIER ON
 GO
-
-CREATE TABLE InventoryItems (
-    ItemID INT PRIMARY KEY IDENTITY(1,1),
-    ItemName NVARCHAR(100) NOT NULL UNIQUE,
-    Description NVARCHAR(MAX) NULL,
-    DefaultCharge DECIMAL(10, 2) NULL,
-    IsDeleted BIT NOT NULL DEFAULT 0
-);
+CREATE TABLE [dbo].[BookingServices](
+	[BookingServiceID] [int] IDENTITY(1,1) NOT NULL,
+	[BookingID] [int] NOT NULL,
+	[ServiceID] [int] NOT NULL,
+	[Quantity] [int] NOT NULL,
+	[PriceAtBooking] [decimal](10, 2) NOT NULL,
+	[ServiceDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[BookingServiceID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-
-CREATE TABLE RoomCategoryInventory (
-    RoomCategoryInventoryID INT PRIMARY KEY IDENTITY(1,1),
-    CategoryID INT NOT NULL,
-    ItemID INT NOT NULL,
-    DefaultQuantity INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (CategoryID) REFERENCES RoomCategories(CategoryID) ON DELETE CASCADE, -- Nếu xóa loại phòng, xóa luôn định nghĩa kiểm kê của nó
-    FOREIGN KEY (ItemID) REFERENCES InventoryItems(ItemID) ON DELETE CASCADE, -- Nếu xóa vật dụng, xóa nó khỏi danh sách kiểm kê của các loại phòng
-    CONSTRAINT UQ_RoomCategory_Item UNIQUE (CategoryID, ItemID) -- Đảm bảo vật dụng chỉ được liệt kê một lần cho mỗi loại phòng
-);
+/****** Object:  Table [dbo].[Feedbacks]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-
-CREATE TABLE BookingRoomInventoryChecks (
-    CheckID INT PRIMARY KEY IDENTITY(1,1),
-    BookingRoomID INT NOT NULL,
-    ItemID INT NOT NULL,
-    CheckType NVARCHAR(10) NOT NULL,
-    ItemStatus NVARCHAR(50) NOT NULL,
-    QuantityChecked INT NULL,
-    ChargeApplied DECIMAL(10, 2) NULL,
-    Notes NVARCHAR(MAX) NULL,
-    CheckedByUserID INT NULL,
-    CheckTimestamp DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (BookingRoomID) REFERENCES BookingRooms(BookingRoomID) ON DELETE CASCADE, -- Nếu xóa việc gán phòng cho đặt phòng, xóa luôn các kiểm tra
-    FOREIGN KEY (ItemID) REFERENCES InventoryItems(ItemID) ON DELETE NO ACTION, -- Không xóa định nghĩa vật dụng nếu có kiểm tra tồn tại
-    FOREIGN KEY (CheckedByUserID) REFERENCES Users(UserID) ON DELETE SET NULL, -- Nếu xóa người dùng nhân viên, giữ lại bản ghi kiểm tra nhưng xóa liên kết
-    CONSTRAINT CK_InventoryCheck_Type CHECK (CheckType IN ('CheckIn', 'CheckOut')), -- Đảm bảo giá trị loại kiểm tra hợp lệ
-    CONSTRAINT CK_InventoryCheck_Status CHECK (ItemStatus IN ('Present', 'Missing', 'Damaged')) -- Đảm bảo giá trị trạng thái vật dụng hợp lệ
-);
+SET QUOTED_IDENTIFIER ON
 GO
-
-INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
-VALUES ('admin_user','123456', 'placeholder_hash_admin', 'Administrator', 'admin@yourhotel.com', 'Admin', 'Active', 0);
+CREATE TABLE [dbo].[Feedbacks](
+	[FeedbackID] [int] IDENTITY(1,1) NOT NULL,
+	[BookingID] [int] NULL,
+	[CustomerID] [int] NOT NULL,
+	[Rating] [int] NULL,
+	[Comment] [nvarchar](max) NULL,
+	[SubmissionDate] [datetime] NULL,
+	[IsApproved] [bit] NULL,
+	[Response] [nvarchar](max) NULL,
+	[RespondedByUserID] [int] NULL,
+	[ResponseDate] [datetime] NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[FeedbackID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
-VALUES ('manager_user', 'placeholder_hash_manager', 'Hotel Manager', 'manager@yourhotel.com', 'Manager', 'Active', 0);
+/****** Object:  Table [dbo].[InventoryItems]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
-VALUES ('reception_user', 'placeholder_hash_reception', 'Reception Desk', 'reception@yourhotel.com', 'Receptionist', 'Active', 0);
+SET QUOTED_IDENTIFIER ON
 GO
-INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
-VALUES ('staff_user', 'placeholder_hash_staff', 'General Staff', 'staff@yourhotel.com', 'Staff', 'Active', 0);
+CREATE TABLE [dbo].[InventoryItems](
+	[ItemID] [int] IDENTITY(1,1) NOT NULL,
+	[ItemName] [nvarchar](100) NOT NULL,
+	[Description] [nvarchar](max) NULL,
+	[DefaultCharge] [decimal](10, 2) NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ItemID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-INSERT INTO Users (Username, Password , PasswordHash, FullName, Email, [Role], Status, IsDeleted)
-VALUES ('customer_user', 'placeholder_hash_customer', 'Valued Customer', 'customer@email.com', 'Customer', 'Active', 0);
+/****** Object:  Table [dbo].[PasswordResetTokens]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
 GO
-
-INSERT INTO InventoryItems (ItemName, Description, DefaultCharge) VALUES
-('Bath Towel', 'Standard white bath towel', 15.00),
-('Hand Towel', 'Standard white hand towel', 8.00),
-('TV Remote', 'Remote control for television', 25.00),
-('Kettle', 'Electric kettle', 30.00),
-('Minibar - Coke', 'Can of Coca-Cola from minibar', 3.00),
-('Minibar - Water', 'Bottle of water from minibar', 2.00);
+SET QUOTED_IDENTIFIER ON
 GO
-
--- Dữ liệu mẫu cho RoomCategories
-INSERT INTO RoomCategories (CategoryName, Description, BasePricePerNight)
-VALUES 
-(N'Premium King Room', N'Phòng cao cấp với giường king size', 200.00),
-(N'Deluxe Room', N'Phòng deluxe tiện nghi', 150.00),
-(N'Double Room', N'Phòng đôi dành cho hai người', 120.00),
-(N'Luxury Room', N'Phòng sang trọng với dịch vụ cao cấp', 250.00),
-(N'Room With View', N'Phòng có tầm nhìn đẹp', 180.00),
-(N'Small View', N'Phòng nhỏ có cửa sổ nhìn ra cảnh quan', 100.00);
+CREATE TABLE [dbo].[PasswordResetTokens](
+	[TokenID] [int] IDENTITY(1,1) NOT NULL,
+	[UserID] [int] NOT NULL,
+	[TokenValue] [nvarchar](255) NOT NULL,
+	[ExpiryDate] [datetime] NOT NULL,
+	[IsUsed] [bit] NOT NULL,
+	[CreatedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[TokenID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-
--- Dữ liệu mẫu cho Rooms
-INSERT INTO Rooms (RoomNumber, CategoryID, VacancyStatus, Description, PriceOverride, CreatedAt, UpdatedAt, IsDeleted)
-VALUES
-(N'101', 1, 'Vacant', N'Phòng Premium King tầng trệt, gần sảnh chính', 210.00, GETDATE(), GETDATE(), 0),
-(N'102', 1, 'Occupied', N'Phòng Premium King có ban công rộng', 220.00, GETDATE(), GETDATE(), 0),
-(N'201', 2, 'Vacant', N'Deluxe Room với view hồ bơi', 160.00, GETDATE(), GETDATE(), 0),
-(N'202', 2, 'Occupied', N'Deluxe Room nội khu yên tĩnh', 155.00, GETDATE(), GETDATE(), 0),
-(N'301', 3, 'Vacant', N'Double Room với 2 giường đơn', 125.00, GETDATE(), GETDATE(), 0),
-(N'302', 3, 'Occupied', N'Double Room có góc học tập', 130.00, GETDATE(), GETDATE(), 0),
-(N'401', 4, 'Vacant', N'Luxury Room tầng cao, trang bị hiện đại', 260.00, GETDATE(), GETDATE(), 0),
-(N'402', 4, 'Vacant', N'Luxury Room có bồn tắm jacuzzi', 270.00, GETDATE(), GETDATE(), 0),
-(N'501', 5, 'Occupied', N'Room With View nhìn ra biển', 185.00, GETDATE(), GETDATE(), 0),
-(N'502', 5, 'Vacant', N'Room With View hướng đồi thông', 180.00, GETDATE(), GETDATE(), 0),
-(N'601', 6, 'Vacant', N'Small View Room tiện nghi gọn nhẹ', 105.00, GETDATE(), GETDATE(), 0),
-(N'602', 6, 'Occupied', N'Small View Room dành cho khách công tác', 110.00, GETDATE(), GETDATE(), 0);
+/****** Object:  Table [dbo].[Payments]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Payments](
+	[PaymentID] [int] IDENTITY(1,1) NOT NULL,
+	[BookingID] [int] NOT NULL,
+	[Amount] [decimal](12, 2) NOT NULL,
+	[PaymentMethod] [nvarchar](50) NOT NULL,
+	[PaymentStatus] [nvarchar](50) NOT NULL,
+	[TransactionID] [nvarchar](255) NULL,
+	[PaymentDate] [datetime] NULL,
+	[ProcessedByUserID] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[PaymentID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[RoomCategories]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RoomCategories](
+	[CategoryID] [int] IDENTITY(1,1) NOT NULL,
+	[CategoryName] [nvarchar](100) NOT NULL,
+	[Description] [nvarchar](max) NULL,
+	[BasePricePerNight] [decimal](10, 2) NOT NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[CategoryID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[RoomCategoryInventory]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RoomCategoryInventory](
+	[RoomCategoryInventoryID] [int] IDENTITY(1,1) NOT NULL,
+	[CategoryID] [int] NOT NULL,
+	[ItemID] [int] NOT NULL,
+	[DefaultQuantity] [int] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[RoomCategoryInventoryID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[RoomImages]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[RoomImages](
+	[ImageID] [int] IDENTITY(1,1) NOT NULL,
+	[RoomCategoryID] [int] NOT NULL,
+	[ImageUrl] [nvarchar](255) NOT NULL,
+	[IsMain] [bit] NOT NULL,
+	[UploadedAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ImageID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Rooms]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Rooms](
+	[RoomID] [int] IDENTITY(1,1) NOT NULL,
+	[RoomNumber] [nvarchar](20) NOT NULL,
+	[CategoryID] [int] NOT NULL,
+	[VacancyStatus] [nvarchar](20) NOT NULL,
+	[Description] [nvarchar](max) NULL,
+	[PriceOverride] [decimal](10, 2) NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[RoomID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Services]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Services](
+	[ServiceID] [int] IDENTITY(1,1) NOT NULL,
+	[ServiceName] [nvarchar](100) NOT NULL,
+	[Description] [nvarchar](max) NULL,
+	[Price] [decimal](10, 2) NOT NULL,
+	[ImageURL] [nvarchar](255) NULL,
+	[IsAvailable] [bit] NULL,
+	[CreatedAt] [datetime] NULL,
+	[UpdatedAt] [datetime] NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ServiceID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Users]    Script Date: 21.04.2025 14:53:42 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Users](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[Username] [nvarchar](100) NOT NULL,
+	[Password] [nvarchar](255) NOT NULL,
+	[FullName] [nvarchar](150) NOT NULL,
+	[Email] [nvarchar](150) NOT NULL,
+	[PhoneNumber] [nvarchar](20) NULL,
+	[Address] [nvarchar](255) NULL,
+	[Role] [nvarchar](50) NOT NULL,
+	[ProfilePictureURL] [nvarchar](255) NULL,
+	[Status] [nvarchar](20) NOT NULL,
+	[RegistrationDate] [datetime] NULL,
+	[IsDeleted] [bit] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET IDENTITY_INSERT [dbo].[Bookings] ON 
+GO
+INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted]) VALUES (1, 6, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-26' AS Date), 4, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T14:34:40.727' AS DateTime), CAST(N'2025-04-21T14:34:40.727' AS DateTime), 0)
+GO
+INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted]) VALUES (2, 6, CAST(N'2025-04-24' AS Date), CAST(N'2025-04-27' AS Date), 5, N'', CAST(0.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T14:40:52.270' AS DateTime), CAST(N'2025-04-21T14:40:52.270' AS DateTime), 0)
+GO
+INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted]) VALUES (3, 11, CAST(N'2025-04-22' AS Date), CAST(N'2025-04-24' AS Date), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T14:49:49.760' AS DateTime), CAST(N'2025-04-21T14:49:49.760' AS DateTime), 0)
+GO
+INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted]) VALUES (4, 10, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-30' AS Date), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Completed', CAST(N'2025-04-21T14:53:25.517' AS DateTime), CAST(N'2025-04-21T14:53:25.517' AS DateTime), 0)
+GO
+SET IDENTITY_INSERT [dbo].[Bookings] OFF
+GO
+SET IDENTITY_INSERT [dbo].[InventoryItems] ON 
+GO
+INSERT [dbo].[InventoryItems] ([ItemID], [ItemName], [Description], [DefaultCharge], [IsDeleted]) VALUES (1, N'Bath Towel', N'Standard white bath towel', CAST(15.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[InventoryItems] ([ItemID], [ItemName], [Description], [DefaultCharge], [IsDeleted]) VALUES (2, N'Hand Towel', N'Standard white hand towel', CAST(8.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[InventoryItems] ([ItemID], [ItemName], [Description], [DefaultCharge], [IsDeleted]) VALUES (3, N'TV Remote', N'Remote control for television', CAST(25.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[InventoryItems] ([ItemID], [ItemName], [Description], [DefaultCharge], [IsDeleted]) VALUES (4, N'Kettle', N'Electric kettle', CAST(30.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[InventoryItems] ([ItemID], [ItemName], [Description], [DefaultCharge], [IsDeleted]) VALUES (5, N'Minibar - Coke', N'Can of Coca-Cola from minibar', CAST(3.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[InventoryItems] ([ItemID], [ItemName], [Description], [DefaultCharge], [IsDeleted]) VALUES (6, N'Minibar - Water', N'Bottle of water from minibar', CAST(2.00 AS Decimal(10, 2)), 0)
+GO
+SET IDENTITY_INSERT [dbo].[InventoryItems] OFF
+GO
+SET IDENTITY_INSERT [dbo].[RoomCategories] ON 
+GO
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (1, N'Premium King Room', N'Phòng cao cấp với giường king size', CAST(200.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (2, N'Deluxe Room', N'Phòng deluxe tiện nghi', CAST(150.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (3, N'Double Room', N'Phòng đôi dành cho hai người', CAST(120.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (4, N'Luxury Room', N'Phòng sang trọng với dịch vụ cao cấp', CAST(250.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (5, N'Room With View', N'Phòng có tầm nhìn đẹp', CAST(180.00 AS Decimal(10, 2)), 0)
+GO
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (6, N'Small View', N'Phòng nhỏ có cửa sổ nhìn ra cảnh quan', CAST(100.00 AS Decimal(10, 2)), 0)
+GO
+SET IDENTITY_INSERT [dbo].[RoomCategories] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Rooms] ON 
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (1, N'101', 1, N'Vacant', N'Phòng Premium King tầng trệt, gần sảnh chính', CAST(210.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (2, N'102', 1, N'Occupied', N'Phòng Premium King có ban công rộng', CAST(220.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (3, N'201', 2, N'Vacant', N'Deluxe Room với view hồ bơi', CAST(160.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (4, N'202', 2, N'Occupied', N'Deluxe Room nội khu yên tĩnh', CAST(155.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (5, N'301', 3, N'Vacant', N'Double Room với 2 giường đơn', CAST(125.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (6, N'302', 3, N'Occupied', N'Double Room có góc học tập', CAST(130.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (7, N'401', 4, N'Vacant', N'Luxury Room tầng cao, trang bị hiện đại', CAST(260.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (8, N'402', 4, N'Vacant', N'Luxury Room có bồn tắm jacuzzi', CAST(270.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (9, N'501', 5, N'Occupied', N'Room With View nhìn ra biển', CAST(185.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (10, N'502', 5, N'Vacant', N'Room With View hướng đồi thông', CAST(180.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (11, N'601', 6, N'Vacant', N'Small View Room tiện nghi gọn nhẹ', CAST(105.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+INSERT [dbo].[Rooms] ([RoomID], [RoomNumber], [CategoryID], [VacancyStatus], [Description], [PriceOverride], [CreatedAt], [UpdatedAt], [IsDeleted]) VALUES (12, N'602', 6, N'Occupied', N'Small View Room dành cho khách công tác', CAST(110.00 AS Decimal(10, 2)), CAST(N'2025-04-21T14:29:46.700' AS DateTime), CAST(N'2025-04-21T14:29:46.700' AS DateTime), 0)
+GO
+SET IDENTITY_INSERT [dbo].[Rooms] OFF
+GO
+SET IDENTITY_INSERT [dbo].[Users] ON 
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (1, N'admin_user', N'123456', N'Administrator', N'admin@yourhotel.com', NULL, NULL, N'Admin', NULL, N'Active', CAST(N'2025-04-21T14:29:46.667' AS DateTime), 0)
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (3, N'manager_user', N'123456', N'Hotel Manager', N'manager@yourhotel.com', NULL, NULL, N'Manager', NULL, N'Active', CAST(N'2025-04-21T14:33:59.197' AS DateTime), 0)
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (4, N'reception_user', N'123456', N'Reception Desk', N'reception@yourhotel.com', NULL, NULL, N'Receptionist', NULL, N'Active', CAST(N'2025-04-21T14:33:59.213' AS DateTime), 0)
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (5, N'staff_user', N'123456', N'General Staff', N'staff@yourhotel.com', NULL, NULL, N'Staff', NULL, N'Active', CAST(N'2025-04-21T14:33:59.227' AS DateTime), 0)
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (6, N'customer_user', N'123456', N'Valued Customer', N'customer@email.com', NULL, NULL, N'Customer', NULL, N'Active', CAST(N'2025-04-21T14:33:59.227' AS DateTime), 0)
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (10, N'abc', N'123', N'abc', N'abc@gmail.com', N'123456798', N'123 abc', N'Customer', NULL, N'Active', CAST(N'2025-04-21T00:00:00.000' AS DateTime), 0)
+GO
+INSERT [dbo].[Users] ([UserID], [Username], [Password], [FullName], [Email], [PhoneNumber], [Address], [Role], [ProfilePictureURL], [Status], [RegistrationDate], [IsDeleted]) VALUES (11, N'nghiant', N'123456', N'Nghia Nguyen', N'nghianthe150495@fpt.edu.vn', N'123456789', N'123 abc', N'Customer', NULL, N'Active', CAST(N'2025-04-21T00:00:00.000' AS DateTime), 0)
+GO
+SET IDENTITY_INSERT [dbo].[Users] OFF
+GO
+/****** Object:  Index [UQ_Booking_Room]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[BookingRooms] ADD  CONSTRAINT [UQ_Booking_Room] UNIQUE NONCLUSTERED 
+(
+	[BookingID] ASC,
+	[RoomID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Inventor__4E4373F722C80757]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[InventoryItems] ADD UNIQUE NONCLUSTERED 
+(
+	[ItemName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Password__FE1B80EC04A94560]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[PasswordResetTokens] ADD UNIQUE NONCLUSTERED 
+(
+	[TokenValue] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+/****** Object:  Index [UQ_RoomCategory_Item]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[RoomCategoryInventory] ADD  CONSTRAINT [UQ_RoomCategory_Item] UNIQUE NONCLUSTERED 
+(
+	[CategoryID] ASC,
+	[ItemID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Rooms__AE10E07A905131A8]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[Rooms] ADD UNIQUE NONCLUSTERED 
+(
+	[RoomNumber] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Users__536C85E43DE1065F]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[Users] ADD UNIQUE NONCLUSTERED 
+(
+	[Username] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [UQ__Users__A9D105348F02F1AD]    Script Date: 21.04.2025 14:53:42 ******/
+ALTER TABLE [dbo].[Users] ADD UNIQUE NONCLUSTERED 
+(
+	[Email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks] ADD  DEFAULT (getdate()) FOR [CheckTimestamp]
+GO
+ALTER TABLE [dbo].[Bookings] ADD  DEFAULT ('Pending') FOR [Status]
+GO
+ALTER TABLE [dbo].[Bookings] ADD  DEFAULT (getdate()) FOR [BookingDate]
+GO
+ALTER TABLE [dbo].[Bookings] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Bookings] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[BookingServices] ADD  DEFAULT ((1)) FOR [Quantity]
+GO
+ALTER TABLE [dbo].[BookingServices] ADD  DEFAULT (getdate()) FOR [ServiceDate]
+GO
+ALTER TABLE [dbo].[Feedbacks] ADD  DEFAULT (getdate()) FOR [SubmissionDate]
+GO
+ALTER TABLE [dbo].[Feedbacks] ADD  DEFAULT ((0)) FOR [IsApproved]
+GO
+ALTER TABLE [dbo].[Feedbacks] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[InventoryItems] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[PasswordResetTokens] ADD  DEFAULT ((0)) FOR [IsUsed]
+GO
+ALTER TABLE [dbo].[PasswordResetTokens] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Payments] ADD  DEFAULT (getdate()) FOR [PaymentDate]
+GO
+ALTER TABLE [dbo].[RoomCategories] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[RoomCategoryInventory] ADD  DEFAULT ((1)) FOR [DefaultQuantity]
+GO
+ALTER TABLE [dbo].[RoomImages] ADD  DEFAULT ((0)) FOR [IsMain]
+GO
+ALTER TABLE [dbo].[RoomImages] ADD  DEFAULT (getdate()) FOR [UploadedAt]
+GO
+ALTER TABLE [dbo].[Rooms] ADD  DEFAULT ('Vacant') FOR [VacancyStatus]
+GO
+ALTER TABLE [dbo].[Rooms] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Rooms] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Rooms] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Services] ADD  DEFAULT ((1)) FOR [IsAvailable]
+GO
+ALTER TABLE [dbo].[Services] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[Services] ADD  DEFAULT (getdate()) FOR [UpdatedAt]
+GO
+ALTER TABLE [dbo].[Services] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ('Active') FOR [Status]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT (getdate()) FOR [RegistrationDate]
+GO
+ALTER TABLE [dbo].[Users] ADD  DEFAULT ((0)) FOR [IsDeleted]
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks]  WITH CHECK ADD FOREIGN KEY([BookingRoomID])
+REFERENCES [dbo].[BookingRooms] ([BookingRoomID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks]  WITH CHECK ADD FOREIGN KEY([CheckedByUserID])
+REFERENCES [dbo].[Users] ([UserID])
+ON DELETE SET NULL
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks]  WITH CHECK ADD FOREIGN KEY([ItemID])
+REFERENCES [dbo].[InventoryItems] ([ItemID])
+GO
+ALTER TABLE [dbo].[BookingRooms]  WITH CHECK ADD FOREIGN KEY([BookingID])
+REFERENCES [dbo].[Bookings] ([BookingID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[BookingRooms]  WITH CHECK ADD FOREIGN KEY([RoomID])
+REFERENCES [dbo].[Rooms] ([RoomID])
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD FOREIGN KEY([CustomerID])
+REFERENCES [dbo].[Users] ([UserID])
+GO
+ALTER TABLE [dbo].[BookingServices]  WITH CHECK ADD FOREIGN KEY([BookingID])
+REFERENCES [dbo].[Bookings] ([BookingID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[BookingServices]  WITH CHECK ADD FOREIGN KEY([ServiceID])
+REFERENCES [dbo].[Services] ([ServiceID])
+GO
+ALTER TABLE [dbo].[Feedbacks]  WITH CHECK ADD FOREIGN KEY([BookingID])
+REFERENCES [dbo].[Bookings] ([BookingID])
+ON DELETE SET NULL
+GO
+ALTER TABLE [dbo].[Feedbacks]  WITH CHECK ADD FOREIGN KEY([CustomerID])
+REFERENCES [dbo].[Users] ([UserID])
+GO
+ALTER TABLE [dbo].[Feedbacks]  WITH CHECK ADD FOREIGN KEY([RespondedByUserID])
+REFERENCES [dbo].[Users] ([UserID])
+ON DELETE SET NULL
+GO
+ALTER TABLE [dbo].[PasswordResetTokens]  WITH CHECK ADD FOREIGN KEY([UserID])
+REFERENCES [dbo].[Users] ([UserID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Payments]  WITH CHECK ADD FOREIGN KEY([BookingID])
+REFERENCES [dbo].[Bookings] ([BookingID])
+GO
+ALTER TABLE [dbo].[Payments]  WITH CHECK ADD FOREIGN KEY([ProcessedByUserID])
+REFERENCES [dbo].[Users] ([UserID])
+ON DELETE SET NULL
+GO
+ALTER TABLE [dbo].[RoomCategoryInventory]  WITH CHECK ADD FOREIGN KEY([CategoryID])
+REFERENCES [dbo].[RoomCategories] ([CategoryID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[RoomCategoryInventory]  WITH CHECK ADD FOREIGN KEY([ItemID])
+REFERENCES [dbo].[InventoryItems] ([ItemID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[RoomImages]  WITH CHECK ADD FOREIGN KEY([RoomCategoryID])
+REFERENCES [dbo].[RoomCategories] ([CategoryID])
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[Rooms]  WITH CHECK ADD FOREIGN KEY([CategoryID])
+REFERENCES [dbo].[RoomCategories] ([CategoryID])
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks]  WITH CHECK ADD  CONSTRAINT [CK_InventoryCheck_Status] CHECK  (([ItemStatus]='Damaged' OR [ItemStatus]='Missing' OR [ItemStatus]='Present'))
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks] CHECK CONSTRAINT [CK_InventoryCheck_Status]
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks]  WITH CHECK ADD  CONSTRAINT [CK_InventoryCheck_Type] CHECK  (([CheckType]='CheckOut' OR [CheckType]='CheckIn'))
+GO
+ALTER TABLE [dbo].[BookingRoomInventoryChecks] CHECK CONSTRAINT [CK_InventoryCheck_Type]
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD CHECK  (([Status]='Completed' OR [Status]='Cancelled' OR [Status]='Confirmed' OR [Status]='Pending'))
+GO
+ALTER TABLE [dbo].[Bookings]  WITH CHECK ADD  CONSTRAINT [CK_Booking_CheckOutDate] CHECK  (([CheckOutDate]>[CheckInDate]))
+GO
+ALTER TABLE [dbo].[Bookings] CHECK CONSTRAINT [CK_Booking_CheckOutDate]
+GO
+ALTER TABLE [dbo].[Feedbacks]  WITH CHECK ADD CHECK  (([Rating]>=(1) AND [Rating]<=(5)))
+GO
+ALTER TABLE [dbo].[Rooms]  WITH CHECK ADD  CONSTRAINT [CK_Room_VacancyStatus] CHECK  (([VacancyStatus]='Occupied' OR [VacancyStatus]='Vacant'))
+GO
+ALTER TABLE [dbo].[Rooms] CHECK CONSTRAINT [CK_Room_VacancyStatus]
+GO
+ALTER TABLE [dbo].[Users]  WITH CHECK ADD CHECK  (([Status]='Inactive' OR [Status]='Active'))
+GO
+ALTER TABLE [dbo].[Users]  WITH CHECK ADD  CONSTRAINT [CK_User_Role] CHECK  (([Role]='Customer' OR [Role]='Staff' OR [Role]='Receptionist' OR [Role]='Manager' OR [Role]='Admin'))
+GO
+ALTER TABLE [dbo].[Users] CHECK CONSTRAINT [CK_User_Role]
+GO
+USE [master]
+GO
+ALTER DATABASE [SWP391_BL5_G3] SET  READ_WRITE 
 GO
