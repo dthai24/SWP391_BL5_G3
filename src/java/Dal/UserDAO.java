@@ -306,6 +306,21 @@ public class UserDAO {
         }
         return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
     }
+    
+    public boolean isPhoneNumberTaken(String phoneNumber) {
+        String query = "SELECT COUNT(*) FROM Users WHERE phonenumber = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, phoneNumber);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Trả về true nếu email đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
+    }
 
     // Helper method to map ResultSet to User object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {

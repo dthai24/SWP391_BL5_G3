@@ -11,18 +11,15 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
         <style>
-            /* Tăng hiệu ứng hover cho tiêu đề cột */
             .sortable:hover {
                 text-decoration: underline;
                 cursor: pointer;
             }
 
-            /* Căn chỉnh biểu tượng sort */
             .sortable i {
                 margin-left: 5px;
             }
-
-            /* Khoảng cách giữa các nút hành động */
+            
             .action-buttons a {
                 margin-right: 5px;
             }
@@ -31,7 +28,7 @@
     <body>
         <%
             List<User> users = (List<User>) request.getAttribute("users");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); // Format for registration date
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             int currentPage = (int) request.getAttribute("currentPage");
             int totalPages = (int) request.getAttribute("totalPages");
             String sortField = (String) request.getAttribute("sortField");
@@ -39,8 +36,6 @@
             String filterRole = request.getParameter("filterRole");
             String filterStatus = request.getParameter("filterStatus");
             String searchKeyword = request.getParameter("searchKeyword");
-
-            // Chuyển đổi hướng sắp xếp mặc định cho lần nhấn tiếp theo
             String nextSortDir = "asc".equals(sortDir) ? "desc" : "asc";
         %>
 
@@ -188,7 +183,7 @@
                 for (User user : users) { %>
                             <tr>
                                 <td>
-                                    <img src="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://via.placeholder.com/50" %>" 
+                                    <img src="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://i.pinimg.com/222x/2a/65/f9/2a65f948b71ff3a70e21c64bca10a312.jpg" %>" 
                                          alt="Avatar" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
                                 </td>
                                 <td><%= user.getUserID() %></td>
@@ -207,7 +202,7 @@
                                 <td><%= user.getRegistrationDate() != null ? dateFormat.format(user.getRegistrationDate()) : "N/A" %></td>
                                 <td class="action-buttons">
                                     <a href="<%= request.getContextPath() %>/user?action=detail&userID=<%= user.getUserID() %>" class="btn btn-info btn-sm">
-                                        Chi Tiết
+                                         <i class="fa fa-eye"></i> Chi Tiết
                                     </a>
                                     <a href="<%= request.getContextPath() %>/user?action=edit&userID=<%= user.getUserID() %>" class="btn btn-warning btn-sm">
                                         <i class="fa fa-pencil-alt"></i> Sửa

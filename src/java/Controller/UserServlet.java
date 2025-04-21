@@ -114,6 +114,7 @@ public class UserServlet extends HttpServlet {
             request.getRequestDispatcher("View/Error.jsp").forward(request, response);
         }
     }
+
     private void getUserAdd(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -326,55 +327,51 @@ public class UserServlet extends HttpServlet {
             boolean isAdd, String originalUsername, String originalEmail) {
         Map<String, String> errors = new HashMap<>();
 
-        // Kiểm tra username
         if (username == null || username.trim().isEmpty() || username.length() < 3) {
             errors.put("username", "Tên người dùng phải có ít nhất 3 ký tự và không được để trống.");
         } else if (!username.equals(originalUsername) && userDAO.isUsernameTaken(username)) {
-            // Chỉ kiểm tra trùng lặp nếu username đã thay đổi
             errors.put("username", "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
         }
 
-        // Kiểm tra mật khẩu
         if (isAdd && (password == null || password.trim().isEmpty() || password.length() < 6 || !Pattern.compile("\\d").matcher(password).find())) {
             errors.put("password", "Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
         }
 
-        // Kiểm tra họ tên
         if (fullName == null || fullName.trim().isEmpty() || fullName.length() < 3) {
             errors.put("fullName", "Họ tên phải có ít nhất 3 ký tự và không được để trống.");
         }
 
-        // Kiểm tra email
         if (email == null || email.trim().isEmpty() || !Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matcher(email).matches()) {
             errors.put("email", "Email không hợp lệ hoặc để trống.");
         } else if (!email.equals(originalEmail) && userDAO.isEmailTaken(email)) {
             // Chỉ kiểm tra trùng lặp nếu email đã thay đổi
-            errors.put("email", "Email đã tồn tại. Vui lòng chọn email khác.");
+            errors.put("email", "Email đã tồn tại. Vui lòng nhập email khác.");
         }
 
-        // Kiểm tra số điện thoại
-        if (phoneNumber != null) { // Cho phép null
+        if (phoneNumber != null) {
             if (phoneNumber.trim().isEmpty()) {
                 errors.put("phoneNumber", "Số điện thoại không được để trống hoặc chỉ chứa khoảng trắng.");
             } else if (!Pattern.compile("^[0-9]{10,11}$").matcher(phoneNumber).matches()) {
                 errors.put("phoneNumber", "Số điện thoại phải chứa 10 hoặc 11 chữ số.");
+            } else if (!phoneNumber.equals(originalEmail) && userDAO.isPhoneNumberTaken(email)) {
+                errors.put("phoneNumber", "Số điện thoại đã tồn tại. Vui lòng nhập số điện thoại khác.");
             }
-        }        // Kiểm tra địa chỉ
-        if (address != null && address.trim().isEmpty()) {
-            errors.put("address", "Địa chỉ không được để trống nếu nhập.");
         }
 
-        // Kiểm tra trạng thái
+        if (address != null) {
+            if (address.trim().isEmpty()) {
+                errors.put("address", "Địa chỉ không được để trống hoặc chỉ chứa khoảng trắng.");
+            }
+        }
+
         if (!"Active".equals(status) && !"Inactive".equals(status)) {
             errors.put("status", "Trạng thái phải là 'Active' hoặc 'Inactive'.");
         }
 
-        // Kiểm tra vai trò
         if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(role)) {
             errors.put("role", "Vai trò không hợp lệ.");
         }
 
-        // Kiểm tra URL ảnh đại diện
         if (profilePictureURL != null && !profilePictureURL.trim().isEmpty() && profilePictureURL.length() > 20000000) {
             errors.put("profilePictureURL", "URL ảnh đại diện phải nhỏ hơn 20MB.");
         }
