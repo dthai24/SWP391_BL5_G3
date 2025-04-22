@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import Model.Room;
 import DBContext.DBContext;
+import java.math.BigDecimal;
 
 public class RoomDAO {
 
@@ -21,8 +22,8 @@ public class RoomDAO {
 
     // Add a new room
     public boolean addRoom(Room room) {
-        String sql = "INSERT INTO Rooms (roomNumber, categoryID, vacancyStatus, description, priceOverride, createdAt, updatedAt, isDeleted) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Rooms (roomNumber, categoryID, vacancyStatus, description, priceOverride, createdAt, updatedAt, isDeleted) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, room.getRoomNumber());
             statement.setInt(2, room.getCategoryID());
@@ -41,8 +42,8 @@ public class RoomDAO {
 
     // Edit an existing room
     public boolean editRoom(Room room) {
-        String sql = "UPDATE Rooms SET roomNumber = ?, categoryID = ?, vacancyStatus = ?, description = ?, priceOverride = ?, updatedAt = ? " +
-                     "WHERE roomID = ?";
+        String sql = "UPDATE Rooms SET roomNumber = ?, categoryID = ?, vacancyStatus = ?, description = ?, priceOverride = ?, updatedAt = ? "
+                + "WHERE roomID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, room.getRoomNumber());
             statement.setInt(2, room.getCategoryID());
@@ -149,16 +150,51 @@ public class RoomDAO {
     // Helper method to map ResultSet to Room object
     private Room mapResultSetToRoom(ResultSet resultSet) throws SQLException {
         return new Room(
-            resultSet.getInt("roomID"),
-            resultSet.getString("roomNumber"),
-            resultSet.getInt("categoryID"),
-            resultSet.getString("vacancyStatus"),
-            resultSet.getString("description"),
-            resultSet.getBigDecimal("priceOverride"),
-            resultSet.getTimestamp("createdAt"),
-            resultSet.getTimestamp("updatedAt"),
-            resultSet.getBoolean("isDeleted")
+                resultSet.getInt("roomID"),
+                resultSet.getString("roomNumber"),
+                resultSet.getInt("categoryID"),
+                resultSet.getString("vacancyStatus"),
+                resultSet.getString("description"),
+                resultSet.getBigDecimal("priceOverride"),
+                resultSet.getTimestamp("createdAt"),
+                resultSet.getTimestamp("updatedAt"),
+                resultSet.getBoolean("isDeleted")
         );
+    }
+
+    public BigDecimal getRoomCategoryBasePrice(int categoryID) {
+        String sql = "SELECT BasePricePerNight FROM RoomCategories WHERE CategoryID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, categoryID);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getBigDecimal("BasePricePerNight");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public List<Room> getAllRoomsWithCategoryNames() {
+        List<Room> rooms = new ArrayList<>();
+        String sql = "SELECT r.*, rc.CategoryName FROM Rooms r "
+                + "JOIN RoomCategories rc ON r.CategoryID = rc.CategoryID "
+                + "WHERE r.isDeleted = 0 ORDER BY r.roomNumber";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Room room = mapResultSetToRoom(resultSet);
+                // Store category name in a separate field or as an additional property
+                room.setCategoryName(resultSet.getString("CategoryName"));
+                rooms.add(room);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rooms;
     }
 
     // Main method to test listAllRooms and getRoomById
@@ -177,4 +213,3 @@ public class RoomDAO {
         System.out.println(roomById);
     }
 }
-

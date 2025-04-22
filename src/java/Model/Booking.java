@@ -23,6 +23,9 @@ public class Booking {
     private List<BookingService> bookingServices;
     private List<Payment> payments;
     
+    // For display purposes only
+    private String customerName;
+    
     // Constructors
     public Booking() {
     }
@@ -162,6 +165,18 @@ public class Booking {
 
     public void setPayments(List<Payment> payments) {
         this.payments = payments;
+    }
+    
+    public String getCustomerName() {
+        // First try to get from customer object, then from the simple field
+        if (customer != null) {
+            return customer.getFullName();
+        }
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     @Override

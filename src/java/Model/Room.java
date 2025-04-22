@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Room {
+
     private int roomID;
     private String roomNumber;
     private int categoryID;
@@ -13,17 +14,17 @@ public class Room {
     private Date createdAt;
     private Date updatedAt;
     private boolean isDeleted;
-    
+
     // For relationships
     private RoomCategory category;
-    
+
     // Constructors
     public Room() {
     }
 
-    public Room(int roomID, String roomNumber, int categoryID, String vacancyStatus, 
-                String description, BigDecimal priceOverride, Date createdAt, 
-                Date updatedAt, boolean isDeleted) {
+    public Room(int roomID, String roomNumber, int categoryID, String vacancyStatus,
+            String description, BigDecimal priceOverride, Date createdAt,
+            Date updatedAt, boolean isDeleted) {
         this.roomID = roomID;
         this.roomNumber = roomNumber;
         this.categoryID = categoryID;
@@ -34,7 +35,7 @@ public class Room {
         this.updatedAt = updatedAt;
         this.isDeleted = isDeleted;
     }
-    
+
     // Getters and Setters
     public int getRoomID() {
         return roomID;
@@ -107,7 +108,7 @@ public class Room {
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-    
+
     public RoomCategory getCategory() {
         return category;
     }
@@ -116,18 +117,28 @@ public class Room {
         this.category = category;
     }
 
+    private String categoryName; // For display purposes
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     @Override
     public String toString() {
-        return "Room{" +
-                "roomID=" + roomID +
-                ", roomNumber='" + roomNumber + '\'' +
-                ", categoryID=" + categoryID +
-                ", vacancyStatus='" + vacancyStatus + '\'' +
-                ", description='" + description + '\'' +
-                ", priceOverride=" + priceOverride +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", isDeleted=" + isDeleted +
-                '}';
+        return "Room{"
+                + "roomID=" + roomID
+                + ", roomNumber='" + roomNumber + '\''
+                + ", categoryID=" + categoryID
+                + ", vacancyStatus='" + vacancyStatus + '\''
+                + ", description='" + description + '\''
+                + ", priceOverride=" + priceOverride
+                + ", createdAt=" + createdAt
+                + ", updatedAt=" + updatedAt
+                + ", isDeleted=" + isDeleted
+                + '}';
     }
 }

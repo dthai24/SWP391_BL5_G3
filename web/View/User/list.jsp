@@ -1,248 +1,453 @@
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="Model.User" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Danh Sách Người Dùng</title>
+
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
+        <%@ include file="/View/Common/header.jsp" %>
         <style>
-            /* Tăng hiệu ứng hover cho tiêu đề cột */
-            .sortable:hover {
-                text-decoration: underline;
-                cursor: pointer;
+            .info-label {
+                font-weight: 600;
             }
-
-            /* Căn chỉnh biểu tượng sort */
-            .sortable i {
-                margin-left: 5px;
+            .status-active {
+                background-color: #28A745;
+                color: #fff;
+                padding: 5px 10px;
+                border-radius: 4px;
             }
-
-            /* Khoảng cách giữa các nút hành động */
-            .action-buttons a {
-                margin-right: 5px;
+            .status-inactive {
+                background-color: #DC3545;
+                color: #fff;
+                padding: 5px 10px;
+                border-radius: 4px;
+            }
+            .avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+            .avatar-large {
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+            .table-responsive {
+                overflow-x: auto !important;
+            }
+            #user-datatable {
+                min-width: 900px !important;
+                table-layout: fixed;
+            }
+            #user-datatable th, #user-datatable td {
+                white-space: normal !important;
+                word-break: break-word !important;
+                vertical-align: middle;
+            }
+            .notification-box {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1050;
+                display: none;
             }
         </style>
     </head>
     <body>
-        <%
-            List<User> users = (List<User>) request.getAttribute("users");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy"); // Format for registration date
-            int currentPage = (int) request.getAttribute("currentPage");
-            int totalPages = (int) request.getAttribute("totalPages");
-            String sortField = (String) request.getAttribute("sortField");
-            String sortDir = (String) request.getAttribute("sortDir");
-            String filterRole = request.getParameter("filterRole");
-            String filterStatus = request.getParameter("filterStatus");
-            String searchKeyword = request.getParameter("searchKeyword");
+        <div class="wrapper">
+            <%@ include file="/View/Common/sidebar.jsp" %>
+            <div class="main">
+                <%@ include file="/View/Common/navbar.jsp" %>
+                <main class="content">
+                    <%
+                        List<User> users = (List<User>) request.getAttribute("users");
+                        User editUser = (User) request.getAttribute("editUser");
+                        String successMessage = (String) request.getAttribute("successMessage");
+                        String errorMessage = (String) request.getAttribute("errorMessage");
+                        Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    %>
 
-            // Chuyển đổi hướng sắp xếp mặc định cho lần nhấn tiếp theo
-            String nextSortDir = "asc".equals(sortDir) ? "desc" : "asc";
-        %>
-
-        <%!
-            // Hàm hỗ trợ xây dựng URL động
-            String buildSortUrl(String field, String nextSortDir, String searchKeyword, String filterRole) {
-                StringBuilder url = new StringBuilder();
-                url.append("?action=list");
-                url.append("&sortField=").append(field);
-                url.append("&sortDir=").append(nextSortDir);
-                if (searchKeyword != null && !searchKeyword.isEmpty()) {
-                    url.append("&searchKeyword=").append(searchKeyword);
-                }
-                if (filterRole != null && !filterRole.isEmpty()) {
-                    url.append("&filterRole=").append(filterRole);
-                }
-                return url.toString();
-            }
-        %>
-
-        <div class="container mt-5">
-            <!-- Hiển thị thông báo nếu có -->
-            <% String success = request.getParameter("success");
-               String error = request.getParameter("error");
-               if (success != null) { %>
-            <div class="alert alert-success"><%= success %></div>
-            <% } else if (error != null) { %>
-            <div class="alert alert-danger"><%= error %></div>
-            <% } %>
-
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h3 class="mb-0">Danh Sách Người Dùng</h3>
-                    <div>
-                        <!-- Link đến add.jsp -->
-                        <a href="<%= request.getContextPath() %>/View/User/add.jsp" class="btn btn-light btn-sm">
-                            <i class="fa fa-plus"></i> Thêm Người Dùng
-                        </a>
+                    <!-- Notification Box -->
+                    <% if (successMessage != null) { %>
+                    <div class="alert alert-success alert-dismissible fade show notification-box" role="alert">
+                        <%= successMessage %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </div>
-                <div class="card-body">
-                    <!-- Bộ lọc và tìm kiếm -->
-                    <form method="get" action="<%= request.getContextPath() %>/user">
-                        <input type="hidden" name="action" value="list">
-                        <div class="row mb-3">
-                            <!-- Tìm kiếm -->
-                            <div class="col-md-4">
-                                <input type="text" name="searchKeyword" class="form-control" placeholder="Tìm kiếm tên hoặc email"
-                                       value="<%= searchKeyword != null ? searchKeyword : "" %>">
+                    <% } %>
+                    <% if (errorMessage != null) { %>
+                    <div class="alert alert-danger alert-dismissible fade show notification-box" role="alert">
+                        <%= errorMessage %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <% } %>
+
+                    <!-- Table Section -->
+                    <div class="container mt-5">
+                        <div class="card shadow-lg">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h3 class="mb-0">Danh Sách Người Dùng</h3>
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">
+                                    <i class="fa fa-plus"></i> Thêm Người Dùng
+                                </button>
                             </div>
-                            <!-- Lọc vai trò -->
-                            <div class="col-md-3">
-                                <select name="filterRole" class="form-control">
-                                    <option value="">Tất cả vai trò</option>
-                                    <option value="Admin" <%= "Admin".equals(filterRole) ? "selected" : "" %>>Admin</option>
-                                    <option value="Customer" <%= "Customer".equals(filterRole) ? "selected" : "" %>>Customer</option>
-                                    <option value="Staff" <%= "Staff".equals(filterRole) ? "selected" : "" %>>Staff</option>
-                                    <option value="Receptionist" <%= "Receptionist".equals(filterRole) ? "selected" : "" %>>Receptionist</option>
-                                    <option value="Manager" <%= "Manager".equals(filterRole) ? "selected" : "" %>>Manager</option>
-                                </select>
-                            </div>
-                            <!-- Lọc trạng thái -->
-                            <div class="col-md-3">
-                                <select name="filterStatus" class="form-control">
-                                    <option value="">Tất cả trạng thái</option>
-                                    <option value="Active" <%= "Active".equals(filterStatus) ? "selected" : "" %>>Hoạt động</option>
-                                    <option value="Inactive" <%= "Inactive".equals(filterStatus) ? "selected" : "" %>>Không hoạt động</option>
-                                </select>
-                            </div>
-                            <!-- Nút áp dụng và hủy -->
-                            <div class="col-md-2 d-flex">
-                                <button type="submit" class="btn btn-primary mr-2">Áp dụng</button>
-                                <a href="<%= request.getContextPath() %>/user?action=list" class="btn btn-secondary">Hủy</a>
+
+                            <div class="card-body">
+                                <form method="get" action="user" class="form-inline mb-3">
+                                    <div class="form-group mr-2">
+                                        <label for="filterRole" class="mr-2">Vai trò</label>
+                                        <select name="filterRole" id="filterRole" class="form-control">
+                                            <option value="">Tất cả</option>
+                                            <option value="Admin" <%= "Admin".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Admin</option>
+                                            <option value="Customer" <%= "Customer".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Customer</option>
+                                            <option value="Staff" <%= "Staff".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Staff</option>
+                                            <option value="Receptionist" <%= "Receptionist".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Receptionist</option>
+                                            <option value="Manager" <%= "Manager".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Manager</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mr-2">
+                                        <label for="filterStatus" class="mr-2">Trạng thái</label>
+                                        <select name="filterStatus" id="filterStatus" class="form-control">
+                                            <option value="">Tất cả</option>
+                                            <option value="Active" <%= "Active".equals(request.getParameter("filterStatus")) ? "selected" : "" %>>Active</option>
+                                            <option value="Inactive" <%= "Inactive".equals(request.getParameter("filterStatus")) ? "selected" : "" %>>Inactive</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+                                    <a href="user" class="btn btn-secondary">Hủy</a>
+                                </form>
+                                <div class="table-responsive">
+                                    <table id="user-datatable" class="table table-hover table-striped align-middle">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Avatar</th>
+                                                <th>Tên Người Dùng</th>
+                                                <th>Họ và Tên</th>
+                                                <th>Email</th>
+                                                <th>Số Điện Thoại</th>
+                                                <th>Địa Chỉ</th>
+                                                <th>Vai Trò</th>
+                                                <th>Trạng Thái</th>
+                                                <th>Ngày Tạo</th>
+                                                <th>Hành Động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (users != null && !users.isEmpty()) {
+                                                for (User user : users) { %>
+                                            <tr>
+                                                <td><%= user.getUserID() %></td>
+                                                <td>
+                                                    <% if (user.getProfilePictureURL() != null && !user.getProfilePictureURL().isEmpty()) { %>
+                                                    <img src="<%= user.getProfilePictureURL() %>" alt="Avatar" class="avatar">
+                                                    <% } else { %>
+                                                    <img src="<%= request.getContextPath() %>/img/default-avatar.png" alt="Avatar" class="avatar">
+                                                    <% } %>
+                                                </td>
+                                                <td><%= user.getUsername() %></td>
+                                                <td><%= user.getFullName() %></td>
+                                                <td><%= user.getEmail() %></td>
+                                                <td><%= user.getPhoneNumber() %></td>
+                                                <td><%= user.getAddress() %></td>
+                                                <td><%= user.getRole() %></td>
+                                                <td>
+                                                    <% if ("Active".equals(user.getStatus())) { %>
+                                                    <span class="status-active">Active</span>
+                                                    <% } else { %>
+                                                    <span class="status-inactive">Inactive</span>
+                                                    <% } %>
+                                                </td>
+                                                <td><%= user.getRegistrationDate() != null ? sdf.format(user.getRegistrationDate()) : "N/A" %></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-link p-0 view-btn" 
+                                                            data-userid="<%= user.getUserID() %>"
+                                                            data-username="<%= user.getUsername() %>"
+                                                            data-fullname="<%= user.getFullName() %>"
+                                                            data-email="<%= user.getEmail() %>"
+                                                            data-phonenumber="<%= user.getPhoneNumber() %>"
+                                                            data-address="<%= user.getAddress() %>"
+                                                            data-role="<%= user.getRole() %>"
+                                                            data-status="<%= user.getStatus() %>"
+                                                            data-registrationdate="<%= user.getRegistrationDate() != null ? sdf.format(user.getRegistrationDate()) : "N/A" %>"
+                                                            data-profilepictureurl="<%= user.getProfilePictureURL() %>"
+                                                            data-toggle="modal" data-target="#viewUserModal">
+                                                        <i class="fa fa-eye" style="color: #17a2b8;"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-link p-0 edit-btn"
+                                                            data-userid="<%= user.getUserID() %>"
+                                                            data-username="<%= user.getUsername() %>"
+                                                            data-fullname="<%= user.getFullName() %>"
+                                                            data-email="<%= user.getEmail() %>"
+                                                            data-phonenumber="<%= user.getPhoneNumber() %>"
+                                                            data-address="<%= user.getAddress() %>"
+                                                            data-role="<%= user.getRole() %>"
+                                                            data-status="<%= user.getStatus() %>"
+                                                            data-profilepictureurl="<%= user.getProfilePictureURL() %>"
+                                                            data-registrationdate="<%= user.getRegistrationDate() != null ? sdf.format(user.getRegistrationDate()) : "N/A" %>"
+                                                            data-toggle="modal" data-target="#editUserModal">
+                                                        <i class="fa fa-edit" style="color: #ffc107;"></i>
+                                                    </button>
+                                                    <form method="post" action="user" class="d-inline delete-user-form">
+                                                        <input type="hidden" name="deleteUserID" value="<%= user.getUserID() %>" />
+                                                        <button type="submit" class="btn btn-link p-0 delete-btn" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                                                            <i class="fa fa-trash" style="color: #dc3545;"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <%  } 
+                                    } else { %>
+                                            <tr><td colspan="11" class="text-center">Không có người dùng nào.</td></tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
 
-                    <!-- Bảng danh sách người dùng -->
-                    <table class="table table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Avatar</th>
-                                <th class="sortable">
-                                    <a href="<%= buildSortUrl("userID", nextSortDir, searchKeyword, filterRole) %>">
-                                        ID
-                                        <% if ("userID".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th class="sortable">
-                                    <a href="<%= buildSortUrl("username", nextSortDir, searchKeyword, filterRole) %>">
-                                        Tên Người Dùng
-                                        <% if ("username".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th class="sortable">
-                                    <a href="<%= buildSortUrl("email", nextSortDir, searchKeyword, filterRole) %>">
-                                        Email
-                                        <% if ("email".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th>Số Điện Thoại</th>
-                                <th class="sortable">  
-                                    <a href="<%= buildSortUrl("address", nextSortDir, searchKeyword, filterRole) %>">
-                                        Địa chỉ
-                                        <% if ("address".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th class="sortable">
-                                    <a href="<%= buildSortUrl("role", nextSortDir, searchKeyword, filterRole) %>">
-                                        Vai trò
-                                        <% if ("role".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th class="sortable">
-                                    <a href="<%= buildSortUrl("status", nextSortDir, searchKeyword, filterRole) %>">
-                                        Trạng Thái
-                                        <% if ("status".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th>
-                                    <a href="<%= buildSortUrl("registrationDate", nextSortDir, searchKeyword, filterRole) %>">
-                                        Ngày Đăng Ký
-                                        <% if ("registrationDate".equals(sortField)) { %>
-                                        <i class="fa <%= "asc".equals(sortDir) ? "fa-sort-up" : "fa-sort-down" %>"></i>
-                                        <% } %>
-                                    </a>
-                                </th>
-                                <th>Hành Động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (users != null && !users.isEmpty()) {
-                for (User user : users) { %>
-                            <tr>
-                                <td>
-                                    <img src="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://via.placeholder.com/50" %>" 
-                                         alt="Avatar" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
-                                </td>
-                                <td><%= user.getUserID() %></td>
-                                <td><%= user.getUsername() %></td>
-                                <td><%= user.getEmail() %></td>
-                                <td><%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "N/A" %></td>
-                                <td><%= user.getAddress() != null ? user.getAddress() : "N/A" %></td>
-                                <td><%= user.getRole() %></td>
-                                <td>
-                                    <% if ("Active".equals(user.getStatus())) { %>
-                                    <span class="badge badge-success">Hoạt động</span>
-                                    <% } else { %>
-                                    <span class="badge badge-danger">Không hoạt động</span>
-                                    <% } %>
-                                </td>
-                                <td><%= user.getRegistrationDate() != null ? dateFormat.format(user.getRegistrationDate()) : "N/A" %></td>
-                                <td class="action-buttons">
-                                    <a href="<%= request.getContextPath() %>/user?action=detail&userID=<%= user.getUserID() %>" class="btn btn-info btn-sm">
-                                        Chi Tiết
-                                    </a>
-                                    <a href="<%= request.getContextPath() %>/user?action=edit&userID=<%= user.getUserID() %>" class="btn btn-warning btn-sm">
-                                        <i class="fa fa-pencil-alt"></i> Sửa
-                                    </a>
-                                    <a href="<%= request.getContextPath() %>/user?action=delete&userID=<%= user.getUserID() %>" 
-                                       class="btn btn-danger btn-sm" 
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">
-                                        <i class="fa fa-trash"></i> Xóa
-                                    </a>
-                                </td>
-                            </tr>
-                            <% }
-            } else { %>
-                            <tr>
-                                <td colspan="9" class="text-center">Không có người dùng nào.</td>
-                            </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
+                    <!-- Add User Modal -->
+                    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <form action="user" method="post">
+                                    <input type="hidden" name="action" value="add">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addUserModalLabel">Thêm Người Dùng Mới</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="add-username">Tên Người Dùng</label>
+                                            <input type="text" name="username" id="add-username" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-password">Mật Khẩu</label>
+                                            <input type="password" name="password" id="add-password" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-fullName">Họ Và Tên</label>
+                                            <input type="text" name="fullName" id="add-fullName" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-email">Email</label>
+                                            <input type="email" name="email" id="add-email" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-phoneNumber">Số Điện Thoại</label>
+                                            <input type="text" name="phoneNumber" id="add-phoneNumber" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-address">Địa Chỉ</label>
+                                            <input type="text" name="address" id="add-address" class="form-control" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-profilePictureURL">Avatar (URL)</label>
+                                            <input type="url" name="profilePictureURL" id="add-profilePictureURL" class="form-control" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-role">Vai Trò</label>
+                                            <select name="role" id="add-role" class="form-control" required>
+                                                <option value="Admin">Admin</option>
+                                                <option value="Customer">Customer</option>
+                                                <option value="Staff">Staff</option>
+                                                <option value="Manager">Manager</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="add-status">Trạng Thái</label>
+                                            <select name="status" id="add-status" class="form-control">
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary">Thêm Người Dùng</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- Phân trang -->
-                    <nav>
-                        <ul class="pagination justify-content-center">
-                            <% for (int i = 1; i <= totalPages; i++) { %>
-                            <li class="page-item <%= i == currentPage ? "active" : "" %>">
-                                <a class="page-link" href="?action=list&page=<%= i %><%= sortField != null ? "&sortField=" + sortField : "" %><%= sortDir != null ? "&sortDir=" + sortDir : "" %><%= filterRole != null ? "&filterRole=" + filterRole : "" %><%= filterStatus != null ? "&filterStatus=" + filterStatus : "" %><%= searchKeyword != null ? "&searchKeyword=" + searchKeyword : "" %>">
-                                    <%= i %>
-                                </a>
-                            </li>
-                            <% } %>
-                        </ul>
-                    </nav>
-                </div>
+                    <!-- View User Modal -->
+                    <div class="modal fade" id="viewUserModal" tabindex="-1" role="dialog" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="viewUserModalLabel">Chi Tiết Người Dùng</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="text-center mb-3">
+                                        <img id="view-avatar" src="<%= request.getContextPath() %>/img/default-avatar.png" alt="Avatar" class="avatar-large">
+                                    </div>
+                                    <p><strong>ID:</strong> <span id="view-userID"></span></p>
+                                    <p><strong>Tên Người Dùng:</strong> <span id="view-username"></span></p>
+                                    <p><strong>Họ và Tên:</strong> <span id="view-fullName"></span></p>
+                                    <p><strong>Email:</strong> <span id="view-email"></span></p>
+                                    <p><strong>Số Điện Thoại:</strong> <span id="view-phoneNumber"></span></p>
+                                    <p><strong>Địa Chỉ:</strong> <span id="view-address"></span></p>
+                                    <p><strong>Vai Trò:</strong> <span id="view-role"></span></p>
+                                    <p><strong>Trạng Thái:</strong> <span id="view-status"></span></p>
+                                    <p><strong>Ngày Tạo:</strong> <span id="view-registrationDate"></span></p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Edit User Modal -->
+                    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <form action="user" method="post">
+                                    <input type="hidden" name="action" value="edit">
+                                    <input type="hidden" name="userID" id="edit-userID">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editUserModalLabel">Chỉnh Sửa Thông Tin Người Dùng</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="text-center mb-3">
+                                            <img id="edit-avatar-preview" src="" alt="Avatar" class="avatar-large">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-username">Tên Người Dùng</label>
+                                            <input type="text" name="username" id="edit-username" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-fullName">Họ và Tên</label>
+                                            <input type="text" name="fullName" id="edit-fullName" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-email">Email</label>
+                                            <input type="email" name="email" id="edit-email" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-phoneNumber">Số Điện Thoại</label>
+                                            <input type="text" name="phoneNumber" id="edit-phoneNumber" class="form-control" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-address">Địa Chỉ</label>
+                                            <input type="text" name="address" id="edit-address" class="form-control" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-profilePictureURL">Avatar (URL)</label>
+                                            <input type="url" name="profilePictureURL" id="edit-profilePictureURL" class="form-control" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-role">Vai Trò</label>
+                                            <select name="role" id="edit-role" class="form-control" required>
+                                                <option value="Admin">Admin</option>
+                                                <option value="Customer">Customer</option>
+                                                <option value="Staff">Staff</option>
+                                                <option value="Manager">Manager</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edit-status">Trạng Thái</label>
+                                            <select name="status" id="edit-status" class="form-control">
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary">Cập Nhật</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+                    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+                    <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
+                    <script>
+                                                            $(document).ready(function () {
+                                                                // Initialize DataTable
+                                                                $('#user-datatable').DataTable({
+                                                                    responsive: true,
+                                                                    paging: true,
+                                                                    ordering: true,
+                                                                    info: true,
+                                                                    columnDefs: [
+                                                                        {orderable: false, targets: -1} // Disable sort for last column (Action)
+                                                                    ],
+                                                                    language: {
+                                                                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+                                                                    }
+                                                                });
+
+                                                                // Handle Notification Box
+                                                                const notificationBox = $('.notification-box');
+                                                                if (notificationBox.children().length > 0) {
+                                                                    notificationBox.fadeIn();
+                                                                    setTimeout(() => notificationBox.fadeOut(), 3000);
+                                                                }
+
+                                                                // Populate View User Modal
+                                                                $('.view-btn').on('click', function () {
+                                                                    $('#view-userID').text($(this).data('userid'));
+                                                                    $('#view-username').text($(this).data('username'));
+                                                                    $('#view-fullName').text($(this).data('fullname'));
+                                                                    $('#view-email').text($(this).data('email'));
+                                                                    $('#view-phoneNumber').text($(this).data('phonenumber'));
+                                                                    $('#view-address').text($(this).data('address'));
+                                                                    $('#view-role').text($(this).data('role'));
+                                                                    $('#view-status').text($(this).data('status'));
+                                                                    $('#view-registrationDate').text($(this).data('registrationdate'));
+                                                                    $('#view-avatar').attr('src', $(this).data('profilepictureurl') || '<%= request.getContextPath() %>/img/default-avatar.png');
+                                                                });
+
+                                                                // Populate Edit User Modal
+                                                                $('.edit-btn').on('click', function () {
+                                                                    $('#edit-userID').val($(this).data('userid'));
+                                                                    $('#edit-username').val($(this).data('username'));
+                                                                    $('#edit-fullName').val($(this).data('fullname'));
+                                                                    $('#edit-email').val($(this).data('email'));
+                                                                    $('#edit-phoneNumber').val($(this).data('phonenumber'));
+                                                                    $('#edit-address').val($(this).data('address'));
+                                                                    $('#edit-profilePictureURL').val($(this).data('profilepictureurl'));
+                                                                    $('#edit-role').val($(this).data('role'));
+                                                                    $('#edit-status').val($(this).data('status'));
+                                                                    $('#edit-avatar-preview').attr('src', $(this).data('profilepictureurl') || '<%= request.getContextPath() %>/img/default-avatar.png');
+                                                                    $('#edit-registrationDate').text($(this).data('registrationdate'));
+                                                                });
+                                                            });
+                    </script>
+                </main>
+                <%@ include file="/View/Common/header.jsp" %>
             </div>
         </div>
-        <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
     </body>
 </html>

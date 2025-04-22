@@ -23,11 +23,11 @@ public class UserDAO {
 
     // Add a new user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, passwordHash, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) "
+        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, isDeleted, registrationDate) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -35,8 +35,8 @@ public class UserDAO {
             statement.setString(7, user.getRole());
             statement.setString(8, user.getProfilePictureURL());
             statement.setString(9, user.getStatus());
-            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
-            statement.setBoolean(11, user.getIsDeleted());
+            statement.setBoolean(10, user.getIsDeleted());
+            statement.setDate(11, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -50,21 +50,22 @@ public class UserDAO {
             ps.setString(1, username);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-           if (rs.next()) {
-    return new User(
-        rs.getString("Username"),
-        rs.getString("Password"),
-        rs.getString("FullName"),
-        rs.getString("Email"),
-        rs.getString("PhoneNumber"),
-        rs.getString("Address"),
-        rs.getString("Role"),
-        rs.getString("ProfilePictureURL"),
-        rs.getString("Status"),
-        rs.getDate("RegistrationDate"), // ✅ THÊM VÀO
-        rs.getBoolean("IsDeleted")
-    );
-}
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("UserID"),
+                        rs.getString("Username"),
+                        rs.getString("Password"),
+                        rs.getString("FullName"),
+                        rs.getString("Email"),
+                        rs.getString("PhoneNumber"),
+                        rs.getString("Address"),
+                        rs.getString("Role"),
+                        rs.getString("ProfilePictureURL"),
+                        rs.getString("Status"),
+                        rs.getDate("RegistrationDate"),
+                        rs.getBoolean("IsDeleted")
+                );
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,7 +89,7 @@ public class UserDAO {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -107,11 +108,11 @@ public class UserDAO {
 
     // Edit an existing user
     public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, passwordHash = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? "
+        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ? "
                 + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPasswordHash());
+            statement.setString(2, user.getPassword());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -119,8 +120,7 @@ public class UserDAO {
             statement.setString(7, user.getRole());
             statement.setString(8, user.getProfilePictureURL());
             statement.setString(9, user.getStatus());
-            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
-            statement.setInt(11, user.getUserID());
+            statement.setInt(10, user.getUserID());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -307,21 +307,41 @@ public class UserDAO {
         return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
     }
 
+    public boolean isPhoneNumberTaken(String phoneNumber) {
+        String query = "SELECT COUNT(*) FROM Users WHERE phonenumber = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, phoneNumber);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Trả về true nếu email đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
+    }
+
     // Helper method to map ResultSet to User object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
-       return new User(
-    resultSet.getString("username"),
-    resultSet.getString("passwordHash"),
-    resultSet.getString("fullName"),
-    resultSet.getString("email"),
-    resultSet.getString("phoneNumber"),
-    resultSet.getString("address"),
-    resultSet.getString("role"),
-    resultSet.getString("profilePictureURL"),
-    resultSet.getString("status"),
-    resultSet.getDate("registrationDate"),
-    resultSet.getBoolean("isDeleted")
-);
+        return new User(
+                resultSet.getInt("userID"),
+                resultSet.getString("username"),
+                resultSet.getString("password"),
+                resultSet.getString("fullName"),
+                resultSet.getString("email"),
+                resultSet.getString("phoneNumber"),
+                resultSet.getString("address"),
+                resultSet.getString("role"),
+                resultSet.getString("profilePictureURL"),
+                resultSet.getString("status"),
+                resultSet.getDate("registrationDate"),
+                resultSet.getBoolean("isDeleted")
+        );
+    }
+
+    public List<User> searchUsers(String searchTerm, String role, String sortBy, String sortDirection) {
+        return searchAndListUsers(searchTerm, role, sortBy, sortDirection, 1, Integer.MAX_VALUE);
     }
 
     // Main method to test new features

@@ -135,7 +135,7 @@
                                     <%
                                         } else {
                                     %>
-                                   <a href="javascript:void(0);" onclick="loadLoginForm()"><i class="fa fa-sign-in"></i> Đăng nhập</a>
+                                    <a href="login.jsp"><i class="fa fa-sign-in"></i> Đăng nhập</a>
                                     <%
                                         }
                                     %>
@@ -199,7 +199,7 @@
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-5 offset-xl-2 offset-lg-1">
-                        <div id="bookingFormContainer" class="booking-form">
+                        <div class="booking-form">
                             <h3>Booking Your Hotel</h3>
                             <form action="#">
                                 <div class="check-date">
@@ -582,7 +582,6 @@
                 </div>
             </div>
         </section>
-        
         <!-- Blog Section End -->
 
         <!-- Footer Section Begin -->
@@ -672,23 +671,6 @@
         <script src="js/jquery.slicknav.js"></script>
         <script src="js/owl.carousel.min.js"></script>
         <script src="js/main.js"></script>
-        <script>
-    function loadLoginForm() {
-    const container = document.getElementById("bookingFormContainer");
-    container.innerHTML = '<div class="text-center">Đang tải form đăng nhập...</div>';
-
-    fetch("login-form.jsp")
-        .then(response => response.text())
-        .then(html => {
-            container.innerHTML = html;
-        })
-        .catch(error => {
-            container.innerHTML = '<div class="text-danger">Không thể tải form đăng nhập.</div>';
-            console.error('Lỗi:', error);
-        });
-}
-
-</script>
     </body>
 
 </html>

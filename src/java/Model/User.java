@@ -5,7 +5,7 @@ import java.util.Date;
 public class User {
     private int userID;
     private String username;
-    private String passwordHash;
+    private String password;
     private String fullName;
     private String email;
     private String phoneNumber;
@@ -20,19 +20,22 @@ public class User {
     public User() {
     }
     
-   public User(String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
-    this.username = username;
-    this.passwordHash = passwordHash;
-    this.fullName = fullName;
-    this.email = email;
-    this.phoneNumber = phoneNumber;
-    this.address = address;
-    this.role = role;
-    this.profilePictureURL = profilePictureURL;
-    this.status = status;
-    this.registrationDate = registrationDate;
-    this.isDeleted = isDeleted;
-}
+    public User(int userID, String username, String password, String fullName, String email, 
+                String phoneNumber, String address, String role, String profilePictureURL, 
+                String status, Date registrationDate, boolean isDeleted) {
+        this.userID = userID;
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.role = role;
+        this.profilePictureURL = profilePictureURL;
+        this.status = status;
+        this.registrationDate = registrationDate;
+        this.isDeleted = isDeleted;
+    }
 
     // Getters and Setters
     public int getUserID() {
@@ -51,12 +54,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFullName() {

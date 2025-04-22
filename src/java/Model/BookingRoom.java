@@ -14,6 +14,9 @@ public class BookingRoom {
     private Room room;
     private List<BookingRoomInventoryCheck> inventoryChecks;
     
+    // For display purposes only - doesn't exist in Room object but needed for UI
+    private String categoryName;
+    
     // Constructors
     public BookingRoom() {
     }
@@ -80,6 +83,23 @@ public class BookingRoom {
 
     public void setInventoryChecks(List<BookingRoomInventoryCheck> inventoryChecks) {
         this.inventoryChecks = inventoryChecks;
+    }
+    
+    // Helper methods to access room properties easily
+    public String getRoomNumber() {
+        return room != null ? room.getRoomNumber() : null;
+    }
+    
+    public String getVacancyStatus() {
+        return room != null ? room.getVacancyStatus() : null;
+    }
+    
+    public String getCategoryName() {
+        return categoryName;
+    }
+    
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     @Override

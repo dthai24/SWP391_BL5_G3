@@ -23,9 +23,9 @@ public class DBContext {
    
    private final String serverName = "localhost";
     private final String dbName = "SWP391_BL5_G3";
-    private final String portNumber = "1433"; 
+    private final String portNumber = "1433"; // Cổng mặc định của SQL Server
     private final String userID = "sa";
-    private final String password = "123"; 
+    private final String password = "123"; // <-- sửa đúng theo máy bạn
 
     public static void main(String[] args) {
         try {
