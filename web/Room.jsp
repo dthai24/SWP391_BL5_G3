@@ -387,36 +387,6 @@
                         return false;
                     }
                 });
-                // Sửa phòng
-                $("#editRoomModal form").on("submit", function(e) {
-                    var roomNumber = $(this).find('[name="roomNumber"]').val();
-                    var oldRoomNumber = $('#edit-roomNumber').data('old');
-                    if (!roomNumber || roomNumber.trim() === "") {
-                        alert("Số phòng không được để trống.");
-                        $(this).find('[name="roomNumber"]').focus();
-                        e.preventDefault();
-                        return false;
-                    }
-                    if (/\s/.test(roomNumber)) {
-                        alert("Số phòng không được chứa khoảng trắng.");
-                        $(this).find('[name="roomNumber"]').focus();
-                        e.preventDefault();
-                        return false;
-                    }
-                    if (!/^\d+$/.test(roomNumber)) {
-                        alert("Số phòng chỉ được chứa các số.");
-                        $(this).find('[name="roomNumber"]').focus();
-                        e.preventDefault();
-                        return false;
-                    }
-                    // Nếu đổi số phòng, kiểm tra trùng
-                    if (roomNumber !== oldRoomNumber && existingRoomNumbers.includes(roomNumber)) {
-                        alert("Số phòng đã tồn tại.");
-                        $(this).find('[name="roomNumber"]').focus();
-                        e.preventDefault();
-                        return false;
-                    }
-                });
                 // Khi mở modal sửa, lưu số phòng cũ vào data-old
                 $('.edit-btn').click(function(){
                     $('#edit-roomID').val($(this).data('roomid'));
