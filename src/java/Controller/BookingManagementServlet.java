@@ -11,7 +11,6 @@ import Model.Service;
 import Model.BookingRoom;
 import Model.BookingService;
 
-// Import JAKARTA versions
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -44,32 +43,33 @@ public class BookingManagementServlet extends HttpServlet {
         serviceDAO = new ServiceDAO();
     }
 
- 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        
+
         // Check user authentication and authorization
         User currentUser = authenticateAndAuthorize(request, response);
-        if (currentUser == null) return; 
-        
+        if (currentUser == null) {
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null || action.trim().isEmpty()) {
-            action = "list"; 
+            action = "list";
         }
-        
+
         String role = currentUser.getRole();
         boolean isManager = "Manager".equalsIgnoreCase(role);
         boolean canView = isManager || "Staff".equalsIgnoreCase(role) || "Receptionist".equalsIgnoreCase(role);
-        
+
         if (!canView) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this resource.");
             return;
         }
-        
+
         try {
             switch (action) {
                 case "list":
@@ -93,34 +93,35 @@ public class BookingManagementServlet extends HttpServlet {
         }
     }
 
-  
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
-        
+
         // Check user authentication and authorization
         User currentUser = authenticateAndAuthorize(request, response);
-        if (currentUser == null) return; 
-        
+        if (currentUser == null) {
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null || action.trim().isEmpty()) {
-            action = "list"; 
+            action = "list";
             response.sendRedirect("manage-bookings");
             return;
         }
-        
+
         String role = currentUser.getRole();
         boolean isManager = "Manager".equalsIgnoreCase(role);
-        
+
         //Require Manager Role
         if (!isManager) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to perform this action.");
             return;
         }
-        
+
         try {
             switch (action) {
                 case "save":
@@ -153,37 +154,34 @@ public class BookingManagementServlet extends HttpServlet {
         }
     }
 
-  
-    private User authenticateAndAuthorize(HttpServletRequest request, HttpServletResponse response) 
+    private User authenticateAndAuthorize(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-            
+
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
 
         // Temporary user creation for development - Replace with actual authentication when ready
         if (currentUser == null) {
             currentUser = new User();
-            currentUser.setUserID(2); 
+            currentUser.setUserID(2);
             currentUser.setRole("Manager");
             session = request.getSession(true);
             session.setAttribute("user", currentUser);
             System.out.println("DEVELOPMENT MODE: Created temporary Manager user with ID 2");
         }
-        
+
         /* 
         // Uncomment when ready for production
         if (currentUser == null) {
             response.sendRedirect("login.jsp");
             return null;
         }
-        */
-
+         */
         return currentUser;
     }
 
-  
-    private void handleError(HttpServletRequest request, HttpServletResponse response, 
-                           Exception e, String message) throws IOException {
+    private void handleError(HttpServletRequest request, HttpServletResponse response,
+            Exception e, String message) throws IOException {
         System.err.println(message);
         e.printStackTrace();
         request.getSession().setAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
@@ -199,9 +197,12 @@ public class BookingManagementServlet extends HttpServlet {
         if (request.getParameter("page") != null) {
             try {
                 page = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) { /* Default to 1 */ }
+            } catch (NumberFormatException e) {
+                /* Default to 1 */ }
         }
-        if (page < 1) page = 1;
+        if (page < 1) {
+            page = 1;
+        }
 
         String statusFilter = request.getParameter("statusFilter");
 
@@ -219,10 +220,10 @@ public class BookingManagementServlet extends HttpServlet {
         request.getRequestDispatcher("/View/Booking/booking-list.jsp").forward(request, response);
     }
 
-     private void viewBooking(HttpServletRequest request, HttpServletResponse response)
+    private void viewBooking(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         String bookingIdParam = request.getParameter("bookingId");
-         try {
+        String bookingIdParam = request.getParameter("bookingId");
+        try {
             int bookingId = Integer.parseInt(bookingIdParam);
             Booking booking = bookingDAO.getBookingById(bookingId);
 
@@ -272,14 +273,15 @@ public class BookingManagementServlet extends HttpServlet {
             List<User> customerList = userDAO.searchUsers(null, "Customer", "FullName", "ASC");
             List<BookingRoom> assignedRooms = bookingDAO.getRoomsForBooking(bookingId);
             List<BookingService> assignedServices = bookingDAO.getServicesForBooking(bookingId);
-            List<Room> allRooms = roomDAO.listAllRooms();
+            List<Room> allRoomsWithCategories = roomDAO.getAllRoomsWithCategoryNames();
+            request.setAttribute("allRooms", allRoomsWithCategories);
             List<Service> availableServices = serviceDAO.listAvailableServices();
 
             request.setAttribute("booking", existingBooking);
             request.setAttribute("customerList", customerList);
             request.setAttribute("assignedRooms", assignedRooms);
             request.setAttribute("assignedServices", assignedServices);
-            request.setAttribute("allRooms", allRooms);
+            request.setAttribute("allRooms", allRoomsWithCategories);
             request.setAttribute("availableServices", availableServices);
 
             request.getRequestDispatcher("/View/Booking/edit-booking.jsp").forward(request, response);
@@ -302,15 +304,15 @@ public class BookingManagementServlet extends HttpServlet {
             String status = request.getParameter("status");
 
             if (checkInStr == null || checkInStr.isEmpty() || checkOutStr == null || checkOutStr.isEmpty()) {
-                 request.getSession().setAttribute("errorMessage", "Check-in and Check-out dates are required.");
-                 response.sendRedirect("manage-bookings?action=add"); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Check-in and Check-out dates are required.");
+                response.sendRedirect("manage-bookings?action=add");
+                return;
             }
-            
+
             if (numberOfGuests <= 0) {
-                 request.getSession().setAttribute("errorMessage", "Number of guests must be positive.");
-                 response.sendRedirect("manage-bookings?action=add"); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Number of guests must be positive.");
+                response.sendRedirect("manage-bookings?action=add");
+                return;
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -319,9 +321,9 @@ public class BookingManagementServlet extends HttpServlet {
             Date checkOutDate = sdf.parse(checkOutStr);
 
             if (!checkOutDate.after(checkInDate)) {
-                 request.getSession().setAttribute("errorMessage", "Check-out date must be after Check-in date.");
-                 response.sendRedirect("manage-bookings?action=add"); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Check-out date must be after Check-in date.");
+                response.sendRedirect("manage-bookings?action=add");
+                return;
             }
 
             Booking newBooking = new Booking();
@@ -368,15 +370,15 @@ public class BookingManagementServlet extends HttpServlet {
             String status = request.getParameter("status");
 
             if (checkInStr == null || checkInStr.isEmpty() || checkOutStr == null || checkOutStr.isEmpty()) {
-                 request.getSession().setAttribute("errorMessage", "Check-in and Check-out dates are required.");
-                 response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdParam); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Check-in and Check-out dates are required.");
+                response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdParam);
+                return;
             }
-            
+
             if (numberOfGuests <= 0) {
-                 request.getSession().setAttribute("errorMessage", "Number of guests must be positive.");
-                 response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdParam); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Number of guests must be positive.");
+                response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdParam);
+                return;
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -385,16 +387,16 @@ public class BookingManagementServlet extends HttpServlet {
             Date checkOutDate = sdf.parse(checkOutStr);
 
             if (!checkOutDate.after(checkInDate)) {
-                 request.getSession().setAttribute("errorMessage", "Check-out date must be after Check-in date.");
-                 response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdParam); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Check-out date must be after Check-in date.");
+                response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdParam);
+                return;
             }
 
             Booking bookingToUpdate = bookingDAO.getBookingById(bookingId);
             if (bookingToUpdate == null) {
-                 request.getSession().setAttribute("errorMessage", "Booking not found for update.");
-                 response.sendRedirect("manage-bookings"); 
-                 return;
+                request.getSession().setAttribute("errorMessage", "Booking not found for update.");
+                response.sendRedirect("manage-bookings");
+                return;
             }
 
             bookingToUpdate.setCustomerID(customerID);
@@ -453,10 +455,12 @@ public class BookingManagementServlet extends HttpServlet {
             Room room = roomDAO.getRoomById(roomId);
             BigDecimal priceAtBooking = BigDecimal.ZERO;
             if (room != null) {
-                priceAtBooking = room.getPriceOverride() != null ? room.getPriceOverride() : 
-                                roomDAO.getRoomCategoryBasePrice(room.getCategoryID());
+                priceAtBooking = room.getPriceOverride() != null ? room.getPriceOverride()
+                        : roomDAO.getRoomCategoryBasePrice(room.getCategoryID());
             }
-            if (priceAtBooking == null) priceAtBooking = BigDecimal.ZERO;
+            if (priceAtBooking == null) {
+                priceAtBooking = BigDecimal.ZERO;
+            }
 
             boolean success = bookingDAO.addRoomToBooking(bookingId, roomId, priceAtBooking);
 
@@ -506,14 +510,14 @@ public class BookingManagementServlet extends HttpServlet {
             int quantity = Integer.parseInt(quantityStr);
 
             if (quantity <= 0) {
-                 request.getSession().setAttribute("errorMessage", "Quantity must be positive.");
-                 response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdStr);
-                 return;
+                request.getSession().setAttribute("errorMessage", "Quantity must be positive.");
+                response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdStr);
+                return;
             }
 
             Service service = serviceDAO.getServiceById(serviceId);
-            BigDecimal priceAtBooking = (service != null && service.getPrice() != null) ? 
-                                       service.getPrice() : BigDecimal.ZERO;
+            BigDecimal priceAtBooking = (service != null && service.getPrice() != null)
+                    ? service.getPrice() : BigDecimal.ZERO;
 
             boolean success = bookingDAO.addServiceToBooking(bookingId, serviceId, quantity, priceAtBooking, new Date());
 
@@ -551,7 +555,6 @@ public class BookingManagementServlet extends HttpServlet {
         }
         response.sendRedirect("manage-bookings?action=edit&bookingId=" + bookingIdStr);
     }
-
 
     private void recalculateBookingTotal(int bookingId) {
         try {

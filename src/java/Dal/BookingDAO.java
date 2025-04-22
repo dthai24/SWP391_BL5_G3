@@ -57,12 +57,12 @@ public class BookingDAO {
                .append("JOIN Users u ON b.CustomerID = u.UserID ")
                .append("WHERE b.IsDeleted = ? ");
             
-            // Add status filter if provided
+            //status filter
             if (statusFilter != null && !statusFilter.trim().isEmpty()) {
                 sql.append("AND b.Status = ? ");
             }
             
-            // Add order by and pagination
+            //order by and pagination
             sql.append("ORDER BY b.BookingDate DESC ")
                .append("OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
             
@@ -82,7 +82,6 @@ public class BookingDAO {
             while (rs.next()) {
                 Booking booking = mapBookingFromResultSet(rs);
                 
-                // Create and set the customer User object
                 User customer = new User();
                 customer.setUserID(rs.getInt("UserID"));
                 customer.setFullName(rs.getString("FullName"));
@@ -169,7 +168,6 @@ public class BookingDAO {
             if (rs.next()) {
                 booking = mapBookingFromResultSet(rs);
                 
-                // Create and set the customer User object
                 User customer = new User();
                 customer.setUserID(rs.getInt("UserID"));
                 customer.setFullName(rs.getString("FullName"));
