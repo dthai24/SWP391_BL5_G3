@@ -20,22 +20,19 @@ public class User {
     public User() {
     }
     
-    public User(int userID, String username, String passwordHash, String fullName, String email, 
-                String phoneNumber, String address, String role, String profilePictureURL, 
-                String status, Date registrationDate, boolean isDeleted) {
-        this.userID = userID;
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.fullName = fullName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.role = role;
-        this.profilePictureURL = profilePictureURL;
-        this.status = status;
-        this.registrationDate = registrationDate;
-        this.isDeleted = isDeleted;
-    }
+   public User(String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
+    this.username = username;
+    this.passwordHash = passwordHash;
+    this.fullName = fullName;
+    this.email = email;
+    this.phoneNumber = phoneNumber;
+    this.address = address;
+    this.role = role;
+    this.profilePictureURL = profilePictureURL;
+    this.status = status;
+    this.registrationDate = registrationDate;
+    this.isDeleted = isDeleted;
+}
 
     // Getters and Setters
     public int getUserID() {

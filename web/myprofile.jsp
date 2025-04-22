@@ -1,86 +1,138 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="Model.User" %>
 <!DOCTYPE html>
-<html lang="vi">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Sona Template">
-    <meta name="keywords" content="Sona, unica, creative, html">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ROSE MOTEL</title>
+    <title>My Profile</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
+        .profile-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    <!-- Css Styles -->
-    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
-    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="css/flaticon.css" type="text/css">
-    <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css">
-    <link rel="stylesheet" href="css/nice-select.css" type="text/css">
-    <link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css">
-    <link rel="stylesheet" href="css/magnific-popup.css" type="text/css">
-    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
-    <link rel="stylesheet" href="css/myprofile.css" type="text/css"> <!-- Thêm CSS riêng -->
+        h2 {
+            text-align: center;
+            color: #333;
+        }
 
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .message p {
+            color: green;
+        }
+
+        a {
+            text-align: center;
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="menu">
-            <button onclick="showProfile()">My Profile</button>
-            <button onclick="showBookingHistory()">Booking History</button>
-        </div>
-        <div class="content">
-            <div class="profile-info active">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKI5TAOsqD7FtzJjsuO-eH0OxinunQMrWjug&s" alt="Avatar" class="avatar"> <!-- Ảnh đại diện từ mạng -->
-                <div class="info">
-                    <label>Họ tên:</label>
-                    <input type="text" value="Nguyễn Văn A" />
-                </div>
-                <div class="info">
-                    <label>Email:</label>
-                    <input type="text" value="johndoe@example.com" />
-                </div>
-                <div class="info">
-                    <label>Số điện thoại:</label>
-                    <input type="text" value="0123456789" />
-                </div>
-                <button class="edit-button" onclick="toggleEdit()">Edit</button>
+    <div class="profile-container">
+        <h2>Thông tin cá nhân</h2>
+
+        <%
+            User user = (User  ) session.getAttribute("user");
+            if (user == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
+        %>
+
+        <form action="updateProfile" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="fullName">Họ và tên:</label>
+                <input type="text" id="fullName" name="fullName" value="<%= user.getFullName() %>" required>
             </div>
-            <div class="booking-history">
-                <table>
-                    <tr>
-                        <th>Mã Đặt Phòng</th>
-                        <th>Ngày Đặt</th>
-                        <th>Trạng Thái</th>
-                        <th class="action-header" style="display: none;">Hành Động</th> <!-- Cột Hành Động ẩn -->
-                    </tr>
-                    <tr>
-                        <td>12345</td>
-                        <td>01/01/2023</td>
-                        <td>Đã Xác Nhận</td>
-                        <td class="action-cell" style="display: none;"><button class="cancel-button">Hủy</button></td> <!-- Nút Hủy ẩn -->
-                    </tr>
-                    <tr>
-                        <td>67890</td>
-                        <td>02/01/2023</td>
-                        <td>Đang Chờ</td>
-                        <td class="action-cell" style="display: none;"><button class="cancel-button">Hủy</button></td> <!-- Nút Hủy ẩn -->
-                    </tr>
-                    <!-- Thêm các hàng khác nếu cần -->
-                </table>
-                <button class="edit-button" onclick="toggleBookingEdit()">Edit</button> <!-- Nút Edit cho Booking History -->
+
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<%= user.getEmail() %>" required readonly>
             </div>
+
+            <div>
+                <label for="password">Mật khẩu mới:</label>
+                <input type="password" id="password" name="password" placeholder="Nhập mật khẩu mới (nếu muốn thay đổi)">
+            </div>
+
+            <div>
+                <label for="profileImage">Ảnh đại diện:</label>
+                <input type="file" id="profileImage" name="profileImage" accept="image/*">
+            </div>
+
+            <button type="submit">Cập nhật thông tin</button>
+        </form>
+
+        <div class="message">
+            <%
+                String message = (String) request.getAttribute("message");
+                if (message != null) {
+                    out.println("<p>" + message + "</p>");
+                }
+            %>
         </div>
+
+        <a href="homepage.jsp">Trở về trang chủ</a>
     </div>
-
-    <script src="js/jquery-3.3.1 .min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/myprofile.js"></script>
 </body>
-
 </html>

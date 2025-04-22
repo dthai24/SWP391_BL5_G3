@@ -1,6 +1,8 @@
 package Controller;
 
 import DBContext.DBContext;
+import Dal.UserDAO;
+import Model.User;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,36 +17,25 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        try (Connection conn = new DBContext().getConnection()) {
-            String sql = "SELECT Password FROM Users WHERE Username = ?";
-            PreparedStatement statement = conn.prepareStatement(sql);
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
+        UserDAO dao = new UserDAO();
+        User user = dao.login(username, password);
 
-            if (resultSet.next()) {
-                String dbPassword = resultSet.getString("Password");
-                if (password.equals(dbPassword)) {
-                    // Đăng nhập thành công
-                    HttpSession session = request.getSession();
-                    session.setAttribute("username", username); // Lưu username vào session
-                    response.sendRedirect("homepage.jsp"); // Chuyển hướng đến trang chủ
-                } else {
-                    // Sai mật khẩu
-                    request.setAttribute("error", "Mật khẩu không đúng");
-                    request.getRequestDispatcher("login.jsp").forward(request, response);
-                }
+        if (user != null) {
+            if ("Active".equals(user.getStatus()) && !user.getIsDeleted()) {
+                HttpSession session = request.getSession();
+                session.setAttribute("user", user);
+                response.sendRedirect("homepage.jsp");
             } else {
-                // Không tìm thấy tài khoản
-                request.setAttribute("error", "Tài khoản không tồn tại");
+                request.setAttribute("error", "Tài khoản bị khóa hoặc đã bị xóa.");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Đăng nhập thất bại do lỗi hệ thống");
+        } else {
+            request.setAttribute("error", "Sai tài khoản hoặc mật khẩu.");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
