@@ -12,7 +12,7 @@ public class UserDAO {
     private Connection connection;
 
     // Constructor to initialize the connection using DBContext
-   public UserDAO() {
+    public UserDAO() {
         try {
             DBContext db = new DBContext();
             connection = db.getConnection();
@@ -23,7 +23,7 @@ public class UserDAO {
 
     // Add a new user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) "
+        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, isDeleted, registrationDate) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
@@ -35,15 +35,16 @@ public class UserDAO {
             statement.setString(7, user.getRole());
             statement.setString(8, user.getProfilePictureURL());
             statement.setString(9, user.getStatus());
-            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
-            statement.setBoolean(11, user.getIsDeleted());
+            statement.setBoolean(10, user.getIsDeleted());
+            statement.setDate(11, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
- public User login(String username, String password) {
+
+    public User login(String username, String password) {
         String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -51,18 +52,18 @@ public class UserDAO {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new User(
-                    rs.getInt("UserID"),
-                    rs.getString("Username"),
-                    rs.getString("Password"),
-                    rs.getString("FullName"),
-                    rs.getString("Email"),
-                    rs.getString("PhoneNumber"),
-                    rs.getString("Address"),
-                    rs.getString("Role"),
-                    rs.getString("ProfilePictureURL"),
-                    rs.getString("Status"),
-                    rs.getDate("RegistrationDate"),
-                    rs.getBoolean("IsDeleted")
+                        rs.getInt("UserID"),
+                        rs.getString("Username"),
+                        rs.getString("Password"),
+                        rs.getString("FullName"),
+                        rs.getString("Email"),
+                        rs.getString("PhoneNumber"),
+                        rs.getString("Address"),
+                        rs.getString("Role"),
+                        rs.getString("ProfilePictureURL"),
+                        rs.getString("Status"),
+                        rs.getDate("RegistrationDate"),
+                        rs.getBoolean("IsDeleted")
                 );
             }
         } catch (Exception e) {
@@ -71,7 +72,7 @@ public class UserDAO {
         return null;
     }
 
- public boolean checkExist(String username, String email) {
+    public boolean checkExist(String username, String email) {
         String sql = "SELECT 1 FROM Users WHERE Username = ? OR Email = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -83,9 +84,9 @@ public class UserDAO {
         return false;
     }
 
-  public boolean register(User user) {
+    public boolean register(User user) {
         String sql = "INSERT INTO Users (Username, Password, FullName, Email, PhoneNumber, Address, Role, ProfilePictureURL, Status, RegistrationDate, IsDeleted) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
@@ -107,7 +108,7 @@ public class UserDAO {
 
     // Edit an existing user
     public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? "
+        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ? "
                 + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
@@ -119,8 +120,7 @@ public class UserDAO {
             statement.setString(7, user.getRole());
             statement.setString(8, user.getProfilePictureURL());
             statement.setString(9, user.getStatus());
-            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
-            statement.setInt(11, user.getUserID());
+            statement.setInt(10, user.getUserID());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -306,7 +306,7 @@ public class UserDAO {
         }
         return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
     }
-    
+
     public boolean isPhoneNumberTaken(String phoneNumber) {
         String query = "SELECT COUNT(*) FROM Users WHERE phonenumber = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {

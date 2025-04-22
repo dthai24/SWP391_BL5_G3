@@ -1,17 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
-        <a class="sidebar-brand" href="index.html">
             <span class="sidebar-brand-text align-middle">
                 Dashboards
             </span>
-        </a>
+
 
         <ul class="sidebar-nav">
             <li class="sidebar-header">Quản lý hệ thống</li>
             <li class="sidebar-item">
                 <a class="sidebar-link" href="<%= request.getContextPath() %>/user">
-                    <i class="align-middle fas fa-users"></i> <span class="align-middle">Quản lý người dùng</span>
+                    <i class="align-middle" data-feather="user"></i> 
+                    <span class="align-middle">Quản lý người dùng</span>
                 </a>
             </li>
             <li class="sidebar-item">
