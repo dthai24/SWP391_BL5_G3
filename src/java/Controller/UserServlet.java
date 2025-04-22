@@ -247,7 +247,7 @@ public class UserServlet extends HttpServlet {
             errors.put("status", "Trạng thái phải là 'Active' hoặc 'Inactive'.");
         }
 
-        if (!List.of("Admin", "Customer", "Manager", "Staff").contains(user.getRole())) {
+        if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(user.getRole())) {
             errors.put("role", "Vai trò không hợp lệ.");
         }
 

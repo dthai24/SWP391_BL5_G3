@@ -270,6 +270,7 @@
                                                 <option value="Customer">Customer</option>
                                                 <option value="Staff">Staff</option>
                                                 <option value="Manager">Manager</option>
+                                                <option value="Receptionist">Receptionist</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
@@ -369,6 +370,7 @@
                                                 <option value="Customer">Customer</option>
                                                 <option value="Staff">Staff</option>
                                                 <option value="Manager">Manager</option>
+                                                <option value="Receptionist">Receptionist</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
@@ -417,6 +419,7 @@
 
                                                                 // Populate View User Modal
                                                                 $('.view-btn').on('click', function () {
+                                                                    // Lấy dữ liệu người dùng từ các thuộc tính data-* của nút
                                                                     $('#view-userID').text($(this).data('userid'));
                                                                     $('#view-username').text($(this).data('username'));
                                                                     $('#view-fullName').text($(this).data('fullname'));
@@ -424,9 +427,21 @@
                                                                     $('#view-phoneNumber').text($(this).data('phonenumber'));
                                                                     $('#view-address').text($(this).data('address'));
                                                                     $('#view-role').text($(this).data('role'));
-                                                                    $('#view-status').text($(this).data('status'));
                                                                     $('#view-registrationDate').text($(this).data('registrationdate'));
-                                                                    $('#view-avatar').attr('src', $(this).data('profilepictureurl') || '<%= request.getContextPath() %>/img/default-avatar.png');
+
+                                                                    // Xử lý trạng thái với HTML tùy chỉnh
+                                                                    var status = $(this).data('status');
+                                                                    var statusHtml = '';
+                                                                    if (status === 'Active') {
+                                                                        statusHtml = '<span class="status-active">Active</span>'; // Class cho trạng thái Active
+                                                                    } else if (status === 'Inactive') {
+                                                                        statusHtml = '<span class="status-inactive">Inactive</span>'; // Class cho trạng thái Inactive
+                                                                    }
+                                                                    $('#view-status').html(statusHtml); // Thay đổi nội dung trạng thái với HTML đã định dạng
+
+                                                                    // Cập nhật hình đại diện (nếu không có thì dùng hình mặc định)
+                                                                    var profilePictureUrl = $(this).data('profilepictureurl') || '<%= request.getContextPath() %>/img/default-avatar.png';
+                                                                    $('#view-avatar').attr('src', profilePictureUrl);
                                                                 });
 
                                                                 // Populate Edit User Modal
@@ -446,7 +461,7 @@
                                                             });
                     </script>
                 </main>
-                <%@ include file="/View/Common/header.jsp" %>
+                <%@ include file="/View/Common/footer.jsp" %>
             </div>
         </div>
     </body>
