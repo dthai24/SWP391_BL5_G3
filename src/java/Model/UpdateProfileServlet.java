@@ -34,7 +34,7 @@ public class UpdateProfileServlet extends HttpServlet {
         
         if (password != null && !password.isEmpty()) {
             // Mã hóa mật khẩu nếu cần
-            user.setPasswordHash(password); // Giả sử bạn đã mã hóa mật khẩu
+            user.setPasswordHash(password); // Giả sử đã mã hóa mật khẩu
         }
 
         // Xử lý tải lên ảnh đại diện nếu có
