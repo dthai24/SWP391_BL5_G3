@@ -1,151 +1,145 @@
 <%@ page import="java.util.List" %>
 <%@ page import="Model.User" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.Map" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Danh Sách Người Dùng</title>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <%@ include file="/View/Common/header.jsp" %>
-    </head>
-    <body>
-        <div class="wrapper">
-            <%@ include file="/View/Common/sidebar.jsp" %> <!-- Sidebar -->
-            <div class="main">
-                <%@ include file="/View/Common/navbar.jsp" %> <!-- Navbar -->
-                <main class="content">
-                    <div class="container mt-5">
-                        <% 
-                            List<User> users = (List<User>) request.getAttribute("users");
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                            int currentPage = (int) request.getAttribute("currentPage");
-                            int totalPages = (int) request.getAttribute("totalPages");
-                            String sortField = (String) request.getAttribute("sortField");
-                            String sortDir = (String) request.getAttribute("sortDir");
-                            String filterRole = request.getParameter("filterRole");
-                            String nextSortDir = "asc".equals(sortDir) ? "desc" : "asc";
-                        %>
-                        <%!
-            // Hàm hỗ trợ xây dựng URL động
-            String buildSortUrl(String field, String nextSortDir, String searchKeyword, String filterRole) {
-                StringBuilder url = new StringBuilder();
-                url.append("?action=list");
-                url.append("&sortField=").append(field);
-                url.append("&sortDir=").append(nextSortDir);
-                if (searchKeyword != null && !searchKeyword.isEmpty()) {
-                    url.append("&searchKeyword=").append(searchKeyword);
-                }
-                if (filterRole != null && !filterRole.isEmpty()) {
-                    url.append("&filterRole=").append(filterRole);
-                }
-                return url.toString();
-            }
-                        %>
-                        <% 
-                            String success = request.getParameter("success");
-                            String error = request.getParameter("error");
-                            if (success != null) { %>
-                        <div class="alert alert-success"><%= success %></div>
-                        <% } else if (error != null) { %>
-                        <div class="alert alert-danger"><%= error %></div>
-                        <% } %>
-
-                        <div class="card shadow-lg">
-                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">Danh Sách Người Dùng</h3>
-                                <div>
-                                    <a href="<%= request.getContextPath() %>/View/User/add.jsp" class="btn btn-light btn-sm">
-                                        <i class="fa fa-plus"></i> Thêm Người Dùng
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <form method="get" action="<%= request.getContextPath() %>/user">
-                                    <input type="hidden" name="action" value="list">
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <input type="text" name="searchKeyword" class="form-control" placeholder="Tìm kiếm tên hoặc email"
-                                                   value="<%= request.getParameter("searchKeyword") %>">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <select name="filterRole" class="form-control">
-                                                <option value="">Tất cả vai trò</option>
-                                                <option value="Admin" <%= "Admin".equals(filterRole) ? "selected" : "" %>>Admin</option>
-                                                <option value="Customer" <%= "Customer".equals(filterRole) ? "selected" : "" %>>Customer</option>
-                                                <option value="Staff" <%= "Staff".equals(filterRole) ? "selected" : "" %>>Staff</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2 d-flex">
-                                            <button type="submit" class="btn btn-primary mr-2">Áp dụng</button>
-                                            <a href="<%= request.getContextPath() %>/user?action=list" class="btn btn-secondary">Hủy</a>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <table class="table table-hover table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Avatar</th>
-                                            <th>
-                                                <a href="<%= buildSortUrl("userID", nextSortDir, null, null) %>">ID</a>
-                                            </th>
-                                            <th>Tên Người Dùng</th>
-                                            <th>Email</th>
-                                            <th>Số Điện Thoại</th>
-                                            <th>Vai trò</th>
-                                            <th>Trạng Thái</th>
-                                            <th>Ngày Đăng Ký</th>
-                                            <th>Hành Động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (users == null || users.isEmpty()) { %>
-                                        <tr><td colspan="9" class="text-center">Không có người dùng nào.</td></tr>
-                                        <% } else { 
-                                            for (User user : users) { %>
-                                        <tr>
-                                            <td>
-                                                <img src="<%= user.getProfilePictureURL() != null ? user.getProfilePictureURL() : "https://example.com/default-avatar.jpg" %>" 
-                                                     alt="Avatar" class="img-fluid rounded-circle" style="width: 50px; height: 50px;">
-                                            </td>
-                                            <td><%= user.getUserID() %></td>
-                                            <td><%= user.getUsername() %></td>
-                                            <td><%= user.getEmail() %></td>
-                                            <td><%= user.getPhoneNumber() != null ? user.getPhoneNumber() : "N/A" %></td>
-                                            <td><%= user.getRole() %></td>
-                                            <td><%= "Active".equals(user.getStatus()) ? "Hoạt động" : "Không hoạt động" %></td>
-                                            <td><%= user.getRegistrationDate() != null ? dateFormat.format(user.getRegistrationDate()) : "N/A" %></td>
-                                            <td class="action-buttons">
-                                                <a href="<%= request.getContextPath() %>/user?action=detail&userID=<%= user.getUserID() %>" class="btn btn-info btn-sm">Chi Tiết</a>
-                                                <a href="<%= request.getContextPath() %>/user?action=edit&userID=<%= user.getUserID() %>" class="btn btn-warning btn-sm">Sửa</a>
-                                                <a href="<%= request.getContextPath() %>/user?action=delete&userID=<%= user.getUserID() %>" 
-                                                   class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">Xóa</a>
-                                            </td>
-                                        </tr>
-                                        <% } } %>
-                                    </tbody>
-                                </table>
-
-                                <nav>
-                                    <ul class="pagination justify-content-center">
-                                        <% for (int i = 1; i <= totalPages; i++) { %>
-                                        <li class="page-item <%= i == currentPage ? "active" : "" %>">
-                                            <a class="page-link" href="?action=list&page=<%= i %>"><%= i %></a>
-                                        </li>
-                                        <% } %>
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Người Dùng</title>
+    <%@ include file="/View/Common/header.jsp" %> <!-- Include header -->
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/style.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
+    <style>
+        .info-label { font-weight: 600; }
+        .status-active { background-color: #28A745; color: #fff; padding: 5px 10px; border-radius: 4px; }
+        .status-inactive { background-color: #DC3545; color: #fff; padding: 5px 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <%@ include file="/View/Common/sidebar.jsp" %> <!-- Include sidebar -->
+        <div class="main">
+            <%@ include file="/View/Common/navbar.jsp" %> <!-- Include navbar -->
+            <main class="content">
+                <div class="container mt-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 style="font-weight: 700;">Danh Sách Người Dùng</h2>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">
+                            <i class="fa fa-plus"></i> Thêm Người Dùng
+                        </button>
                     </div>
-                </main>
-                <%@ include file="/View/Common/footer.jsp" %> <!-- Footer -->
-            </div>
+                    <!-- Filter form -->
+                    <form method="get" action="user" class="form-inline mb-3" id="user-filter-form">
+                        <div class="form-group mr-2">
+                            <label for="filterRole" class="mr-2">Vai trò</label>
+                            <select name="filterRole" id="filterRole" class="form-control">
+                                <option value="">Tất cả</option>
+                                <option value="Admin" <%= "Admin".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Admin</option>
+                                <option value="Customer" <%= "Customer".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Customer</option>
+                                <option value="Staff" <%= "Staff".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Staff</option>
+                                <option value="Manager" <%= "Manager".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Manager</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+                        <a href="user" class="btn btn-secondary">Hủy</a>
+                    </form>
+                    <!-- End filter form -->
+                    <div class="table-responsive mb-0">
+                        <table id="user-datatable" class="table table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Họ và Tên</th>
+                                    <th>Email</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% List<User> users = (List<User>) request.getAttribute("users");
+                                   if (users != null && !users.isEmpty()) {
+                                       for (User user : users) { %>
+                                <tr>
+                                    <td><%= user.getUserID() %></td>
+                                    <td><%= user.getFullName() %></td>
+                                    <td><%= user.getEmail() %></td>
+                                    <td><%= user.getRole() %></td>
+                                    <td>
+                                        <% if ("Active".equals(user.getStatus())) { %>
+                                            <span class="status-active">Active</span>
+                                        <% } else { %>
+                                            <span class="status-inactive">Inactive</span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= user.getRegistrationDate() %></td>
+                                    <td>
+                                        <button type="button" class="btn btn-link p-0 view-btn"
+                                            data-userid="<%= user.getUserID() %>"
+                                            data-fullname="<%= user.getFullName() %>"
+                                            data-email="<%= user.getEmail() %>"
+                                            data-role="<%= user.getRole() %>"
+                                            data-status="<%= user.getStatus() %>"
+                                            data-registrationdate="<%= user.getRegistrationDate() %>"
+                                            data-toggle="modal" data-target="#viewUserModal"
+                                            title="Xem chi tiết">
+                                            <i class="fa fa-eye" style="color: #17a2b8; font-size: 1.2rem;"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-link p-0 edit-btn"
+                                            data-userid="<%= user.getUserID() %>"
+                                            data-fullname="<%= user.getFullName() %>"
+                                            data-email="<%= user.getEmail() %>"
+                                            data-role="<%= user.getRole() %>"
+                                            data-status="<%= user.getStatus() %>"
+                                            data-toggle="modal" data-target="#editUserModal"
+                                            title="Chỉnh sửa">
+                                            <i class="fa fa-edit" style="color: #ffc107; font-size: 1.2rem;"></i>
+                                        </button>
+                                        <form method="post" action="user" class="d-inline delete-user-form">
+                                            <input type="hidden" name="deleteUserID" value="<%= user.getUserID() %>" />
+                                            <button type="submit" class="btn btn-link p-0 delete-btn"
+                                                title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                                                <i class="fa fa-trash" style="color: #dc3545; font-size: 1.2rem;"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }
+                                   } else { %>
+                                <tr><td colspan="7" class="text-center">Không có người dùng nào.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+            <%@ include file="/View/Common/footer.jsp" %> <!-- Include footer -->
         </div>
-        <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
-    </body>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $('#user-datatable').DataTable({
+            responsive: true,
+            paging: true,
+            ordering: true,
+            info: true,
+            columnDefs: [
+                { orderable: false, targets: -1 } // Disable sort for last column (Action)
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+            }
+        });
+    });
+    </script>
+</body>
 </html>
