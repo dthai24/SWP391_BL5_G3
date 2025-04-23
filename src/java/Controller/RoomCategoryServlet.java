@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "RoomCategoryServlet", urlPatterns = {"/room-category"})
+@WebServlet(name = "RoomCategoryServlet", urlPatterns = {"/roomcategory"})
 public class RoomCategoryServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
