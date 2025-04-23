@@ -72,6 +72,7 @@
                       <div class="form-group">
                         <label>Số phòng</label>
                         <input type="text" name="roomNumber" class="form-control" required />
+                        <div id="add-roomNumber-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                       </div>
                       <div class="form-group">
                         <label>Loại phòng</label>
@@ -238,6 +239,7 @@
                       <div class="form-group">
                         <label>Số phòng</label>
                         <input type="text" name="roomNumber" id="edit-roomNumber" class="form-control" required />
+                        <div id="edit-roomNumber-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                       </div>
                       <div class="form-group">
                         <label>Loại phòng</label>
@@ -363,32 +365,34 @@
                 // Thêm phòng
                 $("#addRoomModal form").on("submit", function(e) {
                     var roomNumber = $(this).find('[name="roomNumber"]').val();
+                    var errorDiv = $('#add-roomNumber-error');
+                    errorDiv.text("");
                     if (!roomNumber || roomNumber.trim() === "") {
-                        alert("Số phòng không được để trống.");
+                        errorDiv.text("Số phòng không được để trống.");
                         $(this).find('[name="roomNumber"]').focus();
                         e.preventDefault();
                         return false;
                     }
                     if (/\s/.test(roomNumber)) {
-                        alert("Số phòng không được chứa khoảng trắng.");
+                        errorDiv.text("Số phòng không được chứa khoảng trắng.");
                         $(this).find('[name="roomNumber"]').focus();
                         e.preventDefault();
                         return false;
                     }
                     if (!/^\d+$/.test(roomNumber)) {
-                        alert("Số phòng chỉ được chứa các số.");
+                        errorDiv.text("Số phòng chỉ được chứa các số.");
                         $(this).find('[name="roomNumber"]').focus();
                         e.preventDefault();
                         return false;
                     }
                     if (existingRoomNumbers.includes(roomNumber)) {
-                        alert("Số phòng đã tồn tại.");
+                        errorDiv.text("Số phòng đã tồn tại.");
                         $(this).find('[name="roomNumber"]').focus();
                         e.preventDefault();
                         return false;
                     }
                 });
-                // Khi mở modal sửa, lưu số phòng cũ vào data-old
+                //Sửa phòng (lưu số phòng cũ vào data-old)
                 $('.edit-btn').click(function(){
                     $('#edit-roomID').val($(this).data('roomid'));
                     $('#edit-roomNumber').val($(this).data('roomnumber'));
@@ -397,6 +401,46 @@
                     $('#edit-vacancyStatus').val($(this).data('vacancystatus'));
                     $('#edit-description').val($(this).data('description'));
                     $('#edit-priceOverride').val($(this).data('priceoverride'));
+                    $('#edit-roomNumber-error').text(''); // Clear error when open modal
+                });
+
+                // Validate khi submit form edit
+                $('#editRoomModal form').on('submit', function(e) {
+                    var roomNumber = $('#edit-roomNumber').val();
+                    var oldRoomNumber = $('#edit-roomNumber').data('old');
+                    var errorDiv = $('#edit-roomNumber-error');
+                    errorDiv.text('');
+
+                    // 1. Không để trống
+                    if (!roomNumber || roomNumber.trim() === "") {
+                        errorDiv.text("Số phòng không được để trống.");
+                        $('#edit-roomNumber').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    // 2. Không chứa khoảng trắng
+                    if (/\s/.test(roomNumber)) {
+                        errorDiv.text("Số phòng không được chứa khoảng trắng.");
+                        $('#edit-roomNumber').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    // 3. Chỉ chứa số
+                    if (!/^\d+$/.test(roomNumber)) {
+                        errorDiv.text("Số phòng chỉ được chứa các số.");
+                        $('#edit-roomNumber').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    // 4. Kiểm tra trùng số phòng (nếu thay đổi)
+                    if (roomNumber.trim() !== String(oldRoomNumber).trim()) {
+                        if (existingRoomNumbers.includes(roomNumber)) {
+                            errorDiv.text("Số phòng đã tồn tại.");
+                            $('#edit-roomNumber').focus();
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
                 });
 
                 $('.view-btn').click(function(){
