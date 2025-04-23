@@ -183,21 +183,21 @@ public class UserServlet extends HttpServlet {
 
     // Update user with new data from request
     private void updateUserFromRequest(HttpServletRequest request, User user) {
-    user.setUsername(request.getParameter("username"));
-    String password = request.getParameter("password");
-    if (password != null && !password.trim().isEmpty()) {
-        user.setPassword(password);
+        user.setUsername(request.getParameter("username"));
+        String password = request.getParameter("password");
+        if (password != null && !password.trim().isEmpty()) {
+            user.setPassword(password);
+        }
+        user.setFullName(request.getParameter("fullName"));
+        user.setEmail(request.getParameter("email"));
+        user.setPhoneNumber(request.getParameter("phoneNumber"));
+        user.setAddress(request.getParameter("address"));
+        user.setRole(request.getParameter("role"));
+        user.setStatus(request.getParameter("status"));
+        user.setProfilePictureURL(request.getParameter("profilePictureURL"));
+
+        user.setRegistrationDate(user.getRegistrationDate());
     }
-    user.setFullName(request.getParameter("fullName"));
-    user.setEmail(request.getParameter("email"));
-    user.setPhoneNumber(request.getParameter("phoneNumber"));
-    user.setAddress(request.getParameter("address"));
-    user.setRole(request.getParameter("role"));
-    user.setStatus(request.getParameter("status"));
-    user.setProfilePictureURL(request.getParameter("profilePictureURL"));
-    
-    user.setRegistrationDate(user.getRegistrationDate());
-}
 
     // Validate user inputs
     private Map<String, String> validateUserInputs(User user, boolean isUpdate, Integer userIdParam) {
