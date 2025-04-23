@@ -42,6 +42,7 @@
                       <div class="form-group">
                         <label>Tên loại phòng</label>
                         <input type="text" name="categoryName" class="form-control" required />
+                        <div id="add-categoryName-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                       </div>
                       <div class="form-group">
                         <label>Mô tả</label>
@@ -154,6 +155,7 @@
                       <div class="form-group">
                         <label>Tên loại phòng</label>
                         <input type="text" name="categoryName" id="edit-categoryName" class="form-control" required />
+                        <div id="edit-categoryName-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                       </div>
                       <div class="form-group">
                         <label>Mô tả</label>
@@ -226,11 +228,31 @@
             <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
             <script>
             $(document).ready(function(){
-                // Thêm loại phòng
+                // Lấy danh sách tên loại phòng hiện có
+                var existingCategoryNames = [];
+                $("#category-datatable tbody tr").each(function() {
+                    var name = $(this).find("td").eq(1).text().trim();
+                    if(name) existingCategoryNames.push(name);
+                });
+                // Validate thêm loại phòng
                 $("#addCategoryModal form").on("submit", function(e) {
                     var name = $(this).find('[name="categoryName"]').val();
+                    var errorDiv = $('#add-categoryName-error');
+                    errorDiv.text("");
                     if (!name || name.trim() === "") {
-                        alert("Tên loại phòng không được để trống.");
+                        errorDiv.text("Tên loại phòng không được để trống.");
+                        $(this).find('[name="categoryName"]').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    if (name.trim() !== name) {
+                        errorDiv.text("Tên loại phòng không được chứa khoảng trắng ở đầu hoặc cuối.");
+                        $(this).find('[name="categoryName"]').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    if (existingCategoryNames.includes(name)) {
+                        errorDiv.text("Tên loại phòng đã tồn tại.");
                         $(this).find('[name="categoryName"]').focus();
                         e.preventDefault();
                         return false;
@@ -240,19 +262,35 @@
                 $('.edit-btn').click(function(){
                     $('#edit-categoryID').val($(this).data('categoryid'));
                     $('#edit-categoryName').val($(this).data('categoryname'));
+                    $('#edit-categoryName').data('old', $(this).data('categoryname'));
                     $('#edit-description').val($(this).data('description'));
                     $('#edit-basePrice').val($(this).data('baseprice'));
+                    $('#edit-categoryName-error').text('');
                 });
-                // Khi mở modal xem
-                $('.view-btn').click(function(){
-                    $('#view-categoryID').text($(this).data('categoryid'));
-                    $('#view-categoryName').text($(this).data('categoryname'));
-                    $('#view-categoryName-info').text($(this).data('categoryname'));
-                    $('#view-description').text($(this).data('description'));
-                    $('#view-basePrice').text($(this).data('baseprice'));
-                    var isDeleted = $(this).data('isdeleted') === true || $(this).data('isdeleted') === 'true';
-                    var statusHtml = isDeleted ? '<span class="badge badge-danger">Đã xóa</span>' : '<span class="badge badge-success">Hoạt động</span>';
-                    $('#view-isDeleted').html(statusHtml);
+                // Validate khi submit form edit
+                $('#editCategoryModal form').on('submit', function(e) {
+                    var name = $('#edit-categoryName').val();
+                    var oldName = $('#edit-categoryName').data('old');
+                    var errorDiv = $('#edit-categoryName-error');
+                    errorDiv.text('');
+                    if (!name || name.trim() === "") {
+                        errorDiv.text("Tên loại phòng không được để trống.");
+                        $('#edit-categoryName').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    if (name.trim() !== name) {
+                        errorDiv.text("Tên loại phòng không được chứa khoảng trắng ở đầu hoặc cuối.");
+                        $('#edit-categoryName').focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    if (name !== oldName && existingCategoryNames.includes(name)) {
+                        errorDiv.text("Tên loại phòng đã tồn tại.");
+                        $('#edit-categoryName').focus();
+                        e.preventDefault();
+                        return false;
+                    }
                 });
                 $('#category-datatable').DataTable({
                     responsive: true,
