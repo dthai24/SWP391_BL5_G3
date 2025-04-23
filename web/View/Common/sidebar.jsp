@@ -32,7 +32,7 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a class="sidebar-link" href="roomtype-management.jsp">
+                <a class="sidebar-link" href="<%= request.getContextPath() %>/room-category">
                     <i class="align-middle" data-feather="layers"></i>
                     <span class="align-middle">Quản lý loại phòng</span>
                 </a>
