@@ -25,7 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@WebServlet(name = "BookingManagementServlet", urlPatterns = {"/manage-bookings"})
+//@WebServlet(name = "BookingManagementServlet", urlPatterns = {"/manage-bookings"})
 public class BookingManagementServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -83,6 +83,9 @@ public class BookingManagementServlet extends HttpServlet {
                     break;
                 case "edit":
                     showEditForm(request, response);
+                    break;
+                case "delete":
+                    deleteBooking(request, response);
                     break;
                 default:
                     listBookings(request, response);
@@ -191,33 +194,19 @@ public class BookingManagementServlet extends HttpServlet {
     //Booking Display Methods
     private void listBookings(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        int page = 1;
-        int pageSize = 10;
-        if (request.getParameter("page") != null) {
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                /* Default to 1 */ }
+        try {
+            // Get all bookings without pagination for DataTables
+            List<Booking> bookings = bookingDAO.getAllBookings();
+            request.setAttribute("bookings", bookings);
+            
+            // Forward to the bookings list page
+            request.getRequestDispatcher("/View/Booking/booking-list.jsp").forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error in listBookings: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while retrieving bookings: " + e.getMessage());
+            request.getRequestDispatcher("/View/Booking/booking-list.jsp").forward(request, response);
         }
-        if (page < 1) {
-            page = 1;
-        }
-
-        String statusFilter = request.getParameter("statusFilter");
-
-        List<Booking> bookingList = bookingDAO.listBookings(statusFilter, 0, page, pageSize);
-        int totalBookings = bookingDAO.getBookingCount(statusFilter, 0);
-        int totalPages = (int) Math.ceil((double) totalBookings / pageSize);
-
-        request.setAttribute("bookingList", bookingList);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("pageSize", pageSize);
-        request.setAttribute("totalBookings", totalBookings);
-        request.setAttribute("statusFilter", statusFilter);
-
-        request.getRequestDispatcher("/View/Booking/booking-list.jsp").forward(request, response);
     }
 
     private void viewBooking(HttpServletRequest request, HttpServletResponse response)
@@ -274,7 +263,6 @@ public class BookingManagementServlet extends HttpServlet {
             List<BookingRoom> assignedRooms = bookingDAO.getRoomsForBooking(bookingId);
             List<BookingService> assignedServices = bookingDAO.getServicesForBooking(bookingId);
             List<Room> allRoomsWithCategories = roomDAO.getAllRoomsWithCategoryNames();
-            request.setAttribute("allRooms", allRoomsWithCategories);
             List<Service> availableServices = serviceDAO.listAvailableServices();
 
             request.setAttribute("booking", existingBooking);

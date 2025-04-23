@@ -33,6 +33,49 @@ public class BookingDAO {
     }
 
     /**
+     * Gets all bookings for DataTable display
+     * 
+     * @return List of all active bookings with their customer information
+     */
+    public List<Booking> getAllBookings() {
+        List<Booking> bookings = new ArrayList<>();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            String sql = "SELECT b.*, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
+                         "FROM Bookings b " +
+                         "JOIN Users u ON b.CustomerID = u.UserID " +
+                         "WHERE b.IsDeleted = 0 " +
+                         "ORDER BY b.BookingDate DESC";
+            
+            ps = connection.prepareStatement(sql);
+            rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Booking booking = mapBookingFromResultSet(rs);
+                
+                // Create and set the customer User object
+                User customer = new User();
+                customer.setUserID(rs.getInt("UserID"));
+                customer.setFullName(rs.getString("FullName"));
+                customer.setEmail(rs.getString("Email"));
+                customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                booking.setCustomer(customer);
+                
+                bookings.add(booking);
+            }
+        } catch (Exception e) {
+            System.err.println("Error in BookingDAO.getAllBookings: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            closeResources(ps, rs);
+        }
+        
+        return bookings;
+    }
+
+    /**
      * Lists all bookings with pagination and optional status filter
      * 
      * @param statusFilter Filter by booking status (optional)
