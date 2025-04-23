@@ -18,8 +18,8 @@ import jakarta.servlet.http.HttpSession;
  *
  * @author Phan Huu Kien
  */
-@WebServlet(name="LogoutServlet", urlPatterns={"/logout"})
-public class LogoutServlet extends HttpServlet {
+@WebServlet(name="VerifyServlet", urlPatterns={"/verify"})
+public class VerifyServlet extends HttpServlet {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -36,10 +36,10 @@ public class LogoutServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LogoutServlet</title>");  
+            out.println("<title>Servlet VerifyServlet</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LogoutServlet at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet VerifyServlet at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -56,13 +56,8 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-         HttpSession session = request.getSession(false); // không tạo mới
-        if (session != null) {
-            session.invalidate();
-        }
-        response.sendRedirect("login.jsp");
-    }
-    
+        processRequest(request, response);
+    } 
 
     /** 
      * Handles the HTTP <code>POST</code> method.
@@ -74,8 +69,26 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+    String userInput = request.getParameter("otp");
+        HttpSession session = request.getSession();
+
+        Integer correctOtp = (Integer) session.getAttribute("otp");
+        String email = (String) session.getAttribute("email");
+
+        if (correctOtp != null && userInput.equals(String.valueOf(correctOtp))) {
+            // Xác minh OTP đúng
+            session.removeAttribute("otp");
+            session.removeAttribute("email");
+
+            // Chuyển hướng sang trang login
+            response.sendRedirect("login.jsp");
+        } else {
+            request.setAttribute("error", "\u274C Mã OTP không chính xác. Vui lòng thử lại.");
+            request.getRequestDispatcher("verify.jsp").forward(request, response);
+        }
     }
+
+    
 
     /** 
      * Returns a short description of the servlet.

@@ -76,7 +76,7 @@
             </div>
             <nav class="mainmenu">
                 <ul>
-                    <li class="active"><a href="./index.html">Home</a></li>
+                    <li class="active"><a href="./homepage.jsp">Home</a></li>
                     <li><a href="./rooms.jsp">Rooms</a></li>
                     <li><a href="./about-us.jsp">About Us</a></li>
                     <li><a href="./pages.jsp">Pages</a>
@@ -135,7 +135,7 @@
                                     <%
                                         } else {
                                     %>
-                                    <a href="login.jsp"><i class="fa fa-sign-in"></i> Đăng nhập</a>
+                                   <a href="javascript:void(0);" onclick="loadLoginForm()"><i class="fa fa-sign-in"></i> Đăng nhập</a>
                                     <%
                                         }
                                     %>
@@ -151,7 +151,7 @@
                     <div class="row">
                         <div class="col-lg-2">
                             <div class="logo">
-                                <a href="./index.html">
+                                <a href="./homepage.jsp">
                                     <img src="img/logo.png" alt="">
                                 </a>
                             </div>
@@ -199,7 +199,7 @@
                         </div>
                     </div>
                     <div class="col-xl-4 col-lg-5 offset-xl-2 offset-lg-1">
-                        <div class="booking-form">
+                        <div id="bookingFormContainer" class="booking-form">
                             <h3>Booking Your Hotel</h3>
                             <form action="#">
                                 <div class="check-date">
@@ -582,6 +582,7 @@
                 </div>
             </div>
         </section>
+        
         <!-- Blog Section End -->
 
         <!-- Footer Section Begin -->
@@ -671,6 +672,23 @@
         <script src="js/jquery.slicknav.js"></script>
         <script src="js/owl.carousel.min.js"></script>
         <script src="js/main.js"></script>
+        <script>
+    function loadLoginForm() {
+    const container = document.getElementById("bookingFormContainer");
+    container.innerHTML = '<div class="text-center">Đang tải form đăng nhập...</div>';
+
+    fetch("login-form.jsp")
+        .then(response => response.text())
+        .then(html => {
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            container.innerHTML = '<div class="text-danger">Không thể tải form đăng nhập.</div>';
+            console.error('Lỗi:', error);
+        });
+}
+
+</script>
     </body>
 
 </html>
