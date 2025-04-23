@@ -61,7 +61,7 @@
                         </div>
 
                         <div class="col-auto ms-auto text-end mt-n1">
-                            <a href="<%= request.getContextPath() %>/manage-bookings?action=new" class="btn btn-primary">
+                            <a href="<%= request.getContextPath() %>/manage-bookings?action=add" class="btn btn-primary">
                                 <i class="fa fa-plus"></i> New Booking
                             </a>
                         </div>
@@ -75,6 +75,13 @@
                             <c:if test="${not empty errorMessage}">
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                     ${errorMessage}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </c:if>
+                            
+                            <c:if test="${not empty successMessage}">
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    ${successMessage}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </c:if>
@@ -102,7 +109,7 @@
                                                 <td>
                                                     <span class="booking-status status-${booking.status.toLowerCase()}">${booking.status}</span>
                                                 </td>
-                                                <td><fmt:formatNumber value="${booking.totalAmount}" type="currency" currencySymbol="$" /></td>
+                                                <td><fmt:formatNumber value="${booking.totalPrice}" type="currency" currencySymbol="$" /></td>
                                                 <td>
                                                     <div class="btn-group" role="group">
                                                         <a href="manage-bookings?action=view&bookingId=${booking.bookingID}" class="btn btn-info btn-sm">
@@ -130,7 +137,7 @@
         </div>
     </div>
 
-    <!-- DataTables JavaScript -->
+    <!-- jQuery, DataTables & Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
@@ -189,5 +196,4 @@
         }
     </script>
 </body>
-
 </html>

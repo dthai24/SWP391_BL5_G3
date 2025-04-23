@@ -49,26 +49,40 @@ public class BookingManagementServlet extends HttpServlet {
 
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
+        // HttpSession session = request.getSession(false); // Might not be needed if not checking login
 
-        // Check user authentication and authorization
-        User currentUser = authenticateAndAuthorize(request, response);
-        if (currentUser == null) {
-            return;
-        }
+        // --- COMPLETELY BYPASS AUTHENTICATION & AUTHORIZATION FOR TESTING ---
+        System.out.println("DEBUG: doGet - Bypassing all authentication and authorization checks for view testing.");
 
+        /*
+    // --- Original Authentication/Authorization Call - COMMENTED OUT ---
+    User currentUser = authenticateAndAuthorize(request, response); // Using your OLD method here
+    if (currentUser == null) {
+        // If authenticateAndAuthorize redirected (e.g., to login), stop processing.
+        // This check is commented out as we are bypassing auth.
+        return;
+    }
+         */
+
+ /*
+    // --- Original Role Retrieval and Authorization Logic - COMMENTED OUT ---
+    String role = currentUser.getRole(); // This would fail if User model has no role field
+    boolean isManager = "Manager".equalsIgnoreCase(role);
+    boolean canView = isManager || "Staff".equalsIgnoreCase(role) || "Receptionist".equalsIgnoreCase(role);
+
+    if (!canView) {
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this resource.");
+        return;
+    }
+    // --- END OF COMMENTED OUT AUTH LOGIC ---
+         */
+        // --- Proceed directly to handling the action ---
         String action = request.getParameter("action");
         if (action == null || action.trim().isEmpty()) {
-            action = "list";
+            action = "list"; // Default action
         }
 
-        String role = currentUser.getRole();
-        boolean isManager = "Manager".equalsIgnoreCase(role);
-        boolean canView = isManager || "Staff".equalsIgnoreCase(role) || "Receptionist".equalsIgnoreCase(role);
-
-        if (!canView) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this resource.");
-            return;
-        }
+        System.out.println("DEBUG: doGet - Processing action: " + action); // Log the action being processed
 
         try {
             switch (action) {
@@ -76,15 +90,27 @@ public class BookingManagementServlet extends HttpServlet {
                     listBookings(request, response);
                     break;
                 case "view":
+                    // Assuming viewBooking doesn't strictly need currentUser for basic view testing
                     viewBooking(request, response);
                     break;
                 case "add":
+                    // Assuming showAddForm doesn't strictly need currentUser for basic view testing
                     showAddForm(request, response);
                     break;
                 case "edit":
+                    // Assuming showEditForm doesn't strictly need currentUser for basic view testing
                     showEditForm(request, response);
                     break;
                 case "delete":
+                    /*
+                // --- Original Role Check for Delete - COMMENTED OUT ---
+                // boolean isManager = ... // This would be defined above if not commented out
+                // if (!isManager) {
+                //     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Managers can delete bookings.");
+                //     return;
+                // }
+                     */
+                    System.out.println("DEBUG: doGet - Executing delete action (role check bypassed).");
                     deleteBooking(request, response);
                     break;
                 default:
@@ -92,10 +118,62 @@ public class BookingManagementServlet extends HttpServlet {
                     break;
             }
         } catch (Exception e) {
-            handleError(request, response, e, "Error processing request: " + e.getMessage());
+            // Keep error handling
+            handleError(request, response, e, "Error processing action '" + action + "': " + e.getMessage());
         }
     }
 
+//    @Override
+//    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//
+//        response.setContentType("text/html;charset=UTF-8");
+//        request.setCharacterEncoding("UTF-8");
+//
+//        // Check user authentication and authorization
+//        User currentUser = authenticateAndAuthorize(request, response);
+//        if (currentUser == null) {
+//            return;
+//        }
+//
+//        String role = currentUser.getRole();
+//        boolean isManager = "Manager".equalsIgnoreCase(role);
+//        boolean canView = isManager || "Staff".equalsIgnoreCase(role) || "Receptionist".equalsIgnoreCase(role);
+//
+//        if (!canView) {
+//            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have permission to access this resource.");
+//            return;
+//        }
+//
+//        String action = request.getParameter("action");
+//        if (action == null || action.trim().isEmpty()) {
+//            action = "list";
+//        }
+//        try {
+//            switch (action) {
+//                case "list":
+//                    listBookings(request, response);
+//                    break;
+//                case "view":
+//                    viewBooking(request, response);
+//                    break;
+//                case "add":
+//                    showAddForm(request, response);
+//                    break;
+//                case "edit":
+//                    showEditForm(request, response);
+//                    break;
+//                case "delete":
+//                    deleteBooking(request, response);
+//                    break;
+//                default:
+//                    listBookings(request, response);
+//                    break;
+//            }
+//        } catch (Exception e) {
+//            handleError(request, response, e, "Error processing request: " + e.getMessage());
+//        }
+//    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -198,7 +276,7 @@ public class BookingManagementServlet extends HttpServlet {
             // Get all bookings without pagination for DataTables
             List<Booking> bookings = bookingDAO.getAllBookings();
             request.setAttribute("bookings", bookings);
-            
+
             // Forward to the bookings list page
             request.getRequestDispatcher("/View/Booking/booking-list.jsp").forward(request, response);
         } catch (Exception e) {
