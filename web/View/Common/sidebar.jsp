@@ -28,13 +28,21 @@
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link" href="<%= request.getContextPath() %>/room">
-                    <i class="align-middle fas fa-door-open"></i> <span class="align-middle">Quản lý phòng</span>
+                    <i class="align-middle fas fa-door-open"></i> 
+                    <span class="align-middle">Quản lý phòng</span>
                 </a>
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link" href="<%= request.getContextPath() %>/roomcategory">
                     <i class="align-middle" data-feather="layers"></i>
                     <span class="align-middle">Quản lý loại phòng</span>
+                </a>
+            </li>
+            
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="<%= request.getContextPath() %>/inventory-item">
+                    <i class="align-middle" data-feather="box"></i>
+                    <span class="align-middle">Quản lý đồ dùng</span>
                 </a>
             </li>
         </ul>

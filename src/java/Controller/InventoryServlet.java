@@ -187,8 +187,8 @@ public class InventoryServlet extends HttpServlet {
     }
 
     private void updateInventoryItemFromRequest(HttpServletRequest request, InventoryItem item) {
-        item.setItemName(request.getParameter("username"));
-        item.setItemName(request.getParameter("username"));
+        item.setItemName(request.getParameter("itemName"));
+        item.setDescription(request.getParameter("description"));
         String chargeStr = request.getParameter("defaultCharge");
         if (chargeStr != null && !chargeStr.isEmpty()) {
             item.setDefaultCharge(new BigDecimal(chargeStr));

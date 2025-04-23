@@ -96,10 +96,10 @@
                                             <% if (items != null && !items.isEmpty()) {
                                                 for (InventoryItem item : items) { %>
                                             <tr>
-                                                <td><%= item.getItemID() %></td>
-                                                <td><%= item.getItemName() %></td>
-                                                <td><%= item.getDescription()%></td>
-                                                <td><%= item.getDefaultCharge()%></td>
+                                                <td style="font-weight: 600; color: #007bff;"><%= item.getItemID() %></td>
+                                                <td style="font-weight: 600; color: #28a745;"><%= item.getItemName() %></td>
+                                                <td style="font-weight: 600; color: #28a745;"><%= (item.getDescription() != null && !item.getDescription().trim().isEmpty()) ? item.getDescription() : "N/A" %></td>
+                                                <td style="font-weight: 600; color: #28a745;"><%= item.getDefaultCharge()%></td>
                                                 <td>
                                                     <button type="button" class="btn btn-link p-0 view-btn" 
                                                             data-itemid="<%= item.getItemID() %>"
@@ -127,15 +127,14 @@
                                             </tr>
                                             <%  } 
                                         } else { %>
-                                            <tr>
-                                                <td class="text-center text-muted" colspan="5">Không có vật phẩm nào.</td>
-                                            </tr>
-                                            <%  } %>
+                                            <tr><td colspan="5" class="text-center">Không có vật phẩm nào.</td></tr>
+                                            <% } %>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-                        </div>
+
+                        </div>                
                     </div>
 
                     <!-- View Inventory Item Modal -->
@@ -153,7 +152,6 @@
                                     <p><strong>Tên Sản Phẩm:</strong> <span id="view-inventoryName"></span></p>
                                     <p><strong>Mô Tả:</strong> <span id="view-description"></span></p>
                                     <p><strong>Phí Mặc Định:</strong> <span id="view-defaultCharge"></span></p>
-                                    <p><strong>Trạng Thái:</strong> <span id="view-isDeleted"></span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -232,7 +230,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
                     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>

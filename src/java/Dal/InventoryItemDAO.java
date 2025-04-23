@@ -71,7 +71,7 @@ public class InventoryItemDAO {
 
     // Delete an InventoryItem (soft delete)
     public boolean deleteInventoryItem(int itemID) {
-        String query = "UPDATE InventoryItems SET isDeleted = true WHERE itemID = ?";
+        String query = "UPDATE InventoryItems SET isDeleted = 1 WHERE itemID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, itemID);
             int rowsAffected = stmt.executeUpdate();
@@ -85,7 +85,7 @@ public class InventoryItemDAO {
     // Get all InventoryItems
     public List<InventoryItem> getAllInventoryItems() {
         List<InventoryItem> items = new ArrayList<>();
-        String query = "SELECT * FROM InventoryItems WHERE isDeleted = false";
+        String query = "SELECT * FROM InventoryItems WHERE isDeleted = 0";
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
