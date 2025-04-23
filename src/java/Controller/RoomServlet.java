@@ -59,8 +59,11 @@ public class RoomServlet extends HttpServlet {
                 if (cat != null) roomCategoryMap.put(catId, cat);
             }
         }
+        // Lấy toàn bộ danh sách loại phòng cho filter/add/edit
+        List<RoomCategory> allCategories = roomCategoryDAO.getAllRoomCategories();
         request.setAttribute("rooms", rooms);
         request.setAttribute("roomCategoryMap", roomCategoryMap);
+        request.setAttribute("allCategories", allCategories);
         request.setAttribute("editRoom", editRoom);
         request.getRequestDispatcher("Room.jsp").forward(request, response);
     }

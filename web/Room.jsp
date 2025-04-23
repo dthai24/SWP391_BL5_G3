@@ -55,6 +55,7 @@
             <%
                 List<Room> rooms = (List<Room>)request.getAttribute("rooms");
                 Map<Integer, Model.RoomCategory> catMap = (Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap");
+                List<Model.RoomCategory> allCategories = (List<Model.RoomCategory>)request.getAttribute("allCategories");
             %>
             <!-- Modal for Add Room -->
             <div class="modal fade" id="addRoomModal" tabindex="-1" role="dialog" aria-labelledby="addRoomModalLabel" aria-hidden="true">
@@ -75,8 +76,8 @@
                       <div class="form-group">
                         <label>Loại phòng</label>
                         <select name="categoryID" class="form-control" required>
-                          <% if (catMap != null) {
-                               for (Model.RoomCategory cat : catMap.values()) { %>
+                          <% if (allCategories != null) {
+                               for (Model.RoomCategory cat : allCategories) { %>
                                  <option value="<%= cat.getCategoryID() %>"><%= cat.getCategoryName() %></option>
                           <%   }
                              } %>
@@ -121,8 +122,8 @@
                             <label for="filterCategory" class="mr-2">Loại phòng</label>
                             <select name="filterCategory" id="filterCategory" class="form-control">
                               <option value="">Tất cả</option>
-                              <% if (catMap != null) {
-                                   for (Model.RoomCategory cat : catMap.values()) { %>
+                              <% if (allCategories != null) {
+                                   for (Model.RoomCategory cat : allCategories) { %>
                                      <option value="<%= cat.getCategoryID() %>" <%= request.getParameter("filterCategory") != null && request.getParameter("filterCategory").equals(String.valueOf(cat.getCategoryID())) ? "selected" : "" %>><%= cat.getCategoryName() %></option>
                               <%   }
                                  } %>
@@ -241,8 +242,8 @@
                       <div class="form-group">
                         <label>Loại phòng</label>
                         <select name="categoryID" id="edit-categoryID" class="form-control" required>
-                          <% if (catMap != null) {
-                               for (Model.RoomCategory cat : catMap.values()) { %>
+                          <% if (allCategories != null) {
+                               for (Model.RoomCategory cat : allCategories) { %>
                                  <option value="<%= cat.getCategoryID() %>"><%= cat.getCategoryName() %></option>
                           <%   }
                              } %>

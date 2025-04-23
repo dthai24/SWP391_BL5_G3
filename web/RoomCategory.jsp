@@ -69,6 +69,18 @@
                         </button>
                     </div>
                     <div class="card-body">
+                        <form class="form-inline mb-3" method="get" action="roomcategory">
+                            <div class="form-group mr-2">
+                                <label for="minPrice" class="mr-2">Giá từ:</label>
+                                <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="Min" min="0" value="<%= request.getParameter("minPrice") != null ? request.getParameter("minPrice") : "" %>">
+                            </div>
+                            <div class="form-group mr-2">
+                                <label for="maxPrice" class="mr-2">đến</label>
+                                <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="Max" min="0" value="<%= request.getParameter("maxPrice") != null ? request.getParameter("maxPrice") : "" %>">
+                            </div>
+                            <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+                            <a href="roomcategory" class="btn btn-secondary">Hủy lọc</a>
+                        </form>
                         <div class="table-responsive" style="overflow-x:auto;">
                             <table id="category-datatable" class="table table-hover table-striped align-middle mb-0" style="width:100%; table-layout:fixed; font-size: 15px;">
                                 <thead class="thead-dark">

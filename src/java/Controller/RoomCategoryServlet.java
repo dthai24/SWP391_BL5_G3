@@ -18,7 +18,27 @@ public class RoomCategoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         RoomCategoryDAO categoryDAO = new RoomCategoryDAO();
+        String filterStatus = request.getParameter("filterStatus");
+        String minPriceParam = request.getParameter("minPrice");
+        String maxPriceParam = request.getParameter("maxPrice");
         List<RoomCategory> categories = categoryDAO.getAllRoomCategories();
+        if (filterStatus != null && !filterStatus.isEmpty()) {
+            if ("active".equals(filterStatus)) {
+                categories.removeIf(cat -> cat.getIsDeleted());
+            } else if ("deleted".equals(filterStatus)) {
+                categories.removeIf(cat -> !cat.getIsDeleted());
+            }
+        }
+        if ((minPriceParam != null && !minPriceParam.isEmpty()) || (maxPriceParam != null && !maxPriceParam.isEmpty())) {
+            try {
+                java.math.BigDecimal minPrice = minPriceParam != null && !minPriceParam.isEmpty() ? new java.math.BigDecimal(minPriceParam) : null;
+                java.math.BigDecimal maxPrice = maxPriceParam != null && !maxPriceParam.isEmpty() ? new java.math.BigDecimal(maxPriceParam) : null;
+                categories.removeIf(cat -> (minPrice != null && cat.getBasePricePerNight().compareTo(minPrice) < 0)
+                        || (maxPrice != null && cat.getBasePricePerNight().compareTo(maxPrice) > 0));
+            } catch (NumberFormatException e) {
+                // ignore invalid input
+            }
+        }
         request.setAttribute("categories", categories);
         request.getRequestDispatcher("RoomCategory.jsp").forward(request, response);
     }
