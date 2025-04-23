@@ -29,6 +29,17 @@ public class LoginServlet extends HttpServlet {
             if ("Active".equals(user.getStatus()) && !user.getIsDeleted()) {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
+                // Kiểm tra nhân viên
+                boolean isEmployee = false;
+                try {
+                    Connection conn = new DBContext().getConnection();
+                    PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM Employees WHERE EmployeeID = ?");
+                    ps.setInt(1, user.getUserID());
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) isEmployee = true;
+                    rs.close(); ps.close(); conn.close();
+                } catch(Exception ex) { isEmployee = false; }
+                session.setAttribute("isEmployee", isEmployee);
                 response.sendRedirect("homepage.jsp");
             } else {
                 request.setAttribute("error", "Tài khoản bị khóa hoặc đã bị xóa.");
