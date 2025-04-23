@@ -50,6 +50,18 @@ public class InventoryServlet extends HttpServlet {
         }
 
         List<InventoryItem> items = inventoryItemDAO.getAllInventoryItems();
+        String minPriceParam = request.getParameter("minPrice");
+        String maxPriceParam = request.getParameter("maxPrice");
+        if ((minPriceParam != null && !minPriceParam.isEmpty()) || (maxPriceParam != null && !maxPriceParam.isEmpty())) {
+            try {
+                java.math.BigDecimal minPrice = minPriceParam != null && !minPriceParam.isEmpty() ? new java.math.BigDecimal(minPriceParam) : null;
+                java.math.BigDecimal maxPrice = maxPriceParam != null && !maxPriceParam.isEmpty() ? new java.math.BigDecimal(maxPriceParam) : null;
+                items.removeIf(cat -> (minPrice != null && cat.getDefaultCharge().compareTo(minPrice) < 0)
+                        || (maxPrice != null && cat.getDefaultCharge().compareTo(maxPrice) > 0));
+            } catch (NumberFormatException e) {
+                // ignore invalid input
+            }
+        }
         request.setAttribute("items", items);
         request.setAttribute("editItem", editItem);
         request.getRequestDispatcher("View/Inventory/inventory-item.jsp").forward(request, response);

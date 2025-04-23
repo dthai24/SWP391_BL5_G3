@@ -70,6 +70,8 @@
                         </button>
                     </div>
                     <% } %>
+                    
+                    
                     <!-- Table Section -->
                     <div class="container mt-5">
                         <div class="card shadow-lg">
@@ -81,6 +83,18 @@
                             </div>
 
                             <div class="card-body">
+                                <form class="form-inline mb-3" method="get" action="inventory-item">
+                                    <div class="form-group mr-2">
+                                        <label for="minPrice" class="mr-2">Giá từ:</label>
+                                        <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="Min" min="0" value="<%= request.getParameter("minPrice") != null ? request.getParameter("minPrice") : "" %>">
+                                    </div>
+                                    <div class="form-group mr-2">
+                                        <label for="maxPrice" class="mr-2">đến</label>
+                                        <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="Max" min="0" value="<%= request.getParameter("maxPrice") != null ? request.getParameter("maxPrice") : "" %>">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+                                    <a href="inventory-item" class="btn btn-secondary">Hủy lọc</a>
+                                </form>
                                 <div class="table-responsive">
                                     <table id="inventory-item-datatable" class="table table-hover table-striped align-middle">
                                         <thead class="thead-dark">
@@ -97,8 +111,8 @@
                                                 for (InventoryItem item : items) { %>
                                             <tr>
                                                 <td style="font-weight: 600; color: #007bff;"><%= item.getItemID() %></td>
-                                                <td style="font-weight: 600; color: #28a745;"><%= item.getItemName() %></td>
-                                                <td style="font-weight: 600; color: #28a745;"><%= (item.getDescription() != null && !item.getDescription().trim().isEmpty()) ? item.getDescription() : "N/A" %></td>
+                                                <td><%= item.getItemName() %></td>
+                                                <td><%= (item.getDescription() != null && !item.getDescription().trim().isEmpty()) ? item.getDescription() : "N/A" %></td>
                                                 <td style="font-weight: 600; color: #28a745;"><%= item.getDefaultCharge()%></td>
                                                 <td>
                                                     <button type="button" class="btn btn-link p-0 view-btn" 
