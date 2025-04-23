@@ -157,14 +157,14 @@
                                                     <% if (user.getProfilePictureURL() != null && !user.getProfilePictureURL().isEmpty()) { %>
                                                     <img src="<%= user.getProfilePictureURL() %>" alt="Avatar" class="avatar">
                                                     <% } else { %>
-                                                    <img src="<%= request.getContextPath() %>/img/default-avatar.png" alt="Avatar" class="avatar">
+                                                    <img src="https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg" alt="Avatar" class="avatar">
                                                     <% } %>
                                                 </td>
                                                 <td><%= user.getUsername() %></td>
                                                 <td><%= user.getFullName() %></td>
                                                 <td><%= user.getEmail() %></td>
-                                                <td><%= user.getPhoneNumber() %></td>
-                                                <td><%= user.getAddress() %></td>
+                                                <td><%= (user.getPhoneNumber() != null && !user.getPhoneNumber().trim().isEmpty()) ? user.getPhoneNumber() : "N/A" %></td>
+                                                <td><%= (user.getAddress() != null && !user.getAddress().trim().isEmpty()) ? user.getAddress() : "N/A" %></td>
                                                 <td><%= user.getRole() %></td>
                                                 <td>
                                                     <% if ("Active".equals(user.getStatus())) { %>
@@ -302,7 +302,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="text-center mb-3">
-                                        <img id="view-avatar" src="<%= request.getContextPath() %>/img/default-avatar.png" alt="Avatar" class="avatar-large">
+                                        <img id="view-avatar" src="https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg" alt="Avatar" class="avatar-large">
                                     </div>
                                     <p><strong>ID:</strong> <span id="view-userID"></span></p>
                                     <p><strong>Tên Người Dùng:</strong> <span id="view-username"></span></p>
@@ -424,8 +424,10 @@
                                                                     $('#view-username').text($(this).data('username'));
                                                                     $('#view-fullName').text($(this).data('fullname'));
                                                                     $('#view-email').text($(this).data('email'));
-                                                                    $('#view-phoneNumber').text($(this).data('phonenumber'));
-                                                                    $('#view-address').text($(this).data('address'));
+                                                                    let phone = $(this).data('phonenumber');
+                                                                    let address = $(this).data('address');
+                                                                    $('#view-phoneNumber').text(phone && phone.trim() !== '' ? phone : 'N/A');
+                                                                    $('#view-address').text(address && address.trim() !== '' ? address : 'N/A');
                                                                     $('#view-role').text($(this).data('role'));
                                                                     $('#view-registrationDate').text($(this).data('registrationdate'));
 
@@ -440,7 +442,7 @@
                                                                     $('#view-status').html(statusHtml); // Thay đổi nội dung trạng thái với HTML đã định dạng
 
                                                                     // Cập nhật hình đại diện (nếu không có thì dùng hình mặc định)
-                                                                    var profilePictureUrl = $(this).data('profilepictureurl') || '<%= request.getContextPath() %>/img/default-avatar.png';
+                                                                    var profilePictureUrl = $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg';
                                                                     $('#view-avatar').attr('src', profilePictureUrl);
                                                                 });
 

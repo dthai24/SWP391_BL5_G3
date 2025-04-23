@@ -227,22 +227,23 @@ public class UserServlet extends HttpServlet {
             }
         }
 
-        if (user.getPhoneNumber() != null) {
-            if (user.getPhoneNumber().trim().isEmpty()) {
-                errors.put("phoneNumber", "Số điện thoại không được để trống hoặc chỉ chứa khoảng trắng.");
-            } else if (!Pattern.compile("^[0-9]{10,11}$").matcher(user.getPhoneNumber()).matches()) {
+        if (user.getPhoneNumber() != null && !user.getPhoneNumber().trim().isEmpty()) {
+            if (!Pattern.compile("^[0-9]{10,11}$").matcher(user.getPhoneNumber()).matches()) {
                 errors.put("phoneNumber", "Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-            } else if (!isUpdate || (isUpdate && userIdParam != null && !userDAO.getUserById(userIdParam).getPhoneNumber().equals(user.getPhoneNumber()))) {
+            } else if (!isUpdate || (isUpdate && userIdParam != null &&
+                !user.getPhoneNumber().equals(userDAO.getUserById(userIdParam).getPhoneNumber()))) {
                 if (userDAO.isPhoneNumberTaken(user.getPhoneNumber())) {
                     errors.put("phoneNumber", "Số điện thoại đã tồn tại. Vui lòng nhập số điện thoại khác.");
                 }
             }
+        } else if (user.getPhoneNumber() != null && user.getPhoneNumber().trim().isEmpty()) {
+            errors.put("phoneNumber", "Số điện thoại không được chỉ chứa khoảng trắng.");
         }
 
+            
         if (user.getAddress() != null && user.getAddress().trim().isEmpty()) {
-            errors.put("address", "Địa chỉ không được để trống hoặc chỉ chứa khoảng trắng.");
+            errors.put("address", "Địa chỉ không được chỉ chứa khoảng trắng.");
         }
-
         if (!"Active".equals(user.getStatus()) && !"Inactive".equals(user.getStatus())) {
             errors.put("status", "Trạng thái phải là 'Active' hoặc 'Inactive'.");
         }
