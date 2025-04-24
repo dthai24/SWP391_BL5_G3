@@ -29,6 +29,29 @@
         
 
         <style>
+            #bookingFormContainer {
+        width: 100%; /* Set to 100% or a specific value like 500px */
+        max-width: 500px; /* Maximum width */
+        margin: 0 auto; /* Center the form */
+        padding: 20px; /* Add padding */
+        background-color: #f9f9f9; /* Optional background color */
+        border-radius: 8px; /* Rounded corners */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    }
+
+    .check-date input {
+        width: 100%; /* Full width */
+        padding: 10px; /* Add padding */
+        margin-bottom: 15px; /* Space between inputs */
+        border: 1px solid #ccc; /* Border style */
+        border-radius: 4px; /* Rounded corners */
+    }
+
+    .site-btn {
+        width: 100%; /* Full width for button */
+        padding: 10px; /* Add padding */
+        font-size: 16px; /* Increase font size */
+    }
             a {
                 text-decoration: none;
                 color: black;
