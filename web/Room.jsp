@@ -57,7 +57,8 @@
                 Map<Integer, Model.RoomCategory> catMap = (Map<Integer, Model.RoomCategory>)request.getAttribute("roomCategoryMap");
                 List<Model.RoomCategory> allCategories = (List<Model.RoomCategory>)request.getAttribute("allCategories");
             %>
-            <!-- Modal for Add Room -->
+            
+            <!-- Add New Room -->
             <div class="modal fade" id="addRoomModal" tabindex="-1" role="dialog" aria-labelledby="addRoomModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -117,7 +118,9 @@
                         </button>
                     </div>
                     <div class="card-body">
-                        <!-- Filter form -->
+                        
+                        
+                        <!-- Filter -->
                         <form method="get" action="room" class="form-inline mb-3" id="room-filter-form">
                           <div class="form-group mr-2">
                             <label for="filterCategory" class="mr-2">Loại phòng</label>
@@ -141,7 +144,8 @@
                           <button type="submit" class="btn btn-primary mr-2">Lọc</button>
                           <a href="room" class="btn btn-secondary">Hủy</a>
                         </form>
-                        <!-- End filter form -->
+                        <!-- End filter -->
+                        
                         <div class="table-responsive" style="overflow-x:auto;">
                             <table id="room-datatable" class="table table-hover table-striped align-middle mb-0" style="width:100%; table-layout:fixed; font-size: 15px;">
                                 <thead class="thead-dark">
@@ -223,7 +227,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Modal for Edit Room -->
+                                
+            <!-- Edit Room -->
             <div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog" aria-labelledby="editRoomModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -275,7 +280,8 @@
                 </div>
               </div>
             </div>
-            <!-- Modal for View Room -->
+                        
+            <!--  View Room -->
             <div class="modal fade" id="viewRoomModal" tabindex="-1" role="dialog" aria-labelledby="viewRoomModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">

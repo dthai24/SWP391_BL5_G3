@@ -27,7 +27,8 @@
         <%@ include file="/View/Common/navbar.jsp" %>
         <main class="content">
             <% List<RoomCategory> categories = (List<RoomCategory>)request.getAttribute("categories"); %>
-            <!-- Modal for Add Category -->
+            
+            <!--  Add Category -->
             <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -80,7 +81,7 @@
                                 <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="Max" min="0" value="<%= request.getParameter("maxPrice") != null ? request.getParameter("maxPrice") : "" %>">
                             </div>
                             <button type="submit" class="btn btn-primary mr-2">Lọc</button>
-                            <a href="roomcategory" class="btn btn-secondary">Hủy lọc</a>
+                            <a href="roomcategory" class="btn btn-secondary">Hủy</a>
                         </form>
                         <div class="table-responsive" style="overflow-x:auto;">
                             <table id="category-datatable" class="table table-hover table-striped align-middle mb-0" style="width:100%; table-layout:fixed; font-size: 15px;">
@@ -139,7 +140,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Modal for Edit Category -->
+                                
+            <!--  Edit Category -->
             <div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -174,7 +176,8 @@
                 </div>
               </div>
             </div>
-            <!-- Modal for View Category -->
+            
+            <!--View Category -->
             <div class="modal fade" id="viewCategoryModal" tabindex="-1" role="dialog" aria-labelledby="viewCategoryModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
