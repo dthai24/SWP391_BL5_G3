@@ -97,21 +97,6 @@ public class InventoryItemDAO {
         return items;
     }
 
-    public boolean isItemNameTaken(String itemName) {
-        String query = "SELECT COUNT(*) FROM InventoryItems WHERE itemName = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, itemName);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0; // Trả về true nếu email đã tồn tại
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    
     // Helper method to map ResultSet to InventoryItem object
     private InventoryItem mapResultSetToInventoryItem(ResultSet rs) throws SQLException {
         int itemID = rs.getInt("itemID");
