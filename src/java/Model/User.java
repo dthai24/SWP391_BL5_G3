@@ -3,6 +3,7 @@ package Model;
 import java.util.Date;
 
 public class User {
+
     private int userID;
     private String username;
     private String password;
@@ -10,18 +11,17 @@ public class User {
     private String email;
     private String phoneNumber;
     private String address;
-    private String role;
     private String profilePictureURL;
     private String status;
     private Date registrationDate;
     private boolean isDeleted;
-    
+
     // Constructors
     public User() {
     }
-    
-    public User(int userID, String username, String password, String fullName, String email, 
-                String phoneNumber, String address, String role, String profilePictureURL, 
+
+    public User(int userID, String username, String password, String fullName, String email,
+                String phoneNumber, String address, String profilePictureURL, 
                 String status, Date registrationDate, boolean isDeleted) {
         this.userID = userID;
         this.username = username;
@@ -30,7 +30,6 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.role = role;
         this.profilePictureURL = profilePictureURL;
         this.status = status;
         this.registrationDate = registrationDate;
@@ -94,14 +93,6 @@ public class User {
         this.address = address;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getProfilePictureURL() {
         return profilePictureURL;
     }
@@ -139,11 +130,12 @@ public class User {
         return "User{" +
                 "userID=" + userID +
                 ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", address='" + address + '\'' +
-                ", role='" + role + '\'' +
+                ", profilePictureURL='" + profilePictureURL + '\'' +
                 ", status='" + status + '\'' +
                 ", registrationDate=" + registrationDate +
                 ", isDeleted=" + isDeleted +

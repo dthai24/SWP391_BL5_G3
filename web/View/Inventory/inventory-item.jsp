@@ -15,9 +15,6 @@
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css"/>
         <%@ include file="/View/Common/header.jsp" %>
         <style>
-            .info-label {
-                font-weight: 600;
-            }
             .table-responsive {
                 overflow-x: auto !important;
             }
@@ -30,13 +27,13 @@
                 word-break: break-word !important;
                 vertical-align: middle;
             }
-            .notification-box {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1050;
-                display: none;
-            }
+            #inventory-item-datatable td.description-col {
+                max-width: 180px;
+                overflow-wrap: break-word;
+                }
+            #inventory-item-datatable td {
+                max-width: 160px;
+                }
         </style>
     </head>
     <body>
@@ -47,36 +44,13 @@
                 <main class="content">
                     <%
                         List<InventoryItem> items = (List<InventoryItem>) request.getAttribute("items");
-                        InventoryItem editInventoryItem = (InventoryItem) request.getAttribute("editInventoryItem");
-                        String successMessage = (String) request.getAttribute("successMessage");
-                        String errorMessage = (String) request.getAttribute("errorMessage");
-                        Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
-                    %>
-
-                    <!-- Notification Box -->
-                    <% if (successMessage != null) { %>
-                    <div class="alert alert-success alert-dismissible fade show notification-box" role="alert">
-                        <%= successMessage %>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <% } %>
-                    <% if (errorMessage != null) { %>
-                    <div class="alert alert-danger alert-dismissible fade show notification-box" role="alert">
-                        <%= errorMessage %>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <% } %>
-                    
+                    %>   
                     
                     <!-- Table Section -->
                     <div class="container mt-5">
                         <div class="card shadow-lg">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">Danh Sách Vật Phẩm</h3>
+                                <h3 class="mb-0">Danh Sách Đồ Vật</h3>
                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addInventoryItemModal">
                                     <i class="fa fa-plus"></i> Thêm Vật Phẩm
                                 </button>
@@ -93,7 +67,7 @@
                                         <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="Max" min="0" value="<%= request.getParameter("maxPrice") != null ? request.getParameter("maxPrice") : "" %>">
                                     </div>
                                     <button type="submit" class="btn btn-primary mr-2">Lọc</button>
-                                    <a href="inventory-item" class="btn btn-secondary">Hủy lọc</a>
+                                    <a href="inventory-item" class="btn btn-secondary">Hủy</a>
                                 </form>
                                 <div class="table-responsive">
                                     <table id="inventory-item-datatable" class="table table-hover table-striped align-middle">
@@ -113,7 +87,7 @@
                                                 <td style="font-weight: 600; color: #007bff;"><%= item.getItemID() %></td>
                                                 <td><%= item.getItemName() %></td>
                                                 <td><%= (item.getDescription() != null && !item.getDescription().trim().isEmpty()) ? item.getDescription() : "N/A" %></td>
-                                                <td style="font-weight: 600; color: #28a745;"><%= item.getDefaultCharge()%></td>
+                                                <td style="font-weight: 600; color: #28a745;"><%= item.getDefaultCharge()%>$</td>
                                                 <td>
                                                     <button type="button" class="btn btn-link p-0 view-btn" 
                                                             data-itemid="<%= item.getItemID() %>"
@@ -153,60 +127,62 @@
 
                     <!-- View Inventory Item Modal -->
                     <div class="modal fade" id="viewInventoryItemModal" tabindex="-1" role="dialog" aria-labelledby="viewInventoryItemModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
+                        <div class="modal-dialog modal-lg" role="document">
                             <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="viewInventoryItemModalLabel">Chi Tiết Vật Phẩm</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p><strong>ID Sản Phẩm:</strong> <span id="view-inventoryID"></span></p>
-                                    <p><strong>Tên Sản Phẩm:</strong> <span id="view-inventoryName"></span></p>
-                                    <p><strong>Mô Tả:</strong> <span id="view-description"></span></p>
-                                    <p><strong>Phí Mặc Định:</strong> <span id="view-defaultCharge"></span></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Inventory Item Modal -->
-                    <div class="modal fade" id="addInventoryItemModal" tabindex="-1" role="dialog" aria-labelledby="addInventoryItemModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <form action="inventory-item" method="post">
-                                    <input type="hidden" name="action" value="add">
+                                <div class="card shadow-sm m-0">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="addInventoryItemModalLabel">Thêm Vật Phẩm Mới</h5>
+                                        <h5 class="modal-title" id="viewInventoryItemModalLabel">Chi Tiết Vật Phẩm</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="form-group">
-                                            <label for="add-itemName">Tên Vật Phẩm</label>
-                                            <input type="text" name="itemName" id="add-itemName" class="form-control" required />
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="add-description">Mô Tả</label>
-                                            <textarea name="description" id="add-description" class="form-control"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="add-defaultCharge">Phí Mặc Định</label>
-                                            <input type="number" step="0.01" name="defaultCharge" id="add-defaultCharge" class="form-control" required />
-                                        </div>
+                                        <p><strong>ID Sản Phẩm:</strong> <span id="view-inventoryID"></span></p>
+                                        <p><strong>Tên Sản Phẩm:</strong> <span id="view-inventoryName"></span></p>
+                                        <p><strong>Mô Tả:</strong> <span id="view-description"></span></p>
+                                        <p><strong>Phí Mặc Định:</strong> <span id="view-defaultCharge"></span></p>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                                        <button type="submit" class="btn btn-primary">Thêm Vật Phẩm</button>
                                     </div>
-                                </form>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                    <!-- Add Inventory Item Modal -->
+                    <div class="modal fade" id="addInventoryItemModal" tabindex="-1" role="dialog" aria-labelledby="addInventoryItemModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <form action="inventory-item" method="post">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addInventoryItemModalLabel">Thêm Vật Phẩm Mới</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="form-group">
+                                <label for="add-itemName">Tên Vật Phẩm</label>
+                                <input type="text" name="itemName" class="form-control" required />
+                                <div id="add-itemName-error" style="color:red;font-size:14px;margin-top:4px;"></div>
+                              </div>
+                              <div class="form-group">
+                                <label for="add-description">Mô Tả</label>
+                                <textarea name="description" class="form-control"></textarea>
+                              </div>
+                              <div class="form-group">
+                                 <label for="add-defaultCharge">Phí Mặc Định</label>
+                                 <input type="number" name="defaultCharge" id="add-defaultCharge" class="form-control" required />
+                                 <div id="add-defaultCharge-error" style="color:red;font-size:14px;margin-top:4px;"></div>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                              <button type="submit" class="btn btn-primary">Thêm mới</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
                     </div>
 
                     <!-- Edit Inventory Item Modal -->
@@ -214,18 +190,18 @@
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <form action="inventory-item" method="post">
-                                    <input type="hidden" name="action" value="edit">
-                                    <input type="hidden" name="itemID" id="edit-itemID">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="editInventoryItemModalLabel">Chỉnh Sửa Vật Phẩm</h5>
+                                        <h5 class="modal-title" id="editInventoryItemLabel">Cập nhật đồ vật</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
+                                    <input type="hidden" name="itemID" id="edit-itemID">
                                     <div class="modal-body">
                                         <div class="form-group">
                                             <label for="edit-itemName">Tên Vật Phẩm</label>
                                             <input type="text" name="itemName" id="edit-itemName" class="form-control" required />
+                                            <div id="edit-itemName-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-description">Mô Tả</label>
@@ -233,15 +209,16 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-defaultCharge">Phí Mặc Định</label>
-                                            <input type="number" step="0.01" name="defaultCharge" id="edit-defaultCharge" class="form-control" required />
+                                            <input type="number" name="defaultCharge" id="edit-defaultCharge" class="form-control" required />
+                                            <div id="edit-defaultCharge-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                                        <button type="submit" class="btn btn-primary">Cập Nhật Vật Phẩm</button>
-                                    </div>
-                                </form>
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-primary">Cập Nhật Vật Phẩm</button>
+                            </div>
+                            </form>
                         </div>
                     </div>
                     
@@ -250,46 +227,136 @@
                     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
                     <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
                     <script>
-                                                            $(document).ready(function () {
-                                                                // Initialize DataTable
-                                                                $('#inventory-item-datatable').DataTable({
-                                                                    responsive: true,
-                                                                    paging: true,
-                                                                    ordering: true,
-                                                                    info: true,
-                                                                    columnDefs: [
-                                                                        {orderable: false, targets: -1} // Disable sort for last column (Action)
-                                                                    ],
-                                                                    language: {
-                                                                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
-                                                                    }
-                                                                });
+                        $(document).ready(function () {
+                            // Initialize DataTable
+                            $('#inventory-item-datatable').DataTable({
+                                responsive: true,
+                                paging: true,
+                                ordering: true,
+                                info: true,
+                                columnDefs: [
+                                    { orderable: false, targets: -1 } // Disable sort for last column (Action)
+                                ],
+                                language: {
+                                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+                                }
+                            });
 
-                                                                // Handle Notification Box
-                                                                const notificationBox = $('.notification-box');
-                                                                if (notificationBox.children().length > 0) {
-                                                                    notificationBox.fadeIn();
-                                                                    setTimeout(() => notificationBox.fadeOut(), 3000);
-                                                                }
+                            // Lấy danh sách tên vật phẩm hiện có
+                            var existingItemNames = [];
+                            $("#inventory-item-datatable tbody tr").each(function () {
+                                var name = $(this).find("td").eq(1).text().trim();
+                                if (name) existingItemNames.push(name.toLowerCase());
+                            });
 
-                                                                // Populate View Inventory Item Modal
-                                                                $('.view-btn').on('click', function () {
-                                                                    // Lấy dữ liệu vật phẩm từ các thuộc tính data-* của nút
-                                                                    $('#view-itemID').text($(this).data('itemid'));
-                                                                    $('#view-itemName').text($(this).data('itemname'));
-                                                                    $('#view-description').text($(this).data('description'));
-                                                                    $('#view-defaultCharge').text($(this).data('defaultcharge'));
-                                                                });
+                            // Validate thêm vật phẩm
+                            $("#addInventoryItemModal form").on("submit", function (e) {
+                                var name = $(this).find('[name="itemName"]').val();
+                                var charge = $(this).find('[name="defaultCharge"]').val();
+                                var errorDivName = $('#add-itemName-error');
+                                var errorDivCharge = $('#add-defaultCharge-error');
+                                var hasError = false;
 
-// Populate Edit Inventory Item Modal
-                                                                $('.edit-btn').on('click', function () {
-                                                                    $('#edit-itemID').val($(this).data('itemid'));
-                                                                    $('#edit-itemName').val($(this).data('itemname'));
-                                                                    $('#edit-description').val($(this).data('description'));
-                                                                    $('#edit-defaultCharge').val($(this).data('defaultcharge'));
-                                                                });
+                                // Reset lỗi trước khi kiểm tra
+                                errorDivName.text("");
+                                errorDivCharge.text("");
 
-                                                            });
+                                // Kiểm tra tên
+                                if (!name || name.trim() === "") {
+                                    errorDivName.text("Tên vật phẩm không được để trống.");
+                                    hasError = true;
+                                } else if (name.trim() !== name) {
+                                    errorDivName.text("Tên vật phẩm không được chứa khoảng trắng ở đầu hoặc cuối.");
+                                    hasError = true;
+                                } else if (existingItemNames.includes(name.toLowerCase())) {
+                                    errorDivName.text("Tên vật phẩm đã tồn tại.");
+                                    hasError = true;
+                                }
+
+                                // Kiểm tra giá
+                                if (!charge || isNaN(charge) || parseFloat(charge) < 0) {
+                                    errorDivCharge.text("Phí mặc định phải là số lớn hơn hoặc bằng 0.");
+                                    hasError = true;
+                                }
+
+                                // Ngăn gửi form nếu có lỗi
+                                if (hasError) {
+                                    e.preventDefault();
+                                }
+                            });
+
+                            // Khi mở modal sửa
+                            $('.edit-btn').click(function () {
+                                $('#edit-itemID').val($(this).data('itemid'));
+                                $('#edit-itemName').val($(this).data('itemname'));
+                                $('#edit-itemName').data('old', $(this).data('itemname'));
+                                $('#edit-description').val($(this).data('description'));
+                                $('#edit-defaultCharge').val($(this).data('defaultcharge'));
+                                $('#edit-itemName-error').text('');
+                                $('#edit-defaultCharge-error').text('');
+                            });
+
+                            // Validate khi submit form edit
+                            $('#editInventoryItemModal form').on('submit', function (e) {
+                                var name = $('#edit-itemName').val();
+                                var oldName = $('#edit-itemName').data('old');
+                                var charge = $('#edit-defaultCharge').val();
+                                var errorDivName = $('#edit-itemName-error');
+                                var errorDivCharge = $('#edit-defaultCharge-error');
+                                var hasError = false;
+
+                                // Reset lỗi trước khi kiểm tra
+                                errorDivName.text('');
+                                errorDivCharge.text('');
+                                
+                                // Kiểm tra tên
+                                if (!name || name.trim() === "") {
+                                    errorDivName.text("Tên vật phẩm không được để trống.");
+                                    hasError = true;
+                                } else if (name.trim() !== name) {
+                                    errorDivName.text("Tên vật phẩm không được chứa khoảng trắng ở đầu hoặc cuối.");
+                                    hasError = true;
+                                } else if (name.toLowerCase() !== oldName.toLowerCase() && existingItemNames.includes(name.toLowerCase())) {
+                                    errorDivName.text("Tên vật phẩm đã tồn tại.");
+                                    hasError = true;
+                                }
+                                
+                                // Kiểm tra giá
+                                if (!charge || isNaN(charge) || parseFloat(charge) < 0) {
+                                    errorDivCharge.text("Phí mặc định phải là số lớn hơn hoặc bằng 0.");
+                                    hasError = true;
+                                }
+                                
+                                // Ngăn gửi form nếu có lỗi
+                                if (hasError) {
+                                    e.preventDefault();
+                                }
+                            });
+                            
+                            // Reset form khi đóng modal Add
+                            $('#addInventoryItemModal').on('hidden.bs.modal', function () {
+                                var form = $(this).find('form');
+                                form[0].reset(); // Reset tất cả các trường trong form
+                                $('#add-itemName-error').text(''); // Xóa lỗi tên vật phẩm
+                                $('#add-defaultCharge-error').text(''); // Xóa lỗi phí mặc định
+                            });
+                            
+                            // Reset form khi đóng modal Edit
+                            $('#editInventoryItemModal').on('hidden.bs.modal', function () {
+                                var form = $(this).find('form');
+                                form[0].reset(); // Reset tất cả các trường trong form
+                                $('#edit-itemName-error').text(''); // Xóa lỗi tên vật phẩm
+                                $('#edit-defaultCharge-error').text(''); // Xóa lỗi phí mặc định
+                            });
+                            
+                            // Populate View Modal
+                            $('.view-btn').on('click', function () {
+                                $('#view-inventoryID').text($(this).data('itemid'));
+                                $('#view-inventoryName').text($(this).data('itemname'));
+                                $('#view-description').text($(this).data('description'));
+                                $('#view-defaultCharge').text($(this).data('defaultcharge') + " $");
+                            });
+                        });
                     </script>
                 </main>
                 <%@ include file="/View/Common/footer.jsp" %>

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import Model.User;
 import DBContext.DBContext;
+import Model.Customer;
+import Model.Employee;
 import java.time.Instant;
 
 public class UserDAO {
@@ -21,28 +23,81 @@ public class UserDAO {
         }
     }
 
-    // Add a new user
-    public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, isDeleted, registrationDate) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getFullName());
-            statement.setString(4, user.getEmail());
-            statement.setString(5, user.getPhoneNumber());
-            statement.setString(6, user.getAddress());
-            statement.setString(7, user.getRole());
-            statement.setString(8, user.getProfilePictureURL());
-            statement.setString(9, user.getStatus());
-            statement.setBoolean(10, user.getIsDeleted());
-            statement.setDate(11, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
-            return statement.executeUpdate() > 0;
+    // Add a new customer
+    public boolean addCustomer(Customer customer) {
+        String userSql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL, status, isDeleted, registrationDate) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String customerSql = "INSERT INTO Customers (CustomerID) VALUES (?)";
+        try (PreparedStatement userStatement = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement customerStatement = connection.prepareStatement(customerSql)) {
+
+            // Insert into Users table
+            userStatement.setString(1, customer.getUser().getUsername());
+            userStatement.setString(2, customer.getUser().getPassword());
+            userStatement.setString(3, customer.getUser().getFullName());
+            userStatement.setString(4, customer.getUser().getEmail());
+            userStatement.setString(5, customer.getUser().getPhoneNumber());
+            userStatement.setString(6, customer.getUser().getAddress());
+            userStatement.setString(7, customer.getUser().getProfilePictureURL());
+            userStatement.setString(8, customer.getUser().getStatus());
+            userStatement.setBoolean(9, customer.getUser().getIsDeleted());
+            userStatement.setDate(10, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
+
+            if (userStatement.executeUpdate() > 0) {
+                // Get the generated UserID
+                ResultSet generatedKeys = userStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int userID = generatedKeys.getInt(1);
+
+                    // Insert into Customers table
+                    customerStatement.setInt(1, userID);
+                    return customerStatement.executeUpdate() > 0;
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
+
+    // Add a new employee
+    public boolean addEmployee(Employee employee) {
+        String userSql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL, status, isDeleted, registrationDate) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String employeeSql = "INSERT INTO Employees (EmployeeID, EmployeeRole) VALUES (?, ?)";
+        try (PreparedStatement userStatement = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement employeeStatement = connection.prepareStatement(employeeSql)) {
+
+            // Insert into Users table
+            userStatement.setString(1, employee.getUser().getUsername());
+            userStatement.setString(2, employee.getUser().getPassword());
+            userStatement.setString(3, employee.getUser().getFullName());
+            userStatement.setString(4, employee.getUser().getEmail());
+            userStatement.setString(5, employee.getUser().getPhoneNumber());
+            userStatement.setString(6, employee.getUser().getAddress());
+            userStatement.setString(7, employee.getUser().getProfilePictureURL());
+            userStatement.setString(8, employee.getUser().getStatus());
+            userStatement.setBoolean(9, employee.getUser().getIsDeleted());
+            userStatement.setDate(10, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
+
+            if (userStatement.executeUpdate() > 0) {
+                // Get the generated UserID
+                ResultSet generatedKeys = userStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int userID = generatedKeys.getInt(1);
+
+                    // Insert into Employees table
+                    employeeStatement.setInt(1, userID);
+                    employeeStatement.setString(2, employee.getEmployeeRole());
+                    return employeeStatement.executeUpdate() > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     public User login(String username, String password) {
         String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
@@ -59,7 +114,7 @@ public class UserDAO {
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
                         rs.getString("Address"),
-                        rs.getString("Role"),
+                      
                         rs.getString("ProfilePictureURL"),
                         rs.getString("Status"),
                         rs.getDate("RegistrationDate"),
@@ -85,7 +140,7 @@ public class UserDAO {
     }
 
     public boolean register(User user) {
-        String sql = "INSERT INTO Users (Username, Password, FullName, Email, PhoneNumber, Address, Role, ProfilePictureURL, Status, RegistrationDate, IsDeleted) "
+        String sql = "INSERT INTO Users (Username, Password, FullName, Email, PhoneNumber, Address, ProfilePictureURL, Status, RegistrationDate, IsDeleted) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
@@ -94,11 +149,11 @@ public class UserDAO {
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
             statement.setString(6, user.getAddress());
-            statement.setString(7, user.getRole());
-            statement.setString(8, user.getProfilePictureURL());
-            statement.setString(9, user.getStatus());
-            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
-            statement.setBoolean(11, user.getIsDeleted());
+
+            statement.setString(7, user.getProfilePictureURL());
+            statement.setString(8, user.getStatus());
+            statement.setDate(9, new java.sql.Date(user.getRegistrationDate().getTime()));
+            statement.setBoolean(10, user.getIsDeleted());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -106,21 +161,21 @@ public class UserDAO {
         return false;
     }
 
-    // Edit an existing user
-    public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ? "
+    // Edit an existing customer
+    public boolean editCustomer(Customer customer) {
+        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, profilePictureURL = ?, status = ? "
                 + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getFullName());
-            statement.setString(4, user.getEmail());
-            statement.setString(5, user.getPhoneNumber());
-            statement.setString(6, user.getAddress());
-            statement.setString(7, user.getRole());
-            statement.setString(8, user.getProfilePictureURL());
-            statement.setString(9, user.getStatus());
-            statement.setInt(10, user.getUserID());
+            // Update the user information
+            statement.setString(1, customer.getUser().getUsername());
+            statement.setString(2, customer.getUser().getPassword());
+            statement.setString(3, customer.getUser().getFullName());
+            statement.setString(4, customer.getUser().getEmail());
+            statement.setString(5, customer.getUser().getPhoneNumber());
+            statement.setString(6, customer.getUser().getAddress());
+            statement.setString(7, customer.getUser().getProfilePictureURL());
+            statement.setString(8, customer.getUser().getStatus());
+            statement.setInt(9, customer.getCustomerID()); // Use CustomerID as reference
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -128,11 +183,46 @@ public class UserDAO {
         }
     }
 
-    // Delete a user (soft delete)
-    public boolean deleteUser(int userID) {
+    // Edit an existing employee
+    public boolean editEmployee(Employee employee) {
+        String sqlUser = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, profilePictureURL = ?, status = ? "
+                + "WHERE userID = ?";
+        String sqlEmployee = "UPDATE Employees SET EmployeeRole = ? WHERE EmployeeID = ?";
+        try (PreparedStatement userStatement = connection.prepareStatement(sqlUser);
+             PreparedStatement employeeStatement = connection.prepareStatement(sqlEmployee)) {
+
+            // Update the user information
+            userStatement.setString(1, employee.getUser().getUsername());
+            userStatement.setString(2, employee.getUser().getPassword());
+            userStatement.setString(3, employee.getUser().getFullName());
+            userStatement.setString(4, employee.getUser().getEmail());
+            userStatement.setString(5, employee.getUser().getPhoneNumber());
+            userStatement.setString(6, employee.getUser().getAddress());
+            userStatement.setString(7, employee.getUser().getProfilePictureURL());
+            userStatement.setString(8, employee.getUser().getStatus());
+            userStatement.setInt(9, employee.getEmployeeID()); // Use EmployeeID as reference
+
+            // Update the employee-specific role
+            employeeStatement.setString(1, employee.getEmployeeRole());
+            employeeStatement.setInt(2, employee.getEmployeeID());
+
+            // Execute both updates
+            boolean userUpdated = userStatement.executeUpdate() > 0;
+            boolean employeeUpdated = employeeStatement.executeUpdate() > 0;
+
+            return userUpdated && employeeUpdated;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // Delete a customer (soft delete)
+    public boolean deleteCustomer(int customerID) {
         String sql = "UPDATE Users SET isDeleted = 1 WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, userID);
+            statement.setInt(1, customerID); // CustomerID is the same as UserID
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -140,29 +230,57 @@ public class UserDAO {
         }
     }
 
-    // List all users (non-deleted)
-    public List<User> listAllUsers() {
-        List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM Users WHERE isDeleted = 0";
+    // Delete an employee (soft delete)
+    public boolean deleteEmployee(int employeeID) {
+        String sql = "UPDATE Users SET isDeleted = 1 WHERE userID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, employeeID); // EmployeeID is the same as UserID
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    // List all customers (non-deleted)
+    public List<Customer> listAllCustomers() {
+        List<Customer> customers = new ArrayList<>();
+        String sql = "SELECT * FROM Customers c INNER JOIN Users u ON c.CustomerID = u.UserID WHERE u.isDeleted = 0";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                users.add(mapResultSetToUser(resultSet));
+                customers.add(mapResultSetToCustomer(resultSet)); // Use mapResultSetToCustomer
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return users;
+        return customers;
     }
 
-    // Get user by ID
-    public User getUserById(int userID) {
-        String sql = "SELECT * FROM Users WHERE userID = ? AND isDeleted = 0";
+    // List all employees (non-deleted)
+    public List<Employee> listAllEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        String sql = "SELECT * FROM Employees e INNER JOIN Users u ON e.EmployeeID = u.UserID WHERE u.isDeleted = 0";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, userID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                employees.add(mapResultSetToEmployee(resultSet)); // Use mapResultSetToEmployee
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+
+    // Get customer by ID
+    public Customer getCustomerById(int customerID) {
+        String sql = "SELECT * FROM Customers c INNER JOIN Users u ON c.CustomerID = u.UserID WHERE c.CustomerID = ? AND u.isDeleted = 0";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, customerID);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                return mapResultSetToUser(resultSet);
+                return mapResultSetToCustomer(resultSet); // Use mapResultSetToCustomer
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -170,8 +288,24 @@ public class UserDAO {
         return null;
     }
 
+    // Get employee by ID
+    public Employee getEmployeeById(int employeeID) {
+        String sql = "SELECT * FROM Employees e INNER JOIN Users u ON e.EmployeeID = u.UserID WHERE e.EmployeeID = ? AND u.isDeleted = 0";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, employeeID);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return mapResultSetToEmployee(resultSet); // Use mapResultSetToEmployee
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     // Tìm kiếm, lọc, sắp xếp, và phân trang người dùng
-    public List<User> searchAndListUsers(String keyword, String role, String sortBy, String sortDirection, int page, int pageSize) {
+    public List<User> searchAndListUsers(String keyword, String sortBy, String sortDirection, int page, int pageSize) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM Users WHERE isDeleted = 0";
 
@@ -180,11 +314,7 @@ public class UserDAO {
             sql += " AND (username LIKE ? OR fullName LIKE ? OR email LIKE ?)";
         }
 
-        // Thêm lọc theo vai trò
-        if (role != null && !role.trim().isEmpty()) {
-            sql += " AND role = ?";
-        }
-
+      
         // Thêm sắp xếp
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             sql += " ORDER BY " + sortBy;
@@ -211,10 +341,7 @@ public class UserDAO {
                 statement.setString(paramIndex++, "%" + keyword + "%");
             }
 
-            // Gán tham số cho vai trò
-            if (role != null && !role.trim().isEmpty()) {
-                statement.setString(paramIndex++, role);
-            }
+            
 
             // Gán tham số cho phân trang
             statement.setInt(paramIndex++, (page - 1) * pageSize);
@@ -231,7 +358,7 @@ public class UserDAO {
         return users;
     }
 
-    public int countUsers(String keyword, String role) {
+    public int countUsers(String keyword) {
         String sql = "SELECT COUNT(*) FROM Users WHERE isDeleted = 0";
         List<Object> params = new ArrayList<>();
 
@@ -243,11 +370,7 @@ public class UserDAO {
             params.add("%" + keyword + "%");
         }
 
-        // Thêm điều kiện lọc vai trò
-        if (role != null && !role.trim().isEmpty()) {
-            sql += " AND role = ?";
-            params.add(role);
-        }
+        
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
@@ -321,10 +444,11 @@ public class UserDAO {
         }
         return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
     }
+    
 
-    // Helper method to map ResultSet to User object
+    // Helper method to map ResultSet to Customer object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
-        return new User(
+        User user = new User(
                 resultSet.getInt("userID"),
                 resultSet.getString("username"),
                 resultSet.getString("password"),
@@ -332,16 +456,60 @@ public class UserDAO {
                 resultSet.getString("email"),
                 resultSet.getString("phoneNumber"),
                 resultSet.getString("address"),
-                resultSet.getString("role"),
                 resultSet.getString("profilePictureURL"),
                 resultSet.getString("status"),
                 resultSet.getDate("registrationDate"),
                 resultSet.getBoolean("isDeleted")
         );
+        return user;
+    }
+    
+    // Helper method to map ResultSet to Customer object
+    private Customer mapResultSetToCustomer(ResultSet resultSet) throws SQLException {
+        Customer customer = new Customer();
+        customer.setCustomerID(resultSet.getInt("CustomerID")); // Map CustomerID
+        User user = new User(
+                resultSet.getInt("userID"),
+                resultSet.getString("username"),
+                resultSet.getString("password"),
+                resultSet.getString("fullName"),
+                resultSet.getString("email"),
+                resultSet.getString("phoneNumber"),
+                resultSet.getString("address"),
+                resultSet.getString("profilePictureURL"),
+                resultSet.getString("status"),
+                resultSet.getDate("registrationDate"),
+                resultSet.getBoolean("isDeleted")
+        );
+        customer.setUser(user); // Set associated User object
+        return customer;
     }
 
-    public List<User> searchUsers(String searchTerm, String role, String sortBy, String sortDirection) {
-        return searchAndListUsers(searchTerm, role, sortBy, sortDirection, 1, Integer.MAX_VALUE);
+    // Helper method to map ResultSet to Employee object
+    private Employee mapResultSetToEmployee(ResultSet resultSet) throws SQLException {
+        Employee employee = new Employee();
+        employee.setEmployeeID(resultSet.getInt("EmployeeID")); // Map EmployeeID
+        employee.setEmployeeRole(resultSet.getString("EmployeeRole")); // Map EmployeeRole
+        User user = new User(
+                resultSet.getInt("userID"),
+                resultSet.getString("username"),
+                resultSet.getString("password"),
+                resultSet.getString("fullName"),
+                resultSet.getString("email"),
+                resultSet.getString("phoneNumber"),
+                resultSet.getString("address"),
+                resultSet.getString("profilePictureURL"),
+                resultSet.getString("status"),
+                resultSet.getDate("registrationDate"),
+                resultSet.getBoolean("isDeleted")
+        );
+        employee.setUser(user); // Set associated User object
+        return employee;
+    }
+
+
+    public List<User> searchUsers(String searchTerm, String sortBy, String sortDirection) {
+        return searchAndListUsers(searchTerm, sortBy, sortDirection, 1, Integer.MAX_VALUE);
     }
 
     // Main method to test new features

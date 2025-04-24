@@ -56,7 +56,7 @@ public class RegisterServlet extends HttpServlet {
         }
 
         // Khởi tạo đối tượng user
-        User user = new User(0, username, password, email, phone, address, "role", "status", "gender", "image", new Date(), true);
+        User user = new User(0, username, password, email, phone, address, "status", "gender", "image", new Date(), true);
 
         // Đăng ký người dùng
         dao.register(user);
