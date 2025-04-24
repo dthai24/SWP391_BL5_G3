@@ -11,7 +11,6 @@ public class User {
     private String email;
     private String phoneNumber;
     private String address;
-    private String role;
     private String profilePictureURL;
     private String status;
     private Date registrationDate;
@@ -21,7 +20,13 @@ public class User {
     public User() {
     }
 
+<<<<<<< Updated upstream
     public User(int userID, String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
+=======
+    public User(int userID, String username, String password, String fullName, String email,
+                String phoneNumber, String address, String profilePictureURL, 
+                String status, Date registrationDate, boolean isDeleted) {
+>>>>>>> Stashed changes
         this.userID = userID;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -43,7 +48,6 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.role = role;
         this.profilePictureURL = profilePictureURL;
         this.status = status;
         this.registrationDate = registrationDate;
@@ -107,14 +111,6 @@ public class User {
         this.address = address;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public String getProfilePictureURL() {
         return profilePictureURL;
     }
@@ -149,6 +145,7 @@ public class User {
 
     @Override
     public String toString() {
+<<<<<<< Updated upstream
         return "User{"
                 + "userID=" + userID
                 + ", username='" + username + '\''
@@ -161,5 +158,19 @@ public class User {
                 + ", registrationDate=" + registrationDate
                 + ", isDeleted=" + isDeleted
                 + '}';
+=======
+        return "User{" +
+                "userID=" + userID +
+                ", username='" + username + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", profilePictureURL='" + profilePictureURL + '\'' +
+                ", status='" + status + '\'' +
+                ", registrationDate=" + registrationDate +
+                ", isDeleted=" + isDeleted +
+                '}';
+>>>>>>> Stashed changes
     }
 }

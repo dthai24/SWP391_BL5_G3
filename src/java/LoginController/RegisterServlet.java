@@ -60,6 +60,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
+<<<<<<< Updated upstream:src/java/LoginController/RegisterServlet.java
         User newUser = new User(
                 username,
                 password,
@@ -74,6 +75,13 @@ public class RegisterServlet extends HttpServlet {
                 false // isDeleted
         );
         dao.register(newUser);
+=======
+        // Khởi tạo đối tượng user
+        User user = new User(0, username, password, email, phone, address, "status", "gender", "image", new Date(), true);
+
+        // Đăng ký người dùng
+        dao.register(user);
+>>>>>>> Stashed changes:src/java/Controller/RegisterServlet.java
 
         // Gửi mã xác minh
         int otp = (int) (Math.random() * 900000) + 100000; // random 6 chữ số
