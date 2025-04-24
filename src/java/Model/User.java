@@ -3,9 +3,10 @@ package Model;
 import java.util.Date;
 
 public class User {
+
     private int userID;
     private String username;
-    private String password;
+    private String passwordHash;
     private String fullName;
     private String email;
     private String phoneNumber;
@@ -15,17 +16,29 @@ public class User {
     private String status;
     private Date registrationDate;
     private boolean isDeleted;
-    
+
     // Constructors
     public User() {
     }
-    
-    public User(int userID, String username, String password, String fullName, String email, 
-                String phoneNumber, String address, String role, String profilePictureURL, 
-                String status, Date registrationDate, boolean isDeleted) {
+
+    public User(int userID, String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
         this.userID = userID;
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.role = role;
+        this.profilePictureURL = profilePictureURL;
+        this.status = status;
+        this.registrationDate = registrationDate;
+        this.isDeleted = isDeleted;
+    }
+
+    public User(String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
+        this.username = username;
+        this.passwordHash = passwordHash;
         this.fullName = fullName;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -54,12 +67,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getFullName() {
@@ -136,17 +149,17 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "userID=" + userID +
-                ", username='" + username + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address + '\'' +
-                ", role='" + role + '\'' +
-                ", status='" + status + '\'' +
-                ", registrationDate=" + registrationDate +
-                ", isDeleted=" + isDeleted +
-                '}';
+        return "User{"
+                + "userID=" + userID
+                + ", username='" + username + '\''
+                + ", fullName='" + fullName + '\''
+                + ", email='" + email + '\''
+                + ", phoneNumber='" + phoneNumber + '\''
+                + ", address='" + address + '\''
+                + ", role='" + role + '\''
+                + ", status='" + status + '\''
+                + ", registrationDate=" + registrationDate
+                + ", isDeleted=" + isDeleted
+                + '}';
     }
 }

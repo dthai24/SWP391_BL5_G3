@@ -1,257 +1,401 @@
 package Controller;
 
+import Dal.UserDAO;
+import Model.User;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import Dal.UserDAO;
-import Model.User;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * UserServlet - Handles user-related operations like listing, adding, editing,
+ * deleting, and viewing details of users.
+ */
 @WebServlet(name = "UserServlet", urlPatterns = {"/user"})
 public class UserServlet extends HttpServlet {
+
     private UserDAO userDAO;
 
-    // Initialize DAO
     @Override
-    public void init() {
-        userDAO = new UserDAO();
+    public void init() throws ServletException {
+        userDAO = new UserDAO(); // Initialize DAO for database operations
     }
+        
 
-    // Handle GET requests
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String userIdParam = request.getParameter("edit");
-        User editUser = null;
-
-        // Fetch user details for editing, if an ID is provided
-        if (userIdParam != null) {
-            try {
-                int userId = Integer.parseInt(userIdParam);
-                editUser = userDAO.getUserById(userId);
-            } catch (NumberFormatException e) {
-                request.setAttribute("errorMessage", "ID người dùng không hợp lệ.");
-            }
+        String action = request.getParameter("action");
+        if (action == null || action.equals("list")) {
+            listUsers(request, response);
+        } else if ("detail".equals(action)) {
+            getUserDetail(request, response);
+        } else if ("edit".equals(action)) {
+            getUserEdit(request, response);
+        } else if ("add".equals(action)) {
+            getUserAdd(request, response);
+        } else if ("delete".equals(action)) {
+            deleteUser(request, response);
         }
-
-        // Filter users by role and status
-        String filterRole = request.getParameter("filterRole");
-        String filterStatus = request.getParameter("filterStatus");
-        List<User> users = userDAO.listAllUsers();
-
-        if (filterRole != null && !filterRole.isEmpty()) {
-            users.removeIf(u -> !filterRole.equals(u.getRole()));
-        }
-
-        if (filterStatus != null && !filterStatus.isEmpty()) {
-            users.removeIf(u -> !filterStatus.equals(u.getStatus()));
-        }
-
-        // Set attributes and forward to JSP
-        request.setAttribute("users", users);
-        request.setAttribute("editUser", editUser);
-        request.getRequestDispatcher("View/User/list.jsp").forward(request, response);
     }
 
-    // Handle POST requests for add, edit, and delete actions
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getParameter("action");
-        String deleteUserIdParam = request.getParameter("deleteUserID");
-
-        // Handle delete action
-        if (deleteUserIdParam != null && !deleteUserIdParam.isEmpty()) {
-            handleDeleteUser(request, response, deleteUserIdParam);
-            return;
-        }
-
-        // Add or Edit user
         if ("add".equals(action)) {
-            handleAddUser(request, response);
+            addUser(request, response);
         } else if ("edit".equals(action)) {
-            handleEditUser(request, response);
-        } else {
-            response.sendRedirect("user");
+            editUser(request, response);
         }
     }
 
-    // Handle Add User
-    private void handleAddUser(HttpServletRequest request, HttpServletResponse response)
+    private void listUsers(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        User user = extractUserFromRequest(request);
-        Map<String, String> errors = validateUserInputs(user, false, null);
-
-        if (!errors.isEmpty()) {
-            request.setAttribute("errors", errors);
-            doGet(request, response);
-            return;
-        }
-
-        boolean success = userDAO.addUser(user);
-        if (success) {
-            request.setAttribute("successMessage", "Thêm người dùng thành công!");
-        } else {
-            request.setAttribute("errorMessage", "Không thể thêm người dùng.");
-        }
-        doGet(request, response);
-    }
-
-    // Handle Edit User
-    private void handleEditUser(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String userIdParam = request.getParameter("userID");
-        if (userIdParam == null || userIdParam.isEmpty()) {
-            request.setAttribute("errorMessage", "ID người dùng không hợp lệ.");
-            doGet(request, response);
-            return;
-        }
-
         try {
-            int userID = Integer.parseInt(userIdParam);
-            User user = userDAO.getUserById(userID);
+            // Nhận các tham số từ request
+            String keyword = request.getParameter("searchKeyword");
+            String role = request.getParameter("filterRole");
+            String sortBy = request.getParameter("sortField");
+            String sortDirection = request.getParameter("sortDir");
+            String pageParam = request.getParameter("page");
+            int page = (pageParam != null && pageParam.matches("\\d+")) ? Integer.parseInt(pageParam) : 1;
+            int pageSize = 5; // Số lượng người dùng mỗi trang
 
-            if (user == null) {
-                request.setAttribute("errorMessage", "Không tìm thấy người dùng.");
-                doGet(request, response);
+            // Đếm tổng số người dùng
+            int totalUsers = userDAO.countUsers(keyword, role);
+            if (totalUsers == 0) {
+                request.setAttribute("error", "Không tìm thấy người dùng nào với điều kiện lọc hiện tại.");
+                request.getRequestDispatcher("View/Error.jsp").forward(request, response);
                 return;
             }
 
-            // Update user with new data from request
-            updateUserFromRequest(request, user);
-            Map<String, String> errors = validateUserInputs(user, true, userID);
+            // Tính tổng số trang
+            int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+
+            // Lấy danh sách người dùng
+            List<User> users = userDAO.searchAndListUsers(keyword, role, sortBy, sortDirection, page, pageSize);
+            if (users == null) {
+                throw new Exception("Danh sách người dùng trả về null.");
+            }
+
+            // Gửi dữ liệu đến JSP
+            request.setAttribute("users", users);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("searchKeyword", keyword);
+            request.setAttribute("filterRole", role);
+            request.setAttribute("sortField", sortBy);
+            request.setAttribute("sortDir", sortDirection);
+
+            // Forward đến list.jsp
+            request.getRequestDispatcher("View/User/list.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi xảy ra trong quá trình xử lý danh sách người dùng: " + e.getMessage());
+            request.getRequestDispatcher("View/Error.jsp").forward(request, response);
+        }
+    }
+
+    private void getUserAdd(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while displaying the add user page.");
+            listUsers(request, response);
+        }
+    }
+
+    private void addUser(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            // Lấy dữ liệu từ form
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String address = request.getParameter("address");
+            String role = request.getParameter("role");
+            String status = request.getParameter("status");
+            String profilePictureURL = request.getParameter("profilePictureURL");
+
+            // Validate dữ liệu
+            Map<String, String> errors = validateUserInputs(
+                    username, password, fullName, email, phoneNumber, address, role, status, profilePictureURL,
+                    true, null, null
+            );
 
             if (!errors.isEmpty()) {
+                // Nếu có lỗi, quay lại trang add.jsp với thông báo lỗi
                 request.setAttribute("errors", errors);
-                doGet(request, response);
+                request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
                 return;
             }
 
-            boolean success = userDAO.editUser(user);
-            if (success) {
-                request.setAttribute("successMessage", "Chỉnh sửa người dùng thành công!");
+            // Băm mật khẩu trước khi lưu
+            String hashedPassword = hashPassword(password);
+
+            // Tạo đối tượng User
+            User user = new User();
+            user.setUsername(username);
+            user.setPasswordHash(hashedPassword); // Lưu mật khẩu băm
+            user.setFullName(fullName);
+            user.setEmail(email);
+            user.setPhoneNumber(phoneNumber);
+            user.setAddress(address);
+            user.setRole(role);
+            user.setStatus(status);
+            user.setProfilePictureURL(profilePictureURL); // Thiết lập URL ảnh đại diện
+            user.setRegistrationDate(new Date());
+
+            // Thêm user vào cơ sở dữ liệu
+            boolean isAdded = userDAO.addUser(user);
+
+            if (isAdded) {
+                // Nếu thêm thành công, chuyển hướng về danh sách với thông báo thành công
+                response.sendRedirect(request.getContextPath() + "/user?action=list&success=User added successfully");
             } else {
-                request.setAttribute("errorMessage", "Không thể chỉnh sửa người dùng.");
+                // Nếu thêm thất bại, quay lại trang add.jsp với thông báo lỗi
+                request.setAttribute("error", "Failed to add user.");
+                request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
             }
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "ID người dùng không hợp lệ.");
+        } catch (Exception e) {
+            // Xử lý lỗi chung
+            e.printStackTrace();
+            request.setAttribute("error", "An unexpected error occurred: " + e.getMessage());
+            request.getRequestDispatcher("View/User/add.jsp").forward(request, response);
         }
-        doGet(request, response);
+    }
+// Hàm băm mật khẩu
+
+// Hàm băm mật khẩu
+    private String hashPassword(String password) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(password.getBytes());
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 
-    // Handle Delete User
-    private void handleDeleteUser(HttpServletRequest request, HttpServletResponse response, String deleteUserIdParam)
-            throws IOException {
+    private void getUserEdit(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
-            int deleteUserId = Integer.parseInt(deleteUserIdParam);
-            boolean success = userDAO.deleteUser(deleteUserId);
-
-            if (success) {
-                request.setAttribute("successMessage", "Xóa người dùng thành công!");
-            } else {
-                request.setAttribute("errorMessage", "Không thể xóa người dùng.");
+            String userIDParam = request.getParameter("userID");
+            if (userIDParam == null || !userIDParam.matches("\\d+")) {
+                request.setAttribute("error", "Invalid user ID.");
+                listUsers(request, response);
+                return;
             }
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "ID người dùng không hợp lệ.");
+
+            int userID = Integer.parseInt(userIDParam);
+            User user = userDAO.getUserById(userID);
+
+            if (user != null) {
+                request.setAttribute("userDetail", user);
+                request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while retrieving user details.");
+            listUsers(request, response);
         }
-        response.sendRedirect("user");
     }
 
-    // Extract user data from request
-    private User extractUserFromRequest(HttpServletRequest request) {
-        User user = new User();
-        user.setUsername(request.getParameter("username"));
-        user.setPassword(request.getParameter("password"));
-        user.setFullName(request.getParameter("fullName"));
-        user.setEmail(request.getParameter("email"));
-        user.setPhoneNumber(request.getParameter("phoneNumber"));
-        user.setAddress(request.getParameter("address"));
-        user.setRole(request.getParameter("role"));
-        user.setStatus(request.getParameter("status"));
-        user.setProfilePictureURL(request.getParameter("profilePictureURL"));
-        user.setRegistrationDate(new Date());
-        user.setIsDeleted(false);
-        return user;
-    }
+    private void editUser(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String userIDParam = request.getParameter("userID");
+            if (userIDParam == null || !userIDParam.matches("\\d+")) {
+                request.setAttribute("error", "Invalid user ID.");
+                listUsers(request, response);
+                return;
+            }
 
-    // Update user with new data from request
-    private void updateUserFromRequest(HttpServletRequest request, User user) {
-        user.setUsername(request.getParameter("username"));
-        String password = request.getParameter("password");
-        if (password != null && !password.trim().isEmpty()) {
-            user.setPassword(password);
+            int userID = Integer.parseInt(userIDParam);
+            String username = request.getParameter("username");
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String address = request.getParameter("address");
+            String role = request.getParameter("role");
+            String status = request.getParameter("status");
+            String profilePictureURL = request.getParameter("profilePictureURL");
+
+            // Lấy thông tin người dùng gốc từ cơ sở dữ liệu
+            User originalUser = userDAO.getUserById(userID);
+            if (originalUser == null) {
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
+                return;
+            }
+
+            // Validate dữ liệu
+            Map<String, String> errors = validateUserInputs(
+                    username, null, fullName, email, phoneNumber, address, role, status, profilePictureURL,
+                    false, originalUser.getUsername(), originalUser.getEmail()
+            );
+
+            if (!errors.isEmpty()) {
+                User userWithErrors = new User();
+                userWithErrors.setUserID(userID);
+                userWithErrors.setUsername(username);
+                userWithErrors.setFullName(fullName);
+                userWithErrors.setEmail(email);
+                userWithErrors.setPhoneNumber(phoneNumber);
+                userWithErrors.setAddress(address);
+                userWithErrors.setRole(role);
+                userWithErrors.setStatus(status);
+                userWithErrors.setProfilePictureURL(profilePictureURL);
+
+                request.setAttribute("errors", errors);
+                request.setAttribute("userDetail", userWithErrors);
+                request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
+                return;
+            }
+
+            // Cập nhật thông tin người dùng
+            originalUser.setUsername(username);
+            originalUser.setFullName(fullName);
+            originalUser.setEmail(email);
+            originalUser.setPhoneNumber(phoneNumber);
+            originalUser.setAddress(address);
+            originalUser.setRole(role);
+            originalUser.setStatus(status);
+            originalUser.setProfilePictureURL(profilePictureURL);
+
+            boolean isUpdated = userDAO.editUser(originalUser);
+            if (isUpdated) {
+                response.sendRedirect(request.getContextPath() + "/user?action=list&success=User updated successfully");
+            } else {
+                request.setAttribute("error", "Failed to update user.");
+                request.setAttribute("userDetail", originalUser);
+                request.getRequestDispatcher("View/User/edit.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while updating the user.");
+            listUsers(request, response);
         }
-        user.setFullName(request.getParameter("fullName"));
-        user.setEmail(request.getParameter("email"));
-        user.setPhoneNumber(request.getParameter("phoneNumber"));
-        user.setAddress(request.getParameter("address"));
-        user.setRole(request.getParameter("role"));
-        user.setStatus(request.getParameter("status"));
-        user.setProfilePictureURL(request.getParameter("profilePictureURL"));
-
-        user.setRegistrationDate(user.getRegistrationDate());
     }
 
-    // Validate user inputs
-    private Map<String, String> validateUserInputs(User user, boolean isUpdate, Integer userIdParam) {
+    private void deleteUser(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int userID = Integer.parseInt(request.getParameter("userID"));
+            boolean isDeleted = userDAO.deleteUser(userID);
+            response.sendRedirect(request.getContextPath() + "/user?action=list&success="
+                    + (isDeleted ? "User deleted successfully" : "Failed to delete user"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/user?action=list&error=An error occurred while deleting the user");
+        }
+    }
+
+    private void getUserDetail(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int userID = Integer.parseInt(request.getParameter("userID"));
+            User user = userDAO.getUserById(userID);
+            if (user != null) {
+                request.setAttribute("userDetail", user);
+                request.getRequestDispatcher("View/User/detail.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "User does not exist.");
+                listUsers(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred while fetching user details.");
+            listUsers(request, response);
+        }
+    }
+
+    private Map<String, String> validateUserInputs(String username, String password, String fullName,
+            String email, String phoneNumber, String address,
+            String role, String status, String profilePictureURL,
+            boolean isAdd, String originalUsername, String originalEmail) {
         Map<String, String> errors = new HashMap<>();
 
-        if (user.getUsername() == null || user.getUsername().trim().isEmpty() || user.getUsername().length() < 3) {
+        // Kiểm tra username
+        if (username == null || username.trim().isEmpty() || username.length() < 3) {
             errors.put("username", "Tên người dùng phải có ít nhất 3 ký tự và không được để trống.");
-        } else if (!isUpdate || (isUpdate && userIdParam != null && !userDAO.getUserById(userIdParam).getUsername().equals(user.getUsername()))) {
-            if (userDAO.isUsernameTaken(user.getUsername())) {
-                errors.put("username", "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
-            }
+        } else if (!username.equals(originalUsername) && userDAO.isUsernameTaken(username)) {
+            // Chỉ kiểm tra trùng lặp nếu username đã thay đổi
+            errors.put("username", "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
         }
 
-        if (!isUpdate && (user.getPassword() == null || user.getPassword().trim().isEmpty() || user.getPassword().length() < 6 || !Pattern.compile("\\d").matcher(user.getPassword()).find())) {
+        // Kiểm tra mật khẩu
+        if (isAdd && (password == null || password.trim().isEmpty() || password.length() < 6 || !Pattern.compile("\\d").matcher(password).find())) {
             errors.put("password", "Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
         }
 
-        if (user.getFullName() == null || user.getFullName().trim().isEmpty() || user.getFullName().length() < 3) {
+        // Kiểm tra họ tên
+        if (fullName == null || fullName.trim().isEmpty() || fullName.length() < 3) {
             errors.put("fullName", "Họ tên phải có ít nhất 3 ký tự và không được để trống.");
         }
 
-        if (user.getEmail() == null || user.getEmail().trim().isEmpty() || !Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matcher(user.getEmail()).matches()) {
+        // Kiểm tra email
+        if (email == null || email.trim().isEmpty() || !Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matcher(email).matches()) {
             errors.put("email", "Email không hợp lệ hoặc để trống.");
-        } else if (!isUpdate || (isUpdate && userIdParam != null && !userDAO.getUserById(userIdParam).getEmail().equals(user.getEmail()))) {
-            if (userDAO.isEmailTaken(user.getEmail())) {
-                errors.put("email", "Email đã tồn tại. Vui lòng nhập email khác.");
-            }
+        } else if (!email.equals(originalEmail) && userDAO.isEmailTaken(email)) {
+            // Chỉ kiểm tra trùng lặp nếu email đã thay đổi
+            errors.put("email", "Email đã tồn tại. Vui lòng chọn email khác.");
         }
 
-        if (user.getPhoneNumber() != null && !user.getPhoneNumber().trim().isEmpty()) {
-            if (!Pattern.compile("^[0-9]{10,11}$").matcher(user.getPhoneNumber()).matches()) {
+        // Kiểm tra số điện thoại
+        if (phoneNumber != null) { // Cho phép null
+            if (phoneNumber.trim().isEmpty()) {
+                errors.put("phoneNumber", "Số điện thoại không được để trống hoặc chỉ chứa khoảng trắng.");
+            } else if (!Pattern.compile("^[0-9]{10,11}$").matcher(phoneNumber).matches()) {
                 errors.put("phoneNumber", "Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-            } else if (!isUpdate || (isUpdate && userIdParam != null &&
-                !user.getPhoneNumber().equals(userDAO.getUserById(userIdParam).getPhoneNumber()))) {
-                if (userDAO.isPhoneNumberTaken(user.getPhoneNumber())) {
-                    errors.put("phoneNumber", "Số điện thoại đã tồn tại. Vui lòng nhập số điện thoại khác.");
-                }
             }
-        } else if (user.getPhoneNumber() != null && user.getPhoneNumber().trim().isEmpty()) {
-            errors.put("phoneNumber", "Số điện thoại không được chỉ chứa khoảng trắng.");
+        }        // Kiểm tra địa chỉ
+        if (address != null && address.trim().isEmpty()) {
+            errors.put("address", "Địa chỉ không được để trống nếu nhập.");
         }
 
-            
-        if (user.getAddress() != null && user.getAddress().trim().isEmpty()) {
-            errors.put("address", "Địa chỉ không được chỉ chứa khoảng trắng.");
-        }
-        if (!"Active".equals(user.getStatus()) && !"Inactive".equals(user.getStatus())) {
+        // Kiểm tra trạng thái
+        if (!"Active".equals(status) && !"Inactive".equals(status)) {
             errors.put("status", "Trạng thái phải là 'Active' hoặc 'Inactive'.");
         }
 
-        if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(user.getRole())) {
+        // Kiểm tra vai trò
+        if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(role)) {
             errors.put("role", "Vai trò không hợp lệ.");
         }
 
+        // Kiểm tra URL ảnh đại diện
+        if (profilePictureURL != null && !profilePictureURL.trim().isEmpty() && profilePictureURL.length() > 20000000) {
+            errors.put("profilePictureURL", "URL ảnh đại diện phải nhỏ hơn 20MB.");
+        }
+
         return errors;
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Handles user CRUD operations.";
     }
 }

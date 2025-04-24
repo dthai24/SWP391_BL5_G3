@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import Model.User;
 import DBContext.DBContext;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.time.Instant;
+import util.ValidFunction;
 
 public class UserDAO {
 
@@ -23,11 +27,11 @@ public class UserDAO {
 
     // Add a new user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, isDeleted, registrationDate) "
+        String sql = "INSERT INTO Users (username, passwordHash, fullName, email, phoneNumber, address, role, profilePictureURL, status, registrationDate, isDeleted) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
+            statement.setString(2, user.getPasswordHash());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -35,42 +39,148 @@ public class UserDAO {
             statement.setString(7, user.getRole());
             statement.setString(8, user.getProfilePictureURL());
             statement.setString(9, user.getStatus());
-            statement.setBoolean(10, user.getIsDeleted());
-            statement.setDate(11, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
+            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
+            statement.setBoolean(11, user.getIsDeleted());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+    public boolean updateUser(User user) {
+    String sql = "UPDATE Users SET fullName = ?, email = ?, phoneNumber = ?, address = ?, Password = ? WHERE userID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, user.getFullName() != null ? user.getFullName() : "");
+        ps.setString(2, user.getEmail() != null ? user.getEmail() : "");
+        ps.setString(3, user.getPhoneNumber() != null ? user.getPhoneNumber() : "");
+        ps.setString(4, user.getAddress() != null ? user.getAddress() : "");
+        ps.setString(5, user.getPasswordHash() != null ? user.getPasswordHash() : "");
+        ps.setInt(6, user.getUserID());
+        int rowsUpdated = ps.executeUpdate();
+        return rowsUpdated > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 
-    public User login(String username, String password) {
-        String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new User(
-                        rs.getInt("UserID"),
-                        rs.getString("Username"),
-                        rs.getString("Password"),
-                        rs.getString("FullName"),
-                        rs.getString("Email"),
-                        rs.getString("PhoneNumber"),
-                        rs.getString("Address"),
-                        rs.getString("Role"),
-                        rs.getString("ProfilePictureURL"),
-                        rs.getString("Status"),
-                        rs.getDate("RegistrationDate"),
-                        rs.getBoolean("IsDeleted")
-                );
-            }
-        } catch (Exception e) {
+//    public boolean updateUserProfile(User user) {
+//    String sql = "UPDATE Users SET fullName = ?, email = ?, phone = ?, address = ? WHERE userID = ?";
+//    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+//        stmt.setString(1, user.getFullName());
+//        stmt.setString(2, user.getEmail());
+//        stmt.setString(3, user.getPhoneNumber());
+//        stmt.setString(4, user.getAddress());
+//        stmt.setInt(5, user.getUserID());  // Giả sử bạn có phương thức getUserID để lấy ID người dùng
+//
+//        int rowsAffected = stmt.executeUpdate();
+//        return rowsAffected > 0;  // Nếu cập nhật thành công, trả về true
+//    } catch (SQLException e) {
+//        e.printStackTrace();
+//    }
+//    return false;  // Nếu có lỗi hoặc không cập nhật được, trả về false
+//}
+
+   public boolean updateCustomerbyId(User user) {
+    String sql = "UPDATE Users SET "
+            + "username = ?, "
+            + "password = ?, "
+            + "fullName = ?, "
+            + "email = ?, "
+            + "phoneNumber = ?, "
+            + "address = ?, "
+            + "status = ?, "
+            + "registrationDate = ?, "
+            + "isDeleted = ? "
+            + "WHERE userID = ?";
+
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setString(1, user.getUsername());
+        stmt.setString(2, user.getPasswordHash());  // Không cần băm mật khẩu
+        stmt.setString(3, user.getFullName());
+        stmt.setString(4, user.getEmail());
+        stmt.setString(5, user.getPhoneNumber());
+        stmt.setString(6, user.getAddress());
+        stmt.setString(7, user.getStatus());
+        stmt.setTimestamp(8, new Timestamp(user.getRegistrationDate().getTime()));
+        stmt.setBoolean(9, user.getIsDeleted());
+        stmt.setInt(10, user.getUserID());
+
+        int result = stmt.executeUpdate();
+        return result > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
+public User getUserByEmail(String email) {
+    String sql = "SELECT * FROM Users WHERE Email = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return new User(
+                       rs.getInt("UserID"),
+                rs.getString("Username"),
+                rs.getString("Password"),
+                rs.getString("FullName"),
+                rs.getString("Email"),
+                rs.getString("PhoneNumber"),
+                rs.getString("Address"),
+                rs.getString("Role"),
+                rs.getString("ProfilePictureURL"),
+                rs.getString("Status"),
+                rs.getDate("RegistrationDate"),
+                rs.getBoolean("IsDeleted")
+            );
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+public boolean checkOTP(String email, String otp) {
+        String sql = "SELECT * FROM reset_token WHERE customerID = (SELECT customerID FROM Customer WHERE email = ?) AND token = ? AND expiry_date > ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setString(1, email);
+            st.setString(2, otp);
+            st.setTimestamp(3, new java.sql.Timestamp(System.currentTimeMillis()));  // So sánh với thời gian hiện tại
+            ResultSet rs = st.executeQuery();
+            return rs.next();  // Nếu có kết quả, OTP hợp lệ và chưa hết hạn
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return false;
     }
+    public User login(String username, String password) {
+    String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, username);
+        ps.setString(2, password);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return new User(
+                rs.getInt("UserID"),
+                rs.getString("Username") != null ? rs.getString("Username") : "",
+                rs.getString("Password") != null ? rs.getString("Password") : "",
+                rs.getString("FullName") != null ? rs.getString("FullName") : "",
+                rs.getString("Email") != null ? rs.getString("Email") : "",
+                rs.getString("PhoneNumber") != null ? rs.getString("PhoneNumber") : "",
+                rs.getString("Address") != null ? rs.getString("Address") : "",
+                rs.getString("Role") != null ? rs.getString("Role") : "",
+                rs.getString("ProfilePictureURL") != null ? rs.getString("ProfilePictureURL") : "",
+                rs.getString("Status") != null ? rs.getString("Status") : "",
+                rs.getDate("RegistrationDate"),
+                rs.getBoolean("IsDeleted")
+            );
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
 
     public boolean checkExist(String username, String email) {
         String sql = "SELECT 1 FROM Users WHERE Username = ? OR Email = ?";
@@ -89,7 +199,7 @@ public class UserDAO {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
+            statement.setString(2, user.getPasswordHash());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -108,11 +218,11 @@ public class UserDAO {
 
     // Edit an existing user
     public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ? "
+        String sql = "UPDATE Users SET username = ?, passwordHash = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ?, registrationDate = ? "
                 + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
+            statement.setString(2, user.getPasswordHash());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
@@ -120,7 +230,8 @@ public class UserDAO {
             statement.setString(7, user.getRole());
             statement.setString(8, user.getProfilePictureURL());
             statement.setString(9, user.getStatus());
-            statement.setInt(10, user.getUserID());
+            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
+            statement.setInt(11, user.getUserID());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -307,41 +418,21 @@ public class UserDAO {
         return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
     }
 
-    public boolean isPhoneNumberTaken(String phoneNumber) {
-        String query = "SELECT COUNT(*) FROM Users WHERE phonenumber = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, phoneNumber);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0; // Trả về true nếu email đã tồn tại
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
-    }
-
     // Helper method to map ResultSet to User object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
-        return new User(
-                resultSet.getInt("userID"),
-                resultSet.getString("username"),
-                resultSet.getString("password"),
-                resultSet.getString("fullName"),
-                resultSet.getString("email"),
-                resultSet.getString("phoneNumber"),
-                resultSet.getString("address"),
-                resultSet.getString("role"),
-                resultSet.getString("profilePictureURL"),
-                resultSet.getString("status"),
-                resultSet.getDate("registrationDate"),
-                resultSet.getBoolean("isDeleted")
-        );
-    }
-
-    public List<User> searchUsers(String searchTerm, String role, String sortBy, String sortDirection) {
-        return searchAndListUsers(searchTerm, role, sortBy, sortDirection, 1, Integer.MAX_VALUE);
+       return new User(
+    resultSet.getString("username"),
+    resultSet.getString("passwordHash"),
+    resultSet.getString("fullName"),
+    resultSet.getString("email"),
+    resultSet.getString("phoneNumber"),
+    resultSet.getString("address"),
+    resultSet.getString("role"),
+    resultSet.getString("profilePictureURL"),
+    resultSet.getString("status"),
+    resultSet.getDate("registrationDate"),
+    resultSet.getBoolean("isDeleted")
+);
     }
 
     // Main method to test new features

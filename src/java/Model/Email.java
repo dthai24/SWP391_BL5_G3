@@ -14,13 +14,10 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Properties;
 
-/**
- *
- * @author tiend
- */
+
 public class Email {
 
-    public static final String pass = "iokp ormm dpaz wkcf";
+    public static final String pass = "rxss lftp hwmd qosu";
     // lấy pass
     public static final String from = "capduythai11@gmail.com";
 // gửi đến địa chỉ email
