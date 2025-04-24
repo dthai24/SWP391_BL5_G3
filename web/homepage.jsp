@@ -1,13 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="Model.User" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zxx">
 
     <head>
         <meta charset="UTF-8">
         <meta name="description" content="Sona Template">
         <meta name="keywords" content="Sona, unica, creative, html">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=1024, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>ROSE MOTEL</title>
 
@@ -76,7 +76,7 @@
             </div>
             <nav class="mainmenu">
                 <ul>
-                    <li class="active"><a href="./index.html">Home</a></li>
+                    <li class="active"><a href="./homepage.jsp">Home</a></li>
                     <li><a href="./rooms.jsp">Rooms</a></li>
                     <li><a href="./about-us.jsp">About Us</a></li>
                     <li><a href="./pages.jsp">Pages</a>
@@ -127,15 +127,28 @@
                                 <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
                                 <div class="language-option">
                                     <%
-                         User user = (User) session.getAttribute("user");
-                         if (user != null) {
+                                        User user = (User) session.getAttribute("user");
+                                        Boolean isEmployee = (Boolean) session.getAttribute("isEmployee");
+                                        if (user != null) {
                                     %>
-                                    <a href="myprofile.jsp"><i class="fa fa-user"></i> <%= user.getFullName() %></a> |
-                                    <a href="logout"><i class="fa fa-sign-out"></i> Đăng xuất</a>
+                                    <div class="dropdown d-inline-block">
+                                      <a href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle" style="display:inline-block;">
+                                        <i class="fa fa-user"></i> <%= user.getFullName() %>
+                                      </a>
+                                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                        <a class="dropdown-item" href="myprofile.jsp"><i class="fa fa-user-circle"></i> Trang cá nhân</a>
+                                        <% if (isEmployee != null && isEmployee) { %>
+                                        <a class="dropdown-item" href="room"><i class="fa fa-dashboard"></i> Dash Board</a>
+                                        <% } %>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="logout"><i class="fa fa-sign-out"></i> Đăng xuất</a>
+                                      </div>
+                                    </div>
                                     <%
                                         } else {
                                     %>
-                                   <a href="login.jsp">ĐĂNG NHẬP </a>                                    <%
+                                   <a href="javascript:void(0);" onclick="loadLoginForm()"><i class="fa fa-sign-in"></i> Đăng nhập</a>
+                                    <%
                                         }
                                     %>
 
@@ -150,7 +163,7 @@
                     <div class="row">
                         <div class="col-lg-2">
                             <div class="logo">
-                                <a href="./index.html">
+                                <a href="./homepage.jsp">
                                     <img src="img/logo.png" alt="">
                                 </a>
                             </div>
@@ -159,7 +172,7 @@
                             <div class="nav-menu">
                                 <nav class="mainmenu">
                                     <ul>
-                                        <li class="active"><a href="./homepage.jsp">Home</a></li>
+                                        <li class="active"><a href="./index.jsp">Home</a></li>
                                         <li><a href="./rooms.jsp">Rooms</a></li>
                                         <li><a href="./about-us.jsp">About Us</a></li>
                                         <li><a href="./pages.jsp">Pages</a>
@@ -664,6 +677,7 @@
 
         <!-- Js Plugins -->
         <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="js/jquery.magnific-popup.min.js"></script>
         <script src="js/jquery.nice-select.min.js"></script>
@@ -676,7 +690,7 @@
     const container = document.getElementById("bookingFormContainer");
     container.innerHTML = '<div class="text-center">Đang tải form đăng nhập...</div>';
 
-    fetch("login-form.jsp")
+    fetch("login.jsp")
         .then(response => response.text())
         .then(html => {
             container.innerHTML = html;

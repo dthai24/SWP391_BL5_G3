@@ -76,7 +76,7 @@
                     <div class="container mt-5">
                         <div class="card shadow-lg">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">Danh Sách Đồ Vật</h3>
+                                <h3 class="mb-0">Danh Sách Vật Phẩm</h3>
                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addInventoryItemModal">
                                     <i class="fa fa-plus"></i> Thêm Vật Phẩm
                                 </button>
@@ -151,84 +151,6 @@
                         </div>                
                     </div>
 
-<<<<<<< Updated upstream
-=======
-                    <!-- Add Inventory Item Modal -->
-                    <div class="modal fade" id="addInventoryItemModal" tabindex="-1" role="dialog" aria-labelledby="addInventoryItemModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <form action="inventory-item" method="post">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="addInventoryItemModalLabel">Thêm Vật Phẩm Mới</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="form-group">
-                                            <label for="add-itemName">Tên Vật Phẩm</label>
-                                            <input type="text" name="itemName" class="form-control" required />
-                                            <div id="add-itemName-error" style="color:red;font-size:14px;margin-top:4px;"></div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="add-description">Mô Tả</label>
-                                            <textarea name="description" class="form-control"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                           <label for="add-defaultCharge">Phí Mặc Định</label>
-                                           <input type="number" name="defaultCharge" id="add-defaultCharge" class="form-control" required />
-                                           <div id="add-defaultCharge-error" style="color:red;font-size:14px;margin-top:4px;"></div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                                        <button type="submit" class="btn btn-primary">Thêm mới</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Edit Inventory Item Modal -->
-                    <div class="modal fade" id="editInventoryItemModal" tabindex="-1" role="dialog" aria-labelledby="editInventoryItemModalLabel" aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <form action="inventory-item" method="post">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editCategoryModalLabel">Cập nhật loại phòng</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <input type="hidden" name="itemID" id="edit-itemID">
-                                        <div class="modal-body">
-                                            <div class="form-group">
-                                                <label for="edit-itemName">Tên Vật Phẩm</label>
-                                                <input type="text" name="itemName" id="edit-itemName" class="form-control" required />
-                                                <div id="edit-itemName-error" style="color:red;font-size:14px;margin-top:4px;"></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="edit-description">Mô Tả</label>
-                                                <textarea name="description" id="edit-description" class="form-control"></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="edit-defaultCharge">Phí Mặc Định</label>
-                                                <input type="number" name="defaultCharge" id="edit-defaultCharge" class="form-control" required />
-                                                <div id="edit-defaultCharge-error" style="color:red;font-size:14px;margin-top:4px;"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                                        <button type="submit" class="btn btn-primary">Cập nhật</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
->>>>>>> Stashed changes
                     <!-- View Inventory Item Modal -->
                     <div class="modal fade" id="viewInventoryItemModal" tabindex="-1" role="dialog" aria-labelledby="viewInventoryItemModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">

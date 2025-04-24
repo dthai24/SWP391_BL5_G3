@@ -3,51 +3,34 @@ package Model;
 import java.util.Date;
 
 public class User {
-
     private int userID;
     private String username;
-    private String passwordHash;
+    private String password;
     private String fullName;
     private String email;
     private String phoneNumber;
     private String address;
+    private String role;
     private String profilePictureURL;
     private String status;
     private Date registrationDate;
     private boolean isDeleted;
-
+    
     // Constructors
     public User() {
     }
-
-<<<<<<< Updated upstream
-    public User(int userID, String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
-=======
-    public User(int userID, String username, String password, String fullName, String email,
-                String phoneNumber, String address, String profilePictureURL, 
+    
+    public User(int userID, String username, String password, String fullName, String email, 
+                String phoneNumber, String address, String role, String profilePictureURL, 
                 String status, Date registrationDate, boolean isDeleted) {
->>>>>>> Stashed changes
         this.userID = userID;
         this.username = username;
-        this.passwordHash = passwordHash;
+        this.password = password;
         this.fullName = fullName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.role = role;
-        this.profilePictureURL = profilePictureURL;
-        this.status = status;
-        this.registrationDate = registrationDate;
-        this.isDeleted = isDeleted;
-    }
-
-    public User(String username, String passwordHash, String fullName, String email, String phoneNumber, String address, String role, String profilePictureURL, String status, Date registrationDate, boolean isDeleted) {
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.fullName = fullName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
         this.profilePictureURL = profilePictureURL;
         this.status = status;
         this.registrationDate = registrationDate;
@@ -71,12 +54,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFullName() {
@@ -109,6 +92,14 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getProfilePictureURL() {
@@ -145,20 +136,6 @@ public class User {
 
     @Override
     public String toString() {
-<<<<<<< Updated upstream
-        return "User{"
-                + "userID=" + userID
-                + ", username='" + username + '\''
-                + ", fullName='" + fullName + '\''
-                + ", email='" + email + '\''
-                + ", phoneNumber='" + phoneNumber + '\''
-                + ", address='" + address + '\''
-                + ", role='" + role + '\''
-                + ", status='" + status + '\''
-                + ", registrationDate=" + registrationDate
-                + ", isDeleted=" + isDeleted
-                + '}';
-=======
         return "User{" +
                 "userID=" + userID +
                 ", username='" + username + '\'' +
@@ -166,11 +143,10 @@ public class User {
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", address='" + address + '\'' +
-                ", profilePictureURL='" + profilePictureURL + '\'' +
+                ", role='" + role + '\'' +
                 ", status='" + status + '\'' +
                 ", registrationDate=" + registrationDate +
                 ", isDeleted=" + isDeleted +
                 '}';
->>>>>>> Stashed changes
     }
 }
