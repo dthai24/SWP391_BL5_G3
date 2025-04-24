@@ -10,7 +10,7 @@ public class User {
     private String email;
     private String phoneNumber;
     private String address;
-    private String role;
+    //private String role;
     private String profilePictureURL;
     private String status;
     private Date registrationDate;
@@ -21,7 +21,7 @@ public class User {
     }
     
     public User(int userID, String username, String password, String fullName, String email, 
-                String phoneNumber, String address, String role, String profilePictureURL, 
+                String phoneNumber, String address, String profilePictureURL, 
                 String status, Date registrationDate, boolean isDeleted) {
         this.userID = userID;
         this.username = username;
@@ -30,7 +30,7 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.role = role;
+        //this.role = role;
         this.profilePictureURL = profilePictureURL;
         this.status = status;
         this.registrationDate = registrationDate;
@@ -94,13 +94,7 @@ public class User {
         this.address = address;
     }
 
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
+   
 
     public String getProfilePictureURL() {
         return profilePictureURL;
@@ -143,7 +137,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", address='" + address + '\'' +
-                ", role='" + role + '\'' +
+      
                 ", status='" + status + '\'' +
                 ", registrationDate=" + registrationDate +
                 ", isDeleted=" + isDeleted +

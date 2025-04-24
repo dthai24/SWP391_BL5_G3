@@ -46,9 +46,9 @@ public class UserServlet extends HttpServlet {
         String filterStatus = request.getParameter("filterStatus");
         List<User> users = userDAO.listAllUsers();
 
-        if (filterRole != null && !filterRole.isEmpty()) {
-            users.removeIf(u -> !filterRole.equals(u.getRole()));
-        }
+       // if (filterRole != null && !filterRole.isEmpty()) {
+           // users.removeIf(u -> !filterRole.equals(u.getRole()));
+        //}
 
         if (filterStatus != null && !filterStatus.isEmpty()) {
             users.removeIf(u -> !filterStatus.equals(u.getStatus()));
@@ -173,7 +173,7 @@ public class UserServlet extends HttpServlet {
         user.setEmail(request.getParameter("email"));
         user.setPhoneNumber(request.getParameter("phoneNumber"));
         user.setAddress(request.getParameter("address"));
-        user.setRole(request.getParameter("role"));
+       
         user.setStatus(request.getParameter("status"));
         user.setProfilePictureURL(request.getParameter("profilePictureURL"));
         user.setRegistrationDate(new Date());
@@ -192,7 +192,7 @@ public class UserServlet extends HttpServlet {
         user.setEmail(request.getParameter("email"));
         user.setPhoneNumber(request.getParameter("phoneNumber"));
         user.setAddress(request.getParameter("address"));
-        user.setRole(request.getParameter("role"));
+
         user.setStatus(request.getParameter("status"));
         user.setProfilePictureURL(request.getParameter("profilePictureURL"));
 
@@ -248,9 +248,9 @@ public class UserServlet extends HttpServlet {
             errors.put("status", "Trạng thái phải là 'Active' hoặc 'Inactive'.");
         }
 
-        if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(user.getRole())) {
-            errors.put("role", "Vai trò không hợp lệ.");
-        }
+       // if (!List.of("Admin", "Customer", "Manager", "Staff", "Receptionist").contains(user.getRole())) {
+           // errors.put("role", "Vai trò không hợp lệ.");
+        //}
 
         return errors;
     }

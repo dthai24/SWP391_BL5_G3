@@ -23,7 +23,7 @@ public class UserDAO {
 
     // Add a new user
     public boolean addUser(User user) {
-        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, role, profilePictureURL, status, isDeleted, registrationDate) "
+        String sql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL, status, isDeleted, registrationDate) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
@@ -32,11 +32,11 @@ public class UserDAO {
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
             statement.setString(6, user.getAddress());
-            statement.setString(7, user.getRole());
-            statement.setString(8, user.getProfilePictureURL());
-            statement.setString(9, user.getStatus());
-            statement.setBoolean(10, user.getIsDeleted());
-            statement.setDate(11, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
+
+            statement.setString(7, user.getProfilePictureURL());
+            statement.setString(8, user.getStatus());
+            statement.setBoolean(9, user.getIsDeleted());
+            statement.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -59,7 +59,7 @@ public class UserDAO {
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
                         rs.getString("Address"),
-                        rs.getString("Role"),
+                      
                         rs.getString("ProfilePictureURL"),
                         rs.getString("Status"),
                         rs.getDate("RegistrationDate"),
@@ -85,7 +85,7 @@ public class UserDAO {
     }
 
     public boolean register(User user) {
-        String sql = "INSERT INTO Users (Username, Password, FullName, Email, PhoneNumber, Address, Role, ProfilePictureURL, Status, RegistrationDate, IsDeleted) "
+        String sql = "INSERT INTO Users (Username, Password, FullName, Email, PhoneNumber, Address, ProfilePictureURL, Status, RegistrationDate, IsDeleted) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
@@ -94,11 +94,11 @@ public class UserDAO {
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
             statement.setString(6, user.getAddress());
-            statement.setString(7, user.getRole());
-            statement.setString(8, user.getProfilePictureURL());
-            statement.setString(9, user.getStatus());
-            statement.setDate(10, new java.sql.Date(user.getRegistrationDate().getTime()));
-            statement.setBoolean(11, user.getIsDeleted());
+
+            statement.setString(7, user.getProfilePictureURL());
+            statement.setString(8, user.getStatus());
+            statement.setDate(9, new java.sql.Date(user.getRegistrationDate().getTime()));
+            statement.setBoolean(10, user.getIsDeleted());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -108,7 +108,7 @@ public class UserDAO {
 
     // Edit an existing user
     public boolean editUser(User user) {
-        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, role = ?, profilePictureURL = ?, status = ? "
+        String sql = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, profilePictureURL = ?, status = ? "
                 + "WHERE userID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
@@ -117,10 +117,10 @@ public class UserDAO {
             statement.setString(4, user.getEmail());
             statement.setString(5, user.getPhoneNumber());
             statement.setString(6, user.getAddress());
-            statement.setString(7, user.getRole());
-            statement.setString(8, user.getProfilePictureURL());
-            statement.setString(9, user.getStatus());
-            statement.setInt(10, user.getUserID());
+
+            statement.setString(7, user.getProfilePictureURL());
+            statement.setString(8, user.getStatus());
+            statement.setInt(9, user.getUserID());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -171,7 +171,7 @@ public class UserDAO {
     }
 
     // Tìm kiếm, lọc, sắp xếp, và phân trang người dùng
-    public List<User> searchAndListUsers(String keyword, String role, String sortBy, String sortDirection, int page, int pageSize) {
+    public List<User> searchAndListUsers(String keyword, String sortBy, String sortDirection, int page, int pageSize) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM Users WHERE isDeleted = 0";
 
@@ -180,11 +180,7 @@ public class UserDAO {
             sql += " AND (username LIKE ? OR fullName LIKE ? OR email LIKE ?)";
         }
 
-        // Thêm lọc theo vai trò
-        if (role != null && !role.trim().isEmpty()) {
-            sql += " AND role = ?";
-        }
-
+      
         // Thêm sắp xếp
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             sql += " ORDER BY " + sortBy;
@@ -211,10 +207,7 @@ public class UserDAO {
                 statement.setString(paramIndex++, "%" + keyword + "%");
             }
 
-            // Gán tham số cho vai trò
-            if (role != null && !role.trim().isEmpty()) {
-                statement.setString(paramIndex++, role);
-            }
+            
 
             // Gán tham số cho phân trang
             statement.setInt(paramIndex++, (page - 1) * pageSize);
@@ -231,7 +224,7 @@ public class UserDAO {
         return users;
     }
 
-    public int countUsers(String keyword, String role) {
+    public int countUsers(String keyword) {
         String sql = "SELECT COUNT(*) FROM Users WHERE isDeleted = 0";
         List<Object> params = new ArrayList<>();
 
@@ -243,11 +236,7 @@ public class UserDAO {
             params.add("%" + keyword + "%");
         }
 
-        // Thêm điều kiện lọc vai trò
-        if (role != null && !role.trim().isEmpty()) {
-            sql += " AND role = ?";
-            params.add(role);
-        }
+        
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
@@ -332,7 +321,7 @@ public class UserDAO {
                 resultSet.getString("email"),
                 resultSet.getString("phoneNumber"),
                 resultSet.getString("address"),
-                resultSet.getString("role"),
+               
                 resultSet.getString("profilePictureURL"),
                 resultSet.getString("status"),
                 resultSet.getDate("registrationDate"),
@@ -340,8 +329,8 @@ public class UserDAO {
         );
     }
 
-    public List<User> searchUsers(String searchTerm, String role, String sortBy, String sortDirection) {
-        return searchAndListUsers(searchTerm, role, sortBy, sortDirection, 1, Integer.MAX_VALUE);
+    public List<User> searchUsers(String searchTerm, String sortBy, String sortDirection) {
+        return searchAndListUsers(searchTerm, sortBy, sortDirection, 1, Integer.MAX_VALUE);
     }
 
     // Main method to test new features
