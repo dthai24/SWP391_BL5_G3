@@ -9,10 +9,14 @@
         <ul class="sidebar-nav">
             <li class="sidebar-header">Quản lý hệ thống</li>
             <li class="sidebar-item">
-                <a class="sidebar-link" href="<%= request.getContextPath() %>/user">
-                    <i class="align-middle" data-feather="user"></i> 
-                    <span class="align-middle">Quản lý người dùng</span>
-                </a>
+		<a data-bs-target="#dashboards" data-bs-toggle="collapse" class="sidebar-link collapsed">
+                    <i class="align-middle" data-feather="user"></i> <span class="align-middle">Quản lý người dùng</span>
+		</a>
+		<ul id="dashboards" class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar">
+                    <li class="sidebar-item"><a class="sidebar-link" href="<%= request.getContextPath() %>/employee">Quản lý nhân viên</a></li>
+                    <li class="sidebar-item"><a class="sidebar-link" href="<%= request.getContextPath() %>/customer">Quản lý khách hàng</a></li>
+							
+		</ul>
             </li>
             <li class="sidebar-item">
                 <a class="sidebar-link" href="<%= request.getContextPath() %>/manage-bookings">
@@ -42,7 +46,7 @@
             <li class="sidebar-item">
                 <a class="sidebar-link" href="<%= request.getContextPath() %>/inventory-item">
                     <i class="align-middle" data-feather="box"></i>
-                    <span class="align-middle">Quản lý đồ dùng</span>
+                    <span class="align-middle">Quản lý đồ vật</span>
                 </a>
             </li>
         </ul>

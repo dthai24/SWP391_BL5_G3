@@ -76,7 +76,7 @@
                     <div class="container mt-5">
                         <div class="card shadow-lg">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <h3 class="mb-0">Danh Sách Vật Phẩm</h3>
+                                <h3 class="mb-0">Danh Sách Đồ Vật</h3>
                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addInventoryItemModal">
                                     <i class="fa fa-plus"></i> Thêm Vật Phẩm
                                 </button>
@@ -281,7 +281,7 @@
                                                                     $('#view-defaultCharge').text($(this).data('defaultcharge'));
                                                                 });
 
-// Populate Edit Inventory Item Modal
+                                                                // Populate Edit Inventory Item Modal
                                                                 $('.edit-btn').on('click', function () {
                                                                     $('#edit-itemID').val($(this).data('itemid'));
                                                                     $('#edit-itemName').val($(this).data('itemname'));
