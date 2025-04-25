@@ -86,19 +86,8 @@
                         </select>
                       </div>
                       <div class="form-group">
-                        <label>Trạng thái</label>
-                        <select name="vacancyStatus" class="form-control">
-                          <option value="Vacant">Vacant</option>
-                          <option value="Occupied">Occupied</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
                         <label>Mô tả</label>
                         <input type="text" name="description" class="form-control" />
-                      </div>
-                      <div class="form-group">
-                        <label>Giá phòng</label>
-                        <input type="number" name="priceOverride" class="form-control" required />
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -155,8 +144,6 @@
                                         <th style="white-space:normal; word-break:break-word; max-width:90px;">Trạng thái</th>
                                         <th style="white-space:normal; word-break:break-word; max-width:180px;">Mô tả</th>
                                         <th style="white-space:normal; word-break:break-word; max-width:120px;">Giá phòng</th>
-                                        <th style="white-space:normal; word-break:break-word; max-width:120px;">Ngày tạo</th>
-                                        <th style="white-space:normal; word-break:break-word; max-width:120px;">Ngày sửa</th>
                                         <th style="white-space:normal; word-break:break-word; max-width:100px;">Hành động</th>
                                     </tr>
                                 </thead>
@@ -179,8 +166,6 @@
                                         <td style="font-weight: 600; color: #28a745;">
                                             <%= room.getPriceOverride() %>$
                                         </td>
-                                        <td><%= room.getCreatedAt() %></td>
-                                        <td><%= room.getUpdatedAt() %></td>
                                         <td>
                                             <button type="button" class="btn btn-link p-0 view-btn" 
                                                 data-roomid="<%= room.getRoomID() %>"
@@ -218,9 +203,9 @@
                                         </td>
                                     </tr>
                                     <%  } 
-                                    } else { %>
-                                    <tr><td colspan="8" class="text-center">Không có phòng nào.</td></tr>
-                                    <% } %>
+} else { %>
+<tr><td colspan="6" class="text-center">Không có phòng nào.</td></tr>
+<% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -257,19 +242,8 @@
                         </select>
                       </div>
                       <div class="form-group">
-                        <label>Trạng thái</label>
-                        <select name="vacancyStatus" id="edit-vacancyStatus" class="form-control">
-                          <option value="Vacant">Vacant</option>
-                          <option value="Occupied">Occupied</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
                         <label>Mô tả</label>
                         <input type="text" name="description" id="edit-description" class="form-control" />
-                      </div>
-                      <div class="form-group">
-                        <label>Giá phòng</label>
-                        <input type="number" name="priceOverride" id="edit-priceOverride" class="form-control" required />
                       </div>
                     </div>
                     <div class="modal-footer">

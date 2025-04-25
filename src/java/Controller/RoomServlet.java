@@ -72,6 +72,7 @@ public class RoomServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         RoomDAO roomDAO = new RoomDAO();
+        RoomCategoryDAO roomCategoryDAO = new RoomCategoryDAO();
         String deleteRoomIdParam = request.getParameter("deleteRoomID");
         if (deleteRoomIdParam != null && !deleteRoomIdParam.isEmpty()) {
             try {
@@ -86,9 +87,7 @@ public class RoomServlet extends HttpServlet {
         String roomIdParam = request.getParameter("roomID");
         String roomNumber = request.getParameter("roomNumber");
         String categoryID = request.getParameter("categoryID");
-        String vacancyStatus = request.getParameter("vacancyStatus");
         String description = request.getParameter("description");
-        String priceOverride = request.getParameter("priceOverride");
         Date now = new Date();
         boolean isUpdate = roomIdParam != null && !roomIdParam.isEmpty();
         Room room = new Room();
@@ -126,16 +125,23 @@ public class RoomServlet extends HttpServlet {
         if (isUpdate) {
             room.setRoomID(Integer.parseInt(roomIdParam));
             room.setUpdatedAt(now);
+          
         } else {
             room.setCreatedAt(now);
             room.setUpdatedAt(now);
             room.setIsDeleted(false);
+            room.setVacancyStatus("Vacant");
         }
         room.setRoomNumber(roomNumber);
         room.setCategoryID(Integer.parseInt(categoryID));
-        room.setVacancyStatus(vacancyStatus);
         room.setDescription(description);
-        room.setPriceOverride(new BigDecimal(priceOverride));
+        // Lấy giá loại phòng
+        RoomCategory category = roomCategoryDAO.getRoomCategoryById(Integer.parseInt(categoryID));
+        if (category != null && category.getBasePricePerNight() != null) {
+            room.setPriceOverride(category.getBasePricePerNight());
+        } else {
+            room.setPriceOverride(java.math.BigDecimal.ZERO);
+        }
         boolean success;
         if (isUpdate) {
             success = roomDAO.editRoom(room);
