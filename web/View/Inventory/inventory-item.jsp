@@ -169,6 +169,7 @@
                               <div class="form-group">
                                 <label for="add-description">Mô Tả</label>
                                 <textarea name="description" class="form-control"></textarea>
+                                <div id="add-description-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                               </div>
                               <div class="form-group">
                                  <label for="add-defaultCharge">Phí Mặc Định</label>
@@ -206,6 +207,7 @@
                                         <div class="form-group">
                                             <label for="edit-description">Mô Tả</label>
                                             <textarea name="description" id="edit-description" class="form-control"></textarea>
+                                            <div id="edit-description-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-defaultCharge">Phí Mặc Định</label>
@@ -213,12 +215,12 @@
                                             <div id="edit-defaultCharge-error" style="color:red;font-size:14px;margin-top:4px;"></div>
                                         </div>
                                     </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary">Cập Nhật Vật Phẩm</button>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                                <button type="submit" class="btn btn-primary">Cập Nhật Vật Phẩm</button>
-                            </div>
-                            </form>
                         </div>
                     </div>
                     
@@ -252,13 +254,16 @@
                             // Validate thêm vật phẩm
                             $("#addInventoryItemModal form").on("submit", function (e) {
                                 var name = $(this).find('[name="itemName"]').val();
+                                var description = $(this).find('[name="description"]').val();
                                 var charge = $(this).find('[name="defaultCharge"]').val();
                                 var errorDivName = $('#add-itemName-error');
+                                var errorDivDescription = $('#add-description-error');
                                 var errorDivCharge = $('#add-defaultCharge-error');
                                 var hasError = false;
 
                                 // Reset lỗi trước khi kiểm tra
                                 errorDivName.text("");
+                                errorDivDescription.text("");
                                 errorDivCharge.text("");
 
                                 // Kiểm tra tên
@@ -273,6 +278,12 @@
                                     hasError = true;
                                 }
 
+                                // Kiểm tra mô tả
+                                if (description && !description.trim()) {
+                                    errorDivDescription.text("Mô tả không được để mỗi khoảng trắng.");
+                                    hasError = true;
+                                }
+
                                 // Kiểm tra giá
                                 if (!charge || isNaN(charge) || parseFloat(charge) < 0) {
                                     errorDivCharge.text("Phí mặc định phải là số lớn hơn hoặc bằng 0.");
@@ -282,6 +293,8 @@
                                 // Ngăn gửi form nếu có lỗi
                                 if (hasError) {
                                     e.preventDefault();
+                                } else {
+                                    existingItemNames.push(name.toLowerCase()); // Cập nhật danh sách tên vật phẩm
                                 }
                             });
 
@@ -293,6 +306,7 @@
                                 $('#edit-description').val($(this).data('description'));
                                 $('#edit-defaultCharge').val($(this).data('defaultcharge'));
                                 $('#edit-itemName-error').text('');
+                                $('#edit-description-error').text('');
                                 $('#edit-defaultCharge-error').text('');
                             });
 
@@ -300,15 +314,18 @@
                             $('#editInventoryItemModal form').on('submit', function (e) {
                                 var name = $('#edit-itemName').val();
                                 var oldName = $('#edit-itemName').data('old');
+                                var description = $('#edit-description').val();
                                 var charge = $('#edit-defaultCharge').val();
                                 var errorDivName = $('#edit-itemName-error');
+                                var errorDivDescription = $('#edit-description-error');
                                 var errorDivCharge = $('#edit-defaultCharge-error');
                                 var hasError = false;
 
                                 // Reset lỗi trước khi kiểm tra
                                 errorDivName.text('');
+                                errorDivDescription.text('');
                                 errorDivCharge.text('');
-                                
+
                                 // Kiểm tra tên
                                 if (!name || name.trim() === "") {
                                     errorDivName.text("Tên vật phẩm không được để trống.");
@@ -320,35 +337,49 @@
                                     errorDivName.text("Tên vật phẩm đã tồn tại.");
                                     hasError = true;
                                 }
-                                
+
+                                // Kiểm tra mô tả
+                                if (description && !description.trim()) {
+                                    errorDivDescription.text("Mô tả không được để mỗi khoảng trắng.");
+                                    hasError = true;
+                                }
+
                                 // Kiểm tra giá
                                 if (!charge || isNaN(charge) || parseFloat(charge) < 0) {
                                     errorDivCharge.text("Phí mặc định phải là số lớn hơn hoặc bằng 0.");
                                     hasError = true;
                                 }
-                                
+
                                 // Ngăn gửi form nếu có lỗi
                                 if (hasError) {
                                     e.preventDefault();
+                                } else if (name.toLowerCase() !== oldName.toLowerCase()) {
+                                    var index = existingItemNames.indexOf(oldName.toLowerCase());
+                                    if (index !== -1) {
+                                        existingItemNames.splice(index, 1); // Xóa tên cũ
+                                    }
+                                    existingItemNames.push(name.toLowerCase()); // Thêm tên mới
                                 }
                             });
-                            
+
                             // Reset form khi đóng modal Add
                             $('#addInventoryItemModal').on('hidden.bs.modal', function () {
                                 var form = $(this).find('form');
                                 form[0].reset(); // Reset tất cả các trường trong form
                                 $('#add-itemName-error').text(''); // Xóa lỗi tên vật phẩm
+                                $('#add-description-error').text(''); // Xóa lỗi mô tả
                                 $('#add-defaultCharge-error').text(''); // Xóa lỗi phí mặc định
                             });
-                            
+
                             // Reset form khi đóng modal Edit
                             $('#editInventoryItemModal').on('hidden.bs.modal', function () {
                                 var form = $(this).find('form');
                                 form[0].reset(); // Reset tất cả các trường trong form
                                 $('#edit-itemName-error').text(''); // Xóa lỗi tên vật phẩm
+                                $('#edit-description-error').text(''); // Xóa lỗi mô tả
                                 $('#edit-defaultCharge-error').text(''); // Xóa lỗi phí mặc định
                             });
-                            
+
                             // Populate View Modal
                             $('.view-btn').on('click', function () {
                                 $('#view-inventoryID').text($(this).data('itemid'));
