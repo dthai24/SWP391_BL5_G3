@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="Model.User" %>
+
 <!DOCTYPE html>
 <html lang="zxx">
 
@@ -77,7 +78,7 @@
             <nav class="mainmenu">
                 <ul>
                     <li class="active"><a href="./homepage.jsp">Home</a></li>
-                    <li><a href="./rooms.jsp">Rooms</a></li>
+                    <li><a href="./roompage">Rooms</a></li>
                     <li><a href="./about-us.jsp">About Us</a></li>
                     <li><a href="./pages.jsp">Pages</a>
                         <ul class="dropdown">
@@ -126,31 +127,25 @@
                                 </div>
                                 <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
                                 <div class="language-option">
-                                    <%
-                                        User user = (User) session.getAttribute("user");
-                                        Boolean isEmployee = (Boolean) session.getAttribute("isEmployee");
-                                        if (user != null) {
-                                    %>
-                                    <div class="dropdown d-inline-block">
-                                      <a href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle" style="display:inline-block;">
-                                        <i class="fa fa-user"></i> <%= user.getFullName() %>
-                                      </a>
-                                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                                        <a class="dropdown-item" href="myprofile.jsp"><i class="fa fa-user-circle"></i> Trang cá nhân</a>
-                                        <% if (isEmployee != null && isEmployee) { %>
-                                        <a class="dropdown-item" href="room"><i class="fa fa-dashboard"></i> Dash Board</a>
-                                        <% } %>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="logout"><i class="fa fa-sign-out"></i> Đăng xuất</a>
-                                      </div>
-                                    </div>
-                                    <%
-                                        } else {
-                                    %>
-                                   <a href="javascript:void(0);" onclick="loadLoginForm()"><i class="fa fa-sign-in"></i> Đăng nhập</a>
-                                    <%
-                                        }
-                                    %>
+<% Boolean isEmployee = (Boolean) session.getAttribute("isEmployee"); %>
+<% User user = (User) session.getAttribute("user");
+   if (user != null) { %>
+<div class="dropdown d-inline-block">
+  <a href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle" style="display:inline-block;">
+    <i class="fa fa-user"></i> <%= user.getFullName() %>
+  </a>
+  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+    <a class="dropdown-item" href="myprofile.jsp"><i class="fa fa-user-circle"></i> Trang cá nhân</a>
+    <% if (isEmployee != null && isEmployee) { %>
+    <a class="dropdown-item" href="Room.jsp"><i class="fa fa-dashboard"></i> Dash Board</a>
+    <% } %>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="logout.jsp"><i class="fa fa-sign-out"></i> Đăng xuất</a>
+  </div>
+</div>
+<% } else { %>
+    <a href="javascript:void(0);" onclick="loadLoginForm()"><i class="fa fa-sign-in"></i> Đăng nhập</a>
+<% } %>
 
                                 </div>
                             </div>
@@ -173,7 +168,7 @@
                                 <nav class="mainmenu">
                                     <ul>
                                         <li class="active"><a href="./index.jsp">Home</a></li>
-                                        <li><a href="./rooms.jsp">Rooms</a></li>
+                                        <li><a href="./roompage">Rooms</a></li>
                                         <li><a href="./about-us.jsp">About Us</a></li>
                                         <li><a href="./pages.jsp">Pages</a>
                                             <ul class="dropdown">

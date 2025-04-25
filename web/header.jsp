@@ -1,5 +1,3 @@
-
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,7 +67,7 @@
     <nav class="mainmenu">
         <ul>
             <li><a href="./homepage.jsp">Home</a></li>
-            <li><a href="./rooms.jsp">Rooms</a></li>
+            <li><a href="./roompage">Rooms</a></li>
             <li><a href="./about-us.jsp">About Us</a></li>
             <li><a href="./pages.jsp">Pages</a>
                 <ul class="dropdown">
@@ -113,7 +111,7 @@
                         </div>
                         <a href="#" class="bk-btn">Đặt Phòng Ngay</a>
                         <div class="language-option">
-                            <a href="login.jsp">ĐĂNG NHẬP</a>
+                            <a href="login.jsp">Đăng nhập</a>
                         </div>
                     </div>
                 </div>
@@ -125,7 +123,7 @@
             <div class="row">
                 <div class="col-lg-2">
                     <div class="logo">
-                        <a href="./homepage.jsp">
+                        <a href="<%=request.getContextPath()%>/homepage.jsp">
                             <img src="img/logo.png" alt="">
                         </a>
                     </div>
@@ -134,8 +132,8 @@
                     <div class="nav-menu">
                         <nav class="mainmenu">
                             <ul>
-                                <li><a href="./index.jsp">Home</a></li>
-                                <li><a href="./rooms.jsp">Rooms</a></li>
+                                <li><a href="./homepage.jsp">Home</a></li>
+                                <li><a href="./roompage">Rooms</a></li>
                                 <li><a href="./about-us.jsp">About Us</a></li>
                                 <li><a href="./pages.jsp">Pages</a></li>
                                 <li><a href="./blog.jsp">News</a></li>
