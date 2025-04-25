@@ -112,7 +112,6 @@
                                                 <th>Địa Chỉ</th>
                                                 <th>Vai Trò Nhân Viên</th>
                                                 <th>Trạng Thái</th>
-                                                <th>Ngày Tạo</th>
                                                 <th>Hành Động</th>
                                             </tr>
                                         </thead>
@@ -141,7 +140,6 @@
                                                     <span class="status-inactive">Inactive</span>
                                                     <% } %>
                                                 </td>
-                                                <td><%= employee.getUser().getRegistrationDate() != null ? sdf.format(employee.getUser().getRegistrationDate()) : "N/A" %></td>
                                                 <td>
                                                     <button type="button" class="btn btn-link p-0 view-btn" 
                                                             data-employeeid="<%= employee.getEmployeeID() %>"
@@ -152,7 +150,6 @@
                                                             data-address="<%= employee.getUser().getAddress() %>"
                                                             data-employeerole="<%= employee.getEmployeeRole() %>"
                                                             data-status="<%= employee.getUser().getStatus() %>"
-                                                            data-registrationdate="<%= employee.getUser().getRegistrationDate() != null ? sdf.format(employee.getUser().getRegistrationDate()) : "N/A" %>"
                                                             data-profilepictureurl="<%= employee.getUser().getProfilePictureURL() %>"
                                                             data-toggle="modal" data-target="#viewEmployeeModal">
                                                         <i class="fa fa-eye" style="color: #17a2b8;"></i>
@@ -167,7 +164,6 @@
                                                             data-employeerole="<%= employee.getEmployeeRole() %>"
                                                             data-status="<%= employee.getUser().getStatus() %>"
                                                             data-profilepictureurl="<%= employee.getUser().getProfilePictureURL() %>"
-                                                            data-registrationdate="<%= employee.getUser().getRegistrationDate() != null ? sdf.format(employee.getUser().getRegistrationDate()) : "N/A" %>"
                                                             data-toggle="modal" data-target="#editEmployeeModal">
                                                         <i class="fa fa-edit" style="color: #ffc107;"></i>
                                                     </button>
@@ -247,14 +243,14 @@
                                             </select>
                                             <div id="add-employeeRole-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
                                         </div>
-                                        <div class="form-group">
+<!--                                        <div class="form-group">
                                             <label for="status">Trạng Thái</label>
                                             <select name="status" id="status" class="form-control">
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                             </select>
                                             <div id="add-status-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -287,7 +283,6 @@
                                     <p><strong>Địa Chỉ:</strong> <span id="view-address"></span></p>
                                     <p><strong>Vai Trò Nhân Viên:</strong> <span id="view-employeeRole"></span></p>
                                     <p><strong>Trạng Thái:</strong> <span id="view-status"></span></p>
-                                    <p><strong>Ngày Tạo:</strong> <span id="view-registrationDate"></span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -411,16 +406,18 @@
                                 var fullName = $('#fullName').val();
                                 var email = $('#email').val();
                                 var phoneNumber = $('#phoneNumber').val();
+                                var address = $('#address').val();
                                 var employeeRole = $('#employeeRole').val();
-                                var status = $('#status').val();
-
+                                var avatarURL = $('#pictureProfileURL').val();
+                               
                                 var errorUsername = $('#add-username-error');
                                 var errorPassword = $('#add-password-error');
                                 var errorFullName = $('#add-fullName-error');
                                 var errorEmail = $('#add-email-error');
                                 var errorPhoneNumber = $('#add-phoneNumber-error');
+                                var errorAddress = $('#add-address-error');
                                 var errorEmployeeRole = $('#add-employeeRole-error');
-                                var errorStatus = $('#add-status-error');
+                                var errorAvatarURL = $('#add-pictureProfileURL-error').val();
 
                                 var hasError = false;
 
@@ -430,8 +427,9 @@
                                 errorFullName.text("");
                                 errorEmail.text("");
                                 errorPhoneNumber.text("");
+                                errorAddress.text("");
                                 errorEmployeeRole.text("");
-                                errorStatus.text("");
+                                errorAvatarURL.text("");
 
                                 // Validate username
                                 if (!username || username.trim() === "") {
@@ -479,6 +477,12 @@
                                     errorPhoneNumber.text("Số điện thoại đã tồn tại.");
                                     hasError = true;
                                 }
+                                 
+                                //Validate address
+                                if (address && address.trim() === "" address.trim().length < 5) {
+                                    errorAddress.text("Địa chỉ phải có ít nhất 5 ký tự và không được để mỗi khoảng trắng.");
+                                    hasError = true;
+                                }
 
                                 // Validate employee role
                                 const validRoles = ['Manager', 'Staff', 'Receptionist'];
@@ -486,10 +490,10 @@
                                     errorEmployeeRole.text("Vai trò nhân viên không hợp lệ.");
                                     hasError = true;
                                 }
-
-                                // Validate status
-                                if (status !== 'Active' && status !== 'Inactive') {
-                                    errorStatus.text("Trạng thái phải là 'Active' hoặc 'Inactive'.");
+                                
+                                // Validate avatar URL
+                                if (avatarURL && avatarURL.trim() === "") {
+                                    errorAvatarURL.text("Avatar URL không dược chứa mỗi khoảng trắng.");
                                     hasError = true;
                                 }
 
@@ -601,12 +605,11 @@
                                     hasError = true;
                                 }
 
-                                // Validate URL avatar
-                                const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-                                if (profilePictureURL && !urlRegex.test(profilePictureURL)) {
-                                    errorProfilePictureURL.text("URL avatar không hợp lệ.");
+                                // Kiểm tra URL avatar
+                                if (profilePictureURL && profilePictureURL.trim().length > 0) {
+                                    errorAddress.text("URL Avatar không được chứa mỗi khoảng trắng");
                                     hasError = true;
-                                }
+                               }
 
                                 // Validate employee role
                                 const validRoles = ['Manager', 'Staff', 'Receptionist'];
@@ -643,7 +646,6 @@
                                 $('#view-phoneNumber').text($(this).data('phonenumber'));
                                 $('#view-address').text($(this).data('address'));
                                 $('#view-employeeRole').text($(this).data('employeerole'));
-                                $('#view-registrationDate').text($(this).data('registrationdate'));
 
                                 var status = $(this).data('status');
                                 var statusHtml = status === 'Active' ? '<span class="status-active">Active</span>' : '<span class="status-inactive">Inactive</span>';

@@ -64,7 +64,6 @@
                 <main class="content">
                     <%
                         List<Customer> customers = (List<Customer>) request.getAttribute("customers");
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     %>
 
                     <!-- Table Section -->
@@ -90,7 +89,6 @@
                                                 <th>Số Điện Thoại</th>
                                                 <th>Địa Chỉ</th>
                                                 <th>Trạng Thái</th>
-                                                <th>Ngày Tạo</th>
                                                 <th>Hành Động</th>
                                             </tr>
                                         </thead>
@@ -118,7 +116,6 @@
                                                     <span class="status-inactive">Inactive</span>
                                                     <% } %>
                                                 </td>
-                                                <td><%= customer.getUser().getRegistrationDate() != null ? sdf.format(customer.getUser().getRegistrationDate()) : "N/A" %></td>
                                                 <td>
                                                     <!-- Button View -->
                                                     <button type="button" class="btn btn-link p-0 view-btn" 
@@ -129,7 +126,6 @@
                                                             data-phonenumber="<%= customer.getUser().getPhoneNumber() %>"
                                                             data-address="<%= customer.getUser().getAddress() %>"
                                                             data-status="<%= customer.getUser().getStatus() %>"
-                                                            data-registrationdate="<%= customer.getUser().getRegistrationDate() != null ? sdf.format(customer.getUser().getRegistrationDate()) : "N/A" %>"
                                                             data-profilepictureurl="<%= customer.getUser().getProfilePictureURL() %>"
                                                             data-toggle="modal" data-target="#viewCustomerModal"
                                                             title="Xem chi tiết khách hàng">
@@ -216,14 +212,14 @@
                                             <input type="url" name="profilePictureURL" id="customer-profilePictureURL" class="form-control" />
                                             <div id="add-customer-profilePictureURL-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
                                         </div>
-                                        <div class="form-group">
+<!--                                        <div class="form-group">
                                             <label for="customer-status">Trạng Thái</label>
                                             <select name="status" id="customer-status" class="form-control">
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                             </select>
                                             <div id="add-customer-status-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -248,14 +244,12 @@
                                     <div class="text-center mb-3">
                                         <img id="view-avatar" src="https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg" alt="Avatar" class="avatar-large">
                                     </div>
-                                    <p><strong>ID Khách Hàng:</strong> <span id="view-customerID"></span></p>
                                     <p><strong>Tên Người Dùng:</strong> <span id="view-username"></span></p>
                                     <p><strong>Họ và Tên:</strong> <span id="view-fullName"></span></p>
                                     <p><strong>Email:</strong> <span id="view-email"></span></p>
                                     <p><strong>Số Điện Thoại:</strong> <span id="view-phoneNumber"></span></p>
                                     <p><strong>Địa Chỉ:</strong> <span id="view-address"></span></p>
                                     <p><strong>Trạng Thái:</strong> <span id="view-status"></span></p>
-                                    <p><strong>Ngày Tạo:</strong> <span id="view-registrationDate"></span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -372,14 +366,16 @@
                                                                     var fullName = $('#customer-fullName').val();
                                                                     var email = $('#customer-email').val();
                                                                     var phoneNumber = $('#customer-phoneNumber').val();
-                                                                    var status = $('#customer-status').val();
+                                                                    var address = $('#customer-address').val();
+                                                                    var avatarURL = $('#customer-').val();
 
                                                                     var errorUsername = $('#add-customer-username-error');
                                                                     var errorPassword = $('#add-customer-password-error');
                                                                     var errorFullName = $('#add-customer-fullName-error');
                                                                     var errorEmail = $('#add-customer-email-error');
                                                                     var errorPhoneNumber = $('#add-customer-phoneNumber-error');
-                                                                    var errorStatus = $('#add-customer-status-error');
+                                                                    var errorAddress = $('#add-customer-address-error');
+                                                                    var errorAvatarURL = $('#add-customer-profilePictureURL-error');
 
                                                                     var hasError = false;
 
@@ -389,7 +385,8 @@
                                                                     errorFullName.text("");
                                                                     errorEmail.text("");
                                                                     errorPhoneNumber.text("");
-                                                                    errorStatus.text("");
+                                                                    errorAddress.text("");
+                                                                    errorAvatarURL.text("");
 
                                                                     // Kiểm tra username
                                                                     if (!username || username.trim() === "") {
@@ -438,9 +435,16 @@
                                                                         hasError = true;
                                                                     }
 
-                                                                    // Kiểm tra trạng thái
-                                                                    if (status !== 'Active' && status !== 'Inactive') {
-                                                                        errorStatus.text("Trạng thái phải là 'Active' hoặc 'Inactive'.");
+                                                                    //Validate address
+                                                                    if (address && (address.trim() === "" || address.trim().length < 5)) {
+                                                                        errorAddress.text("Địa chỉ phải có ít nhất 5 ký tự và không được để mỗi khoảng trắng.");
+                                                                        hasError = true;
+                                                                    }
+
+
+                                                                    // Validate avatar URL
+                                                                    if (avatarURL && address.trim().length > 0) {
+                                                                        errorAvatarURL.text("Avatar URL không dược chứa mỗi khoảng trắng.");
                                                                         hasError = true;
                                                                     }
 
@@ -548,11 +552,11 @@
                                                                     }
 
                                                                     // Kiểm tra URL avatar
-                                                                    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-                                                                    if (profilePictureURL && !urlRegex.test(profilePictureURL)) {
-                                                                        errorProfilePictureURL.text("URL avatar không hợp lệ.");
+                                                                    if (profilePictureURL && profilePictureURL.trim().length > 0) {
+                                                                        errorAddress.text("URL Avatar không được chứa mỗi khoảng trắng");
                                                                         hasError = true;
                                                                     }
+                  
 
                                                                     // Kiểm tra trạng thái
                                                                     if (status !== 'Active' && status !== 'Inactive') {
@@ -575,13 +579,11 @@
 
                                                                 // Populate View Customer Modal
                                                                 $('.view-btn').on('click', function () {
-                                                                    $('#view-customerID').text($(this).data('customerid'));
                                                                     $('#view-username').text($(this).data('username'));
                                                                     $('#view-fullName').text($(this).data('fullname'));
                                                                     $('#view-email').text($(this).data('email'));
                                                                     $('#view-phoneNumber').text($(this).data('phonenumber'));
                                                                     $('#view-address').text($(this).data('address'));
-                                                                    $('#view-registrationDate').text($(this).data('registrationdate'));
 
                                                                     var status = $(this).data('status');
                                                                     var statusHtml = status === 'Active' ? '<span class="status-active">Active</span>' : '<span class="status-inactive">Inactive</span>';
