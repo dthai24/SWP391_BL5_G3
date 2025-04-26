@@ -66,17 +66,10 @@
     </div>
     <nav class="mainmenu">
         <ul>
-            <li><a href="./homepage.jsp">Home</a></li>
-            <li><a href="./roompage">Rooms</a></li>
-            <li><a href="./about-us.jsp">About Us</a></li>
-            <li><a href="./pages.jsp">Pages</a>
-                <ul class="dropdown">
-                    <li><a href="./room-details.jsp">Room Details</a></li>
-                    <li><a href="./blog-details.jsp">Blog Details</a></li>
-                </ul>
-            </li>
-            <li><a href="./blog.jsp">News</a></li>
-            <li><a href="./contact.jsp">Contact</a></li>
+            <li><a href="./homepage.jsp">Trang chủ</a></li>
+            <li><a href="./roompage">Phòng</a></li>
+            <li><a href="./about-us.jsp">Giới thiệu</a></li>
+            <li><a href="./contact.jsp">Liên hệ</a></li>
         </ul>
     </nav>
     <div id="mobile-menu-wrap"></div>
@@ -132,12 +125,10 @@
                     <div class="nav-menu">
                         <nav class="mainmenu">
                             <ul>
-                                <li><a href="./homepage.jsp">Home</a></li>
-                                <li><a href="./roompage">Rooms</a></li>
-                                <li><a href="./about-us.jsp">About Us</a></li>
-                                <li><a href="./pages.jsp">Pages</a></li>
-                                <li><a href="./blog.jsp">News</a></li>
-                                <li><a href="./contact.jsp">Contact</a></li>
+                                <li><a href="./homepage.jsp">Trang chủ</a></li>
+                                <li><a href="./roompage">Phòng</a></li>
+                                <li><a href="./about-us.jsp">Giới thiệu</a></li>
+                                <li><a href="./contact.jsp">Liên hệ</a></li>
                             </ul>
                         </nav>
                         <div class="nav-right search-switch">

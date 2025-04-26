@@ -8,10 +8,10 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="breadcrumb-text">
-                    <h2>Our Rooms</h2>
+                    <h2>Phòng</h2>
                     <div class="bt-option">
-                        <a href="homepage.jsp">Home</a>
-                        <span>Rooms</span>
+                        <a href="homepage.jsp">Trang chủ</a>
+                        <span>Phòng</span>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <a href="RoomDetailsPage.jsp?categoryId=<%=cat.getCategoryID()%>" class="primary-btn">More Details</a>
+                        <a href="RoomDetailsPage.jsp?categoryId=<%=cat.getCategoryID()%>" class="primary-btn">Xem thêm</a>
                     </div>
                 </div>
             </div>
