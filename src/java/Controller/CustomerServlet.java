@@ -1,9 +1,8 @@
 package Controller;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,12 +22,13 @@ public class CustomerServlet extends HttpServlet {
 
         UserDAO userDAO = new UserDAO();
         List<Customer> customers = userDAO.listAllCustomers();
-
-        // Filter customers by status
+        
+        // Filter customer
         String filterStatus = request.getParameter("filterStatus");
         if (filterStatus != null && !filterStatus.isEmpty()) {
-            customers.removeIf(c -> !filterStatus.equals(c.getUser().getStatus()));
+            customers.removeIf(e -> !filterStatus.equals(e.getUser().getStatus()));
         }
+
 
         request.setAttribute("customers", customers);
         request.getRequestDispatcher("View/User/list-customer.jsp").forward(request, response);
@@ -61,7 +61,8 @@ public class CustomerServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
         String address = request.getParameter("address");
-        String status = request.getParameter("status");
+        String avatar = request.getParameter("profilePictureURL");
+        String status = request.getParameter("status"); // Only used for edit
         boolean isUpdate = customerID != null && !customerID.isEmpty();
 
         // Validate inputs
@@ -90,7 +91,7 @@ public class CustomerServlet extends HttpServlet {
             }
         }
 
-         if (!isUpdate && (password == null || password.trim().isEmpty() || password.length() < 6 || !Pattern.compile("\\d").matcher(password).find())) {
+        if (!isUpdate && (password == null || password.trim().isEmpty() || password.length() < 6 || !Pattern.compile("\\d").matcher(password).find())) {
             errors.add("Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
         }
 
@@ -156,12 +157,11 @@ public class CustomerServlet extends HttpServlet {
             errors.add("Địa chỉ không được để trống hoặc chỉ chứa khoảng trắng.");
         }
 
-
-
-        if (!"Active".equals(status) && !"Inactive".equals(status)) {
-            errors.add("Trạng thái phải là 'Active' hoặc 'Inactive'.");
+        // Validate avatar
+        if (avatar != null && avatar.trim().isEmpty()) {
+            errors.add("Địa chỉ không được để trống hoặc chỉ chứa khoảng trắng.");
         }
-
+        
         // Nếu có lỗi, trả về giao diện với danh sách lỗi
         if (!errors.isEmpty()) {
             request.setAttribute("errorMessages", errors);
@@ -189,7 +189,12 @@ public class CustomerServlet extends HttpServlet {
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
         user.setAddress(address);
-        user.setStatus(status);
+        user.setProfilePictureURL(avatar);
+
+        // Only update status if editing
+        if (isUpdate && status != null) {
+            user.setStatus(status);
+        }
 
         customer.setUser(user); // Ensure customer links to the correct user
 

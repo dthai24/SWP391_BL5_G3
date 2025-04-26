@@ -25,11 +25,10 @@ public class UserDAO {
 
     // Add a new customer
     public boolean addCustomer(Customer customer) {
-        String userSql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL, status, isDeleted, registrationDate) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String userSql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         String customerSql = "INSERT INTO Customers (CustomerID) VALUES (?)";
-        try (PreparedStatement userStatement = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement customerStatement = connection.prepareStatement(customerSql)) {
+        try (PreparedStatement userStatement = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement customerStatement = connection.prepareStatement(customerSql)) {
 
             // Insert into Users table
             userStatement.setString(1, customer.getUser().getUsername());
@@ -39,9 +38,6 @@ public class UserDAO {
             userStatement.setString(5, customer.getUser().getPhoneNumber());
             userStatement.setString(6, customer.getUser().getAddress());
             userStatement.setString(7, customer.getUser().getProfilePictureURL());
-            userStatement.setString(8, customer.getUser().getStatus());
-            userStatement.setBoolean(9, customer.getUser().getIsDeleted());
-            userStatement.setDate(10, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
 
             if (userStatement.executeUpdate() > 0) {
                 // Get the generated UserID
@@ -60,13 +56,12 @@ public class UserDAO {
         return false;
     }
 
-    // Add a new employee
+// Add a new employee
     public boolean addEmployee(Employee employee) {
-        String userSql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL, status, isDeleted, registrationDate) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String userSql = "INSERT INTO Users (username, password, fullName, email, phoneNumber, address, profilePictureURL) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         String employeeSql = "INSERT INTO Employees (EmployeeID, EmployeeRole) VALUES (?, ?)";
-        try (PreparedStatement userStatement = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement employeeStatement = connection.prepareStatement(employeeSql)) {
+        try (PreparedStatement userStatement = connection.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS); PreparedStatement employeeStatement = connection.prepareStatement(employeeSql)) {
 
             // Insert into Users table
             userStatement.setString(1, employee.getUser().getUsername());
@@ -76,9 +71,6 @@ public class UserDAO {
             userStatement.setString(5, employee.getUser().getPhoneNumber());
             userStatement.setString(6, employee.getUser().getAddress());
             userStatement.setString(7, employee.getUser().getProfilePictureURL());
-            userStatement.setString(8, employee.getUser().getStatus());
-            userStatement.setBoolean(9, employee.getUser().getIsDeleted());
-            userStatement.setDate(10, new java.sql.Date(System.currentTimeMillis())); // Ngày hiện tại
 
             if (userStatement.executeUpdate() > 0) {
                 // Get the generated UserID
@@ -98,7 +90,6 @@ public class UserDAO {
         return false;
     }
 
-
     public User login(String username, String password) {
         String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -114,7 +105,6 @@ public class UserDAO {
                         rs.getString("Email"),
                         rs.getString("PhoneNumber"),
                         rs.getString("Address"),
-                      
                         rs.getString("ProfilePictureURL"),
                         rs.getString("Status"),
                         rs.getDate("RegistrationDate"),
@@ -188,8 +178,7 @@ public class UserDAO {
         String sqlUser = "UPDATE Users SET username = ?, password = ?, fullName = ?, email = ?, phoneNumber = ?, address = ?, profilePictureURL = ?, status = ? "
                 + "WHERE userID = ?";
         String sqlEmployee = "UPDATE Employees SET EmployeeRole = ? WHERE EmployeeID = ?";
-        try (PreparedStatement userStatement = connection.prepareStatement(sqlUser);
-             PreparedStatement employeeStatement = connection.prepareStatement(sqlEmployee)) {
+        try (PreparedStatement userStatement = connection.prepareStatement(sqlUser); PreparedStatement employeeStatement = connection.prepareStatement(sqlEmployee)) {
 
             // Update the user information
             userStatement.setString(1, employee.getUser().getUsername());
@@ -217,7 +206,6 @@ public class UserDAO {
         }
     }
 
-
     // Delete a customer (soft delete)
     public boolean deleteCustomer(int customerID) {
         String sql = "UPDATE Users SET isDeleted = 1 WHERE userID = ?";
@@ -241,7 +229,6 @@ public class UserDAO {
             return false;
         }
     }
-
 
     // List all customers (non-deleted)
     public List<Customer> listAllCustomers() {
@@ -303,7 +290,6 @@ public class UserDAO {
         return null;
     }
 
-
     // Tìm kiếm, lọc, sắp xếp, và phân trang người dùng
     public List<User> searchAndListUsers(String keyword, String sortBy, String sortDirection, int page, int pageSize) {
         List<User> users = new ArrayList<>();
@@ -314,7 +300,6 @@ public class UserDAO {
             sql += " AND (username LIKE ? OR fullName LIKE ? OR email LIKE ?)";
         }
 
-      
         // Thêm sắp xếp
         if (sortBy != null && !sortBy.trim().isEmpty()) {
             sql += " ORDER BY " + sortBy;
@@ -340,8 +325,6 @@ public class UserDAO {
                 statement.setString(paramIndex++, "%" + keyword + "%");
                 statement.setString(paramIndex++, "%" + keyword + "%");
             }
-
-            
 
             // Gán tham số cho phân trang
             statement.setInt(paramIndex++, (page - 1) * pageSize);
@@ -369,8 +352,6 @@ public class UserDAO {
             params.add("%" + keyword + "%");
             params.add("%" + keyword + "%");
         }
-
-        
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
@@ -444,7 +425,6 @@ public class UserDAO {
         }
         return false; // Trả về false nếu không có lỗi hoặc không tìm thấy
     }
-    
 
     // Helper method to map ResultSet to Customer object
     private User mapResultSetToUser(ResultSet resultSet) throws SQLException {
@@ -463,7 +443,7 @@ public class UserDAO {
         );
         return user;
     }
-    
+
     // Helper method to map ResultSet to Customer object
     private Customer mapResultSetToCustomer(ResultSet resultSet) throws SQLException {
         Customer customer = new Customer();
@@ -506,7 +486,6 @@ public class UserDAO {
         employee.setUser(user); // Set associated User object
         return employee;
     }
-
 
     public List<User> searchUsers(String searchTerm, String sortBy, String sortDirection) {
         return searchAndListUsers(searchTerm, sortBy, sortDirection, 1, Integer.MAX_VALUE);

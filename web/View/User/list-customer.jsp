@@ -45,10 +45,6 @@
             .table-responsive {
                 overflow-x: auto !important;
             }
-            #customer-datatable {
-                min-width: 900px !important;
-                table-layout: fixed;
-            }
             #customer-datatable th, #customer-datatable td {
                 white-space: normal !important;
                 word-break: break-word !important;
@@ -66,7 +62,6 @@
                         List<Customer> customers = (List<Customer>) request.getAttribute("customers");
                     %>
 
-                    <!-- Table Section -->
                     <div class="container mt-5">
                         <div class="card shadow-lg">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -180,46 +175,38 @@
                                         <div class="form-group">
                                             <label for="customer-username">Tên Người Dùng</label>
                                             <input type="text" name="username" id="customer-username" class="form-control" required />
-                                            <div id="add-customer-username-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-username-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="customer-password">Mật Khẩu</label>
                                             <input type="password" name="password" id="customer-password" class="form-control" required />
-                                            <div id="add-customer-password-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-password-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="customer-fullName">Họ Và Tên</label>
+                                            <label for="customer-fullName">Họ và Tên</label>
                                             <input type="text" name="fullName" id="customer-fullName" class="form-control" required />
-                                            <div id="add-customer-fullName-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-fullName-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="customer-email">Email</label>
                                             <input type="email" name="email" id="customer-email" class="form-control" required />
-                                            <div id="add-customer-email-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-email-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="customer-phoneNumber">Số Điện Thoại</label>
                                             <input type="text" name="phoneNumber" id="customer-phoneNumber" class="form-control" required />
-                                            <div id="add-customer-phoneNumber-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-phoneNumber-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="customer-address">Địa Chỉ</label>
                                             <input type="text" name="address" id="customer-address" class="form-control" />
-                                            <div id="add-customer-address-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-address-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="customer-profilePictureURL">Avatar (URL)</label>
                                             <input type="url" name="profilePictureURL" id="customer-profilePictureURL" class="form-control" />
-                                            <div id="add-customer-profilePictureURL-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-customer-profilePictureURL-error" class="text-danger"></div>
                                         </div>
-<!--                                        <div class="form-group">
-                                            <label for="customer-status">Trạng Thái</label>
-                                            <select name="status" id="customer-status" class="form-control">
-                                                <option value="Active">Active</option>
-                                                <option value="Inactive">Inactive</option>
-                                            </select>
-                                            <div id="add-customer-status-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
-                                        </div>-->
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -277,32 +264,32 @@
                                         <div class="form-group">
                                             <label for="edit-username">Tên Người Dùng</label>
                                             <input type="text" name="username" id="edit-username" class="form-control" required />
-                                            <div id="edit-username-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-username-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-fullName">Họ và Tên</label>
                                             <input type="text" name="fullName" id="edit-fullName" class="form-control" required />
-                                            <div id="edit-fullName-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-fullName-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-email">Email</label>
                                             <input type="email" name="email" id="edit-email" class="form-control" required />
-                                            <div id="edit-email-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-email-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-phoneNumber">Số Điện Thoại</label>
                                             <input type="text" name="phoneNumber" id="edit-phoneNumber" class="form-control" />
-                                            <div id="edit-phoneNumber-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-phoneNumber-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-address">Địa Chỉ</label>
                                             <input type="text" name="address" id="edit-address" class="form-control" />
-                                            <div id="edit-address-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-address-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-profilePictureURL">Avatar (URL)</label>
                                             <input type="url" name="profilePictureURL" id="edit-profilePictureURL" class="form-control" />
-                                            <div id="edit-profilePictureURL-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-profilePictureURL-error" class="text-danger"></div>
                                         </div>
                                         <div class="form-group">
                                             <label for="edit-status">Trạng Thái</label>
@@ -310,7 +297,7 @@
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                             </select>
-                                            <div id="edit-status-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-status-error" class="text-danger"></div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -327,278 +314,262 @@
                     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
                     <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
                     <script>
-                                                            $(document).ready(function () {
-                                                                // Initialize DataTable
-                                                                $('#customer-datatable').DataTable({
-                                                                    responsive: true,
-                                                                    paging: true,
-                                                                    ordering: true,
-                                                                    info: true,
-                                                                    columnDefs: [
-                                                                        {orderable: false, targets: -1} // Disable sort for last column (Action)
-                                                                    ],
-                                                                    language: {
-                                                                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
-                                                                    }
-                                                                });
+                        $(document).ready(function () {
+                            // Initialize DataTable
+                            $('#customer-datatable').DataTable({
+                                responsive: true,
+                                paging: true,
+                                ordering: true,
+                                info: true,
+                                columnDefs: [
+                                    { orderable: false, targets: -1 } // Disable sort for last column (Action)
+                                ],
+                                language: {
+                                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+                                }
+                            });
 
-                                                                // Lấy danh sách username, email, phone number hiện có
-                                                                var existingUsernames = [];
-                                                                var existingEmails = [];
-                                                                var existingPhoneNumbers = [];
-                                                                $("#customer-datatable tbody tr").each(function () {
-                                                                    var username = $(this).find("td").eq(2).text().trim();
-                                                                    var email = $(this).find("td").eq(4).text().trim();
-                                                                    var phoneNumber = $(this).find("td").eq(5).text().trim();
+                            // Collect existing usernames, emails, and phone numbers
+                            const existingUsernames = [];
+                            const existingEmails = [];
+                            const existingPhoneNumbers = [];
 
-                                                                    if (username)
-                                                                        existingUsernames.push(username.toLowerCase());
-                                                                    if (email)
-                                                                        existingEmails.push(email.toLowerCase());
-                                                                    if (phoneNumber)
-                                                                        existingPhoneNumbers.push(phoneNumber);
-                                                                });
+                            $("#customer-datatable tbody tr").each(function () {
+                                const username = $(this).find("td").eq(2).text().trim();
+                                const email = $(this).find("td").eq(4).text().trim();
+                                const phoneNumber = $(this).find("td").eq(5).text().trim();
 
-                                                                // Validate thêm khách hàng
-                                                                $("#addCustomerForm").on("submit", function (e) {
-                                                                    var username = $('#customer-username').val();
-                                                                    var password = $('#customer-password').val();
-                                                                    var fullName = $('#customer-fullName').val();
-                                                                    var email = $('#customer-email').val();
-                                                                    var phoneNumber = $('#customer-phoneNumber').val();
-                                                                    var address = $('#customer-address').val();
-                                                                    var avatarURL = $('#customer-').val();
+                                if (username) existingUsernames.push(username.toLowerCase());
+                                if (email) existingEmails.push(email.toLowerCase());
+                                if (phoneNumber) existingPhoneNumbers.push(phoneNumber);
+                            });
 
-                                                                    var errorUsername = $('#add-customer-username-error');
-                                                                    var errorPassword = $('#add-customer-password-error');
-                                                                    var errorFullName = $('#add-customer-fullName-error');
-                                                                    var errorEmail = $('#add-customer-email-error');
-                                                                    var errorPhoneNumber = $('#add-customer-phoneNumber-error');
-                                                                    var errorAddress = $('#add-customer-address-error');
-                                                                    var errorAvatarURL = $('#add-customer-profilePictureURL-error');
+                            // Add Customer Form Validation
+                            $("#addCustomerForm").on("submit", function (e) {
+                                let hasError = false;
 
-                                                                    var hasError = false;
+                                const username = $('#customer-username').val();
+                                const password = $('#customer-password').val();
+                                const fullName = $('#customer-fullName').val();
+                                const email = $('#customer-email').val();
+                                const phoneNumber = $('#customer-phoneNumber').val();
+                                const address = $('#customer-address').val();
+                                const avatarURL = $('#customer-profilePictureURL').val();
 
-                                                                    // Reset lỗi trước khi kiểm tra
-                                                                    errorUsername.text("");
-                                                                    errorPassword.text("");
-                                                                    errorFullName.text("");
-                                                                    errorEmail.text("");
-                                                                    errorPhoneNumber.text("");
-                                                                    errorAddress.text("");
-                                                                    errorAvatarURL.text("");
+                                const errorFields = {
+                                    username: $('#add-customer-username-error'),
+                                    password: $('#add-customer-password-error'),
+                                    fullName: $('#add-customer-fullName-error'),
+                                    email: $('#add-customer-email-error'),
+                                    phoneNumber: $('#add-customer-phoneNumber-error'),
+                                    address: $('#add-customer-address-error'),
+                                    avatarURL: $('#add-customer-profilePictureURL-error')
+                                };
 
-                                                                    // Kiểm tra username
-                                                                    if (!username || username.trim() === "") {
-                                                                        errorUsername.text("Tên người dùng không được để trống.");
-                                                                        hasError = true;
-                                                                    } else if (username.trim() !== username) {
-                                                                        errorUsername.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
-                                                                        hasError = true;
-                                                                    } else if (existingUsernames.includes(username.toLowerCase())) {
-                                                                        errorUsername.text("Tên người dùng đã tồn tại.");
-                                                                        hasError = true;
-                                                                    }
+                                // Reset errors
+                                Object.values(errorFields).forEach(field => field.text(""));
 
-                                                                    // Kiểm tra password
-                                                                    if (!password || password.trim() === "" || password.length < 6 || !/\d/.test(password)) {
-                                                                        errorPassword.text("Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
-                                                                        hasError = true;
-                                                                    }
+                                // Username validation
+                                if (!username || username.trim() === "") {
+                                    errorFields.username.text("Tên người dùng không được để trống.");
+                                    hasError = true;
+                                } else if (username.trim() !== username) {
+                                    errorFields.username.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
+                                    hasError = true;
+                                } else if (existingUsernames.includes(username.toLowerCase())) {
+                                    errorFields.username.text("Tên người dùng đã tồn tại.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra họ và tên
-                                                                    if (!fullName || fullName.trim() === "" || fullName.length < 3) {
-                                                                        errorFullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
-                                                                        hasError = true;
-                                                                    }
+                                // Password validation
+                                if (!password || password.trim() === "" || password.length < 6 || !/\d/.test(password)) {
+                                    errorFields.password.text("Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra email
-                                                                    const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
-                                                                    if (!email || email.trim() === "" || !emailRegex.test(email)) {
-                                                                        errorEmail.text("Email không hợp lệ hoặc để trống.");
-                                                                        hasError = true;
-                                                                    } else if (existingEmails.includes(email.toLowerCase())) {
-                                                                        errorEmail.text("Email đã tồn tại.");
-                                                                        hasError = true;
-                                                                    }
+                                // Full name validation
+                                if (!fullName || fullName.trim() === "" || fullName.length < 3) {
+                                    errorFields.fullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra số điện thoại
-                                                                    const phoneRegex = /^[0-9]{10,11}$/;
-                                                                    if (!phoneNumber || phoneNumber.trim() === "") {
-                                                                        errorPhoneNumber.text("Số điện thoại không được để trống.");
-                                                                        hasError = true;
-                                                                    } else if (!phoneRegex.test(phoneNumber)) {
-                                                                        errorPhoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-                                                                        hasError = true;
-                                                                    } else if (existingPhoneNumbers.includes(phoneNumber)) {
-                                                                        errorPhoneNumber.text("Số điện thoại đã tồn tại.");
-                                                                        hasError = true;
-                                                                    }
+                                // Email validation
+                                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                                if (!email || email.trim() === "" || !emailRegex.test(email)) {
+                                    errorFields.email.text("Email không hợp lệ hoặc để trống.");
+                                    hasError = true;
+                                } else if (existingEmails.includes(email.toLowerCase())) {
+                                    errorFields.email.text("Email đã tồn tại.");
+                                    hasError = true;
+                                }
 
-                                                                    //Validate address
-                                                                    if (address && (address.trim() === "" || address.trim().length < 5)) {
-                                                                        errorAddress.text("Địa chỉ phải có ít nhất 5 ký tự và không được để mỗi khoảng trắng.");
-                                                                        hasError = true;
-                                                                    }
+                                // Phone number validation
+                                const phoneRegex = /^[0-9]{10,11}$/;
+                                if (!phoneNumber || phoneNumber.trim() === "") {
+                                    errorFields.phoneNumber.text("Số điện thoại không được để trống.");
+                                    hasError = true;
+                                } else if (!phoneRegex.test(phoneNumber)) {
+                                    errorFields.phoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
+                                    hasError = true;
+                                } else if (existingPhoneNumbers.includes(phoneNumber)) {
+                                    errorFields.phoneNumber.text("Số điện thoại đã tồn tại.");
+                                    hasError = true;
+                                }
 
+                                // Address validation
+                                if (address && (address.trim() === "" || address.trim().length < 5)) {
+                                    errorFields.address.text("Địa chỉ phải có ít nhất 5 ký tự và không được để mỗi khoảng trắng.");
+                                    hasError = true;
+                                }
 
-                                                                    // Validate avatar URL
-                                                                    if (avatarURL && address.trim().length > 0) {
-                                                                        errorAvatarURL.text("Avatar URL không dược chứa mỗi khoảng trắng.");
-                                                                        hasError = true;
-                                                                    }
+                                // Avatar URL validation
+                                if (avatarURL && avatarURL.trim() === "") {
+                                    errorFields.avatarURL.text("Avatar URL không được chứa mỗi khoảng trắng.");
+                                    hasError = true;
+                                }
 
-                                                                    // Ngăn gửi form nếu có lỗi
-                                                                    if (hasError) {
-                                                                        e.preventDefault();
-                                                                    }
-                                                                });
+                                // Prevent form submission if there are errors
+                                if (hasError) e.preventDefault();
+                            });
 
-                                                                // Populate Edit Customer Modal
-                                                                $('.edit-btn').on('click', function () {
-                                                                    $('#edit-customerID').val($(this).data('customerid'));
-                                                                    $('#edit-username').val($(this).data('username'));
-                                                                    $('#edit-username').data('old', $(this).data('username')); // Lưu giá trị cũ để kiểm tra trùng lặp
-                                                                    $('#edit-fullName').val($(this).data('fullname'));
-                                                                    $('#edit-email').val($(this).data('email'));
-                                                                    $('#edit-email').data('old', $(this).data('email')); // Lưu giá trị cũ để kiểm tra trùng lặp
-                                                                    $('#edit-phoneNumber').val($(this).data('phonenumber'));
-                                                                    $('#edit-phoneNumber').data('old', $(this).data('phonenumber')); // Lưu giá trị cũ để kiểm tra trùng lặp
-                                                                    $('#edit-address').val($(this).data('address'));
-                                                                    $('#edit-profilePictureURL').val($(this).data('profilepictureurl'));
-                                                                    $('#edit-status').val($(this).data('status'));
-                                                                    $('#edit-avatar-preview').attr('src', $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg');
+                            // Populate Edit Customer Modal
+                            $('.edit-btn').on('click', function () {
+                                $('#edit-customerID').val($(this).data('customerid'));
+                                $('#edit-username').val($(this).data('username'));
+                                $('#edit-username').data('old', $(this).data('username')); // Store old username
+                                $('#edit-fullName').val($(this).data('fullname'));
+                                $('#edit-email').val($(this).data('email'));
+                                $('#edit-email').data('old', $(this).data('email')); // Store old email
+                                $('#edit-phoneNumber').val($(this).data('phonenumber'));
+                                $('#edit-phoneNumber').data('old', $(this).data('phonenumber')); // Store old phone number
+                                $('#edit-address').val($(this).data('address'));
+                                $('#edit-profilePictureURL').val($(this).data('profilepictureurl'));
+                                $('#edit-status').val($(this).data('status'));
+                                $('#edit-avatar-preview').attr('src', $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg');
 
-                                                                    // Xóa lỗi cũ
-                                                                    $('.text-danger').text('');
-                                                                });
+                                // Clear previous errors
+                                $('.text-danger').text('');
+                            });
 
-                                                                // Validate khi submit form edit
-                                                                $('#editCustomerForm').on('submit', function (e) {
-                                                                    var username = $('#edit-username').val();
-                                                                    var oldUsername = $('#edit-username').data('old'); // Lấy giá trị cũ của username
-                                                                    var fullName = $('#edit-fullName').val();
-                                                                    var email = $('#edit-email').val();
-                                                                    var oldEmail = $('#edit-email').data('old'); // Lấy giá trị cũ của email
-                                                                    var phoneNumber = $('#edit-phoneNumber').val();
-                                                                    var oldPhoneNumber = $('#edit-phoneNumber').data('old'); // Lấy giá trị cũ của phone number
-                                                                    var address = $('#edit-address').val();
-                                                                    var profilePictureURL = $('#edit-profilePictureURL').val();
-                                                                    var status = $('#edit-status').val();
+                            // Edit Customer Form Validation
+                            $('#editCustomerForm').on('submit', function (e) {
+                                let hasError = false;
 
-                                                                    var errorUsername = $('#edit-username-error');
-                                                                    var errorFullName = $('#edit-fullName-error');
-                                                                    var errorEmail = $('#edit-email-error');
-                                                                    var errorPhoneNumber = $('#edit-phoneNumber-error');
-                                                                    var errorAddress = $('#edit-address-error');
-                                                                    var errorProfilePictureURL = $('#edit-profilePictureURL-error');
-                                                                    var errorStatus = $('#edit-status-error');
+                                const username = $('#edit-username').val();
+                                const oldUsername = $('#edit-username').data('old');
+                                const fullName = $('#edit-fullName').val();
+                                const email = $('#edit-email').val();
+                                const oldEmail = $('#edit-email').data('old');
+                                const phoneNumber = $('#edit-phoneNumber').val();
+                                const oldPhoneNumber = $('#edit-phoneNumber').data('old');
+                                const address = $('#edit-address').val();
+                                const profilePictureURL = $('#edit-profilePictureURL').val();
+                                const status = $('#edit-status').val();
 
-                                                                    var hasError = false;
+                                const errorFields = {
+                                    username: $('#edit-username-error'),
+                                    fullName: $('#edit-fullName-error'),
+                                    email: $('#edit-email-error'),
+                                    phoneNumber: $('#edit-phoneNumber-error'),
+                                    address: $('#edit-address-error'),
+                                    profilePictureURL: $('#edit-profilePictureURL-error'),
+                                    status: $('#edit-status-error')
+                                };
 
-                                                                    // Reset lỗi trước khi kiểm tra
-                                                                    errorUsername.text('');
-                                                                    errorFullName.text('');
-                                                                    errorEmail.text('');
-                                                                    errorPhoneNumber.text('');
-                                                                    errorAddress.text('');
-                                                                    errorProfilePictureURL.text('');
-                                                                    errorStatus.text('');
+                                // Reset errors
+                                Object.values(errorFields).forEach(field => field.text(""));
 
-                                                                    // Kiểm tra username
-                                                                    if (!username || username.trim() === "") {
-                                                                        errorUsername.text("Tên người dùng không được để trống.");
-                                                                        hasError = true;
-                                                                    } else if (username.trim() !== username) {
-                                                                        errorUsername.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
-                                                                        hasError = true;
-                                                                    } else if (username.toLowerCase() !== oldUsername.toLowerCase() && existingUsernames.includes(username.toLowerCase())) {
-                                                                        errorUsername.text("Tên người dùng đã tồn tại.");
-                                                                        hasError = true;
-                                                                    }
+                                // Username validation
+                                if (!username || username.trim() === "") {
+                                    errorFields.username.text("Tên người dùng không được để trống.");
+                                    hasError = true;
+                                } else if (username.trim() !== username) {
+                                    errorFields.username.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
+                                    hasError = true;
+                                } else if (username.toLowerCase() !== oldUsername.toLowerCase() && existingUsernames.includes(username.toLowerCase())) {
+                                    errorFields.username.text("Tên người dùng đã tồn tại.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra full name
-                                                                    if (!fullName || fullName.trim() === "" || fullName.length < 3) {
-                                                                        errorFullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
-                                                                        hasError = true;
-                                                                    }
+                                // Full name validation
+                                if (!fullName || fullName.trim() === "" || fullName.length < 3) {
+                                    errorFields.fullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra email
-                                                                    const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
-                                                                    if (!email || email.trim() === "" || !emailRegex.test(email)) {
-                                                                        errorEmail.text("Email không hợp lệ hoặc để trống.");
-                                                                        hasError = true;
-                                                                    } else if (email.toLowerCase() !== oldEmail.toLowerCase() && existingEmails.includes(email.toLowerCase())) {
-                                                                        errorEmail.text("Email đã tồn tại.");
-                                                                        hasError = true;
-                                                                    }
+                                // Email validation
+                                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                                if (!email || email.trim() === "" || !emailRegex.test(email)) {
+                                    errorFields.email.text("Email không hợp lệ hoặc để trống.");
+                                    hasError = true;
+                                } else if (email.toLowerCase() !== oldEmail.toLowerCase() && existingEmails.includes(email.toLowerCase())) {
+                                    errorFields.email.text("Email đã tồn tại.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra phone number
-                                                                    const phoneRegex = /^[0-9]{10,11}$/;
-                                                                    if (phoneNumber && phoneNumber.trim() !== "") {
-                                                                        if (!phoneRegex.test(phoneNumber)) {
-                                                                            errorPhoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-                                                                            hasError = true;
-                                                                        } else if (phoneNumber !== oldPhoneNumber && existingPhoneNumbers.includes(phoneNumber)) {
-                                                                            errorPhoneNumber.text("Số điện thoại đã tồn tại.");
-                                                                            hasError = true;
-                                                                        }
-                                                                    }
+                                // Phone number validation
+                                const phoneRegex = /^[0-9]{10,11}$/;
+                                if (phoneNumber && phoneNumber.trim() !== "") {
+                                    if (!phoneRegex.test(phoneNumber)) {
+                                        errorFields.phoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
+                                        hasError = true;
+                                    } else if (phoneNumber !== oldPhoneNumber && existingPhoneNumbers.includes(phoneNumber)) {
+                                        errorFields.phoneNumber.text("Số điện thoại đã tồn tại.");
+                                        hasError = true;
+                                    }
+                                }
 
-                                                                    // Kiểm tra địa chỉ
-                                                                    if (address && address.trim().length > 0 && address.trim().length < 5) {
-                                                                        errorAddress.text("Địa chỉ phải có ít nhất 5 ký tự.");
-                                                                        hasError = true;
-                                                                    }
+                                // Address validation
+                                if (address && address.trim() === "" && address.trim().length < 5) {
+                                    errorFields.address.text("Địa chỉ phải có ít nhất 5 ký tự.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra URL avatar
-                                                                    if (profilePictureURL && profilePictureURL.trim().length > 0) {
-                                                                        errorAddress.text("URL Avatar không được chứa mỗi khoảng trắng");
-                                                                        hasError = true;
-                                                                    }
-                  
+                                // Avatar URL validation
+                                if (profilePictureURL && profilePictureURL.trim() === "") {
+                                    errorFields.profilePictureURL.text("URL Avatar không được chứa mỗi khoảng trắng.");
+                                    hasError = true;
+                                }
 
-                                                                    // Kiểm tra trạng thái
-                                                                    if (status !== 'Active' && status !== 'Inactive') {
-                                                                        errorStatus.text("Trạng thái phải là 'Active' hoặc 'Inactive'.");
-                                                                        hasError = true;
-                                                                    }
+                                // Status validation
+                                if (status !== 'Active' && status !== 'Inactive') {
+                                    errorFields.status.text("Trạng thái phải là 'Active' hoặc 'Inactive'.");
+                                    hasError = true;
+                                }
 
-                                                                    // Ngăn gửi form nếu có lỗi
-                                                                    if (hasError) {
-                                                                        e.preventDefault();
-                                                                    }
-                                                                });
+                                // Prevent form submission if there are errors
+                                if (hasError) e.preventDefault();
+                            });
 
-                                                                // Reset form khi đóng modal Edit
-                                                                $('#editCustomerModal').on('hidden.bs.modal', function () {
-                                                                    var form = $(this).find('form');
-                                                                    form[0].reset(); // Reset tất cả các trường trong form
-                                                                    $('.text-danger').text(''); // Xóa tất cả lỗi
-                                                                });
+                            // Reset modal forms when closed
+                            $('#addCustomerModal').on('hidden.bs.modal', function () {
+                                $(this).find('form')[0].reset();
+                                $('.text-danger').text('');
+                            });
 
-                                                                // Populate View Customer Modal
-                                                                $('.view-btn').on('click', function () {
-                                                                    $('#view-username').text($(this).data('username'));
-                                                                    $('#view-fullName').text($(this).data('fullname'));
-                                                                    $('#view-email').text($(this).data('email'));
-                                                                    $('#view-phoneNumber').text($(this).data('phonenumber'));
-                                                                    $('#view-address').text($(this).data('address'));
+                            $('#editCustomerModal').on('hidden.bs.modal', function () {
+                                $(this).find('form')[0].reset();
+                                $('.text-danger').text('');
+                            });
 
-                                                                    var status = $(this).data('status');
-                                                                    var statusHtml = status === 'Active' ? '<span class="status-active">Active</span>' : '<span class="status-inactive">Inactive</span>';
-                                                                    $('#view-status').html(statusHtml);
+                            // Populate View Customer Modal
+                            $('.view-btn').on('click', function () {
+                                $('#view-username').text($(this).data('username'));
+                                $('#view-fullName').text($(this).data('fullname'));
+                                $('#view-email').text($(this).data('email'));
+                                $('#view-phoneNumber').text($(this).data('phonenumber'));
+                                $('#view-address').text($(this).data('address'));
 
-                                                                    var profilePictureUrl = $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg';
-                                                                    $('#view-avatar').attr('src', profilePictureUrl);
-                                                                });
+                                const status = $(this).data('status');
+                                const statusHtml = status === 'Active'
+                                    ? '<span class="status-active">Active</span>'
+                                    : '<span class="status-inactive">Inactive</span>';
+                                $('#view-status').html(statusHtml);
 
-                                                                // Reset form when closing Add Customer Modal
-                                                                $('#addCustomerModal').on('hidden.bs.modal', function () {
-                                                                    $(this).find('form')[0].reset();
-                                                                    $('.text-danger').text('');
-                                                                });
-                                                            });
+                                const profilePictureUrl = $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg';
+                                $('#view-avatar').attr('src', profilePictureUrl);
+                            });
+                        });
                     </script>
                 </main>
                 <%@ include file="/View/Common/footer.jsp" %>
