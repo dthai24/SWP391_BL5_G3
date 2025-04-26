@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import Dal.UserDAO;
 import Model.Employee;
+import Model.User;
 
 @WebServlet(name = "EmployeeServlet", urlPatterns = {"/employee"})
 public class EmployeeServlet extends HttpServlet {
@@ -29,10 +30,9 @@ public class EmployeeServlet extends HttpServlet {
         String filterStatus = request.getParameter("filterStatus");
 
         if (filterRole != null && !filterRole.isEmpty()) {
-            employees.removeIf(e -> !filterStatus.equals(e.getEmployeeRole()));
+            employees.removeIf(e -> !filterRole.equals(e.getEmployeeRole()));
         }
 
-        
         if (filterStatus != null && !filterStatus.isEmpty()) {
             employees.removeIf(e -> !filterStatus.equals(e.getUser().getStatus()));
         }
@@ -61,6 +61,7 @@ public class EmployeeServlet extends HttpServlet {
             return;
         }
 
+        // Handle add or edit actions
         String employeeID = request.getParameter("employeeID");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -68,9 +69,9 @@ public class EmployeeServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
         String address = request.getParameter("address");
-        String employeeRole = request.getParameter("employeeRole");
-        String status = request.getParameter("status");
         String profilePictureURL = request.getParameter("profilePictureURL");
+        String status = request.getParameter("status"); // Only used for edit
+        String employeeRole = request.getParameter("employeeRole");
         boolean isUpdate = employeeID != null && !employeeID.isEmpty();
 
         // Validate inputs
@@ -78,13 +79,21 @@ public class EmployeeServlet extends HttpServlet {
 
         if (username == null || username.trim().isEmpty() || username.length() < 3) {
             errors.add("Tên người dùng phải có ít nhất 3 ký tự và không được để trống.");
-        } else if (!isUpdate && userDAO.isUsernameTaken(username)) {
-            request.setAttribute("errorMessage", "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
-            doGet(request, response);
-            return;
-        } else if (isUpdate) {
-            Employee oldEmployee = userDAO.getEmployeeById(Integer.parseInt(employeeID));
-            if (oldEmployee != null && !oldEmployee.getUser().getUsername().equals(username) && userDAO.isUsernameTaken(username)) {
+        } else {
+            boolean isTaken = false;
+
+            if (!isUpdate) {
+                // Check if username already exists for a new employee
+                isTaken = userDAO.isUsernameTaken(username);
+            } else {
+                // Check if username is being updated and already exists
+                Employee oldEmployee = userDAO.getEmployeeById(Integer.parseInt(employeeID));
+                if (oldEmployee != null && !oldEmployee.getUser().getUsername().equals(username)) {
+                    isTaken = userDAO.isUsernameTaken(username);
+                }
+            }
+
+            if (isTaken) {
                 request.setAttribute("errorMessage", "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.");
                 doGet(request, response);
                 return;
@@ -99,46 +108,65 @@ public class EmployeeServlet extends HttpServlet {
             errors.add("Họ tên phải có ít nhất 3 ký tự và không được để trống.");
         }
 
+        // Validate email
         if (email == null || email.trim().isEmpty() || !Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matcher(email).matches()) {
             errors.add("Email không hợp lệ hoặc để trống.");
-        } else if (!isUpdate && userDAO.isEmailTaken(email)) {
-            request.setAttribute("errorMessage", "Email đã tồn tại. Vui lòng nhập email khác.");
-            doGet(request, response);
-            return;
-        } else if (isUpdate) {
-            Employee oldEmployee = userDAO.getEmployeeById(Integer.parseInt(employeeID));
-            if (oldEmployee != null && !oldEmployee.getUser().getEmail().equals(email) && userDAO.isEmailTaken(email)) {
+        } else {
+            boolean isTaken = false;
+
+            if (!isUpdate) {
+                // Check if email already exists for a new employee
+                isTaken = userDAO.isEmailTaken(email);
+            } else {
+                // Check if email is being updated and already exists
+                Employee oldEmployee = userDAO.getEmployeeById(Integer.parseInt(employeeID));
+                if (oldEmployee != null && !oldEmployee.getUser().getEmail().equals(email)) {
+                    isTaken = userDAO.isEmailTaken(email);
+                }
+            }
+
+            if (isTaken) {
                 request.setAttribute("errorMessage", "Email đã tồn tại. Vui lòng nhập email khác.");
                 doGet(request, response);
                 return;
             }
         }
 
-        if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
-            if (!Pattern.compile("^[0-9]{10,11}$").matcher(phoneNumber).matches()) {
-                errors.add("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-            } else if (!isUpdate && userDAO.isPhoneNumberTaken(phoneNumber)) {
+        // Validate phone number
+        if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !Pattern.compile("^[0-9]{10,11}$").matcher(phoneNumber).matches()) {
+            errors.add("Số điện thoại phải chứa 10 hoặc 11 chữ số và không được để trống.");
+        } else {
+            boolean isTaken = false;
+
+            if (!isUpdate) {
+                // Check if phone number already exists for a new employee
+                if (phoneNumber != null && !phoneNumber.trim().isEmpty()) {
+                    isTaken = userDAO.isPhoneNumberTaken(phoneNumber);
+                }
+            } else {
+                // Check if phone number is being updated and already exists
+                Employee oldEmployee = userDAO.getEmployeeById(Integer.parseInt(employeeID));
+                if (oldEmployee != null) {
+                    String oldPhoneNumber = oldEmployee.getUser().getPhoneNumber();
+                    if (phoneNumber != null && !phoneNumber.equals(oldPhoneNumber)) {
+                        isTaken = userDAO.isPhoneNumberTaken(phoneNumber);
+                    }
+                }
+            }
+
+            if (isTaken) {
                 request.setAttribute("errorMessage", "Số điện thoại đã tồn tại. Vui lòng nhập số điện thoại khác.");
                 doGet(request, response);
                 return;
-            } else if (isUpdate) {
-                Employee oldEmployee = userDAO.getEmployeeById(Integer.parseInt(employeeID));
-                if (oldEmployee != null && !phoneNumber.equals(oldEmployee.getUser().getPhoneNumber()) && userDAO.isPhoneNumberTaken(phoneNumber)) {
-                    request.setAttribute("errorMessage", "Số điện thoại đã tồn tại. Vui lòng nhập số điện thoại khác.");
-                    doGet(request, response);
-                    return;
-                }
             }
         }
 
+        // Validate address
         if (address != null && address.trim().isEmpty()) {
             errors.add("Địa chỉ không được để trống hoặc chỉ chứa khoảng trắng.");
         }
 
-        if (!"Active".equals(status) && !"Inactive".equals(status)) {
-            errors.add("Trạng thái phải là 'Active' hoặc 'Inactive'.");
-        }
-
+        // Validate employee role
         if (employeeRole == null || employeeRole.trim().isEmpty()) {
             errors.add("Vai trò nhân viên không được để trống.");
         }
@@ -157,38 +185,40 @@ public class EmployeeServlet extends HttpServlet {
             doGet(request, response);
             return;
         }
+        
+        // Khởi tạo User nếu chưa tồn tại
+        if (employee.getUser() == null) {
+            employee.setUser(new User());
+        }
 
+
+        // Map data to employee and user objects
         employee.getUser().setUsername(username);
+
         if (!isUpdate || (password != null && !password.trim().isEmpty())) {
             employee.getUser().setPassword(password);
         }
+
         employee.getUser().setFullName(fullName);
         employee.getUser().setEmail(email);
         employee.getUser().setPhoneNumber(phoneNumber);
         employee.getUser().setAddress(address);
-        employee.getUser().setStatus(status);
         employee.getUser().setProfilePictureURL(profilePictureURL);
-        employee.setEmployeeRole(employeeRole);
-        if (!isUpdate) {
-            employee.getUser().setRegistrationDate(new Date()); // Chỉ cập nhật ngày đăng ký nếu là thêm mới
+
+        // Only update status if editing
+        if (isUpdate && status != null) {
+            employee.getUser().setStatus(status);
         }
 
-        // Lưu thay đổi vào cơ sở dữ liệu
-        boolean success;
+        employee.setEmployeeRole(employeeRole); // Set employee role
+
         if (isUpdate) {
-            success = userDAO.editEmployee(employee);
+            userDAO.editEmployee(employee);
         } else {
-            success = userDAO.addEmployee(employee);
+            userDAO.addEmployee(employee);
         }
 
-        // Xử lý thông báo thành công hoặc thất bại
-        if (success) {
-            request.setAttribute("successMessage", isUpdate ? "Cập nhật nhân viên thành công!" : "Thêm nhân viên thành công!");
-        } else {
-            request.setAttribute("errorMessage", isUpdate ? "Không thể cập nhật nhân viên." : "Không thể thêm nhân viên.");
-        }
-
-        // Quay lại danh sách nhân viên
+        // Redirect or reload the list
         doGet(request, response);
     }
 }

@@ -64,10 +64,8 @@
                 <main class="content">
                     <%
                         List<Employee> employees = (List<Employee>) request.getAttribute("employees");
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     %>
 
-                    <!-- Table Section -->
                     <div class="container mt-5">
                         <div class="card shadow-lg">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -78,11 +76,13 @@
                             </div>
 
                             <div class="card-body">
+                                <!-- Filter Form -->
                                 <form method="get" action="employee" class="form-inline mb-3">
                                     <div class="form-group mr-2">
                                         <label for="filterRole" class="mr-2">Vai trò</label>
                                         <select name="filterRole" id="filterRole" class="form-control">
                                             <option value="">Tất cả</option>
+                                            <option value="Admin" <%= "Admin".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Admin</option>
                                             <option value="Manager" <%= "Manager".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Manager</option>
                                             <option value="Staff" <%= "Staff".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Staff</option>
                                             <option value="Receptionist" <%= "Receptionist".equals(request.getParameter("filterRole")) ? "selected" : "" %>>Receptionist</option>
@@ -99,6 +99,8 @@
                                     <button type="submit" class="btn btn-primary mr-2">Lọc</button>
                                     <a href="employee" class="btn btn-secondary">Hủy</a>
                                 </form>
+
+                                <!-- Employee Table -->
                                 <div class="table-responsive">
                                     <table id="employee-datatable" class="table table-hover table-striped align-middle">
                                         <thead class="thead-dark">
@@ -141,6 +143,7 @@
                                                     <% } %>
                                                 </td>
                                                 <td>
+                                                    <!-- Action Buttons -->
                                                     <button type="button" class="btn btn-link p-0 view-btn" 
                                                             data-employeeid="<%= employee.getEmployeeID() %>"
                                                             data-username="<%= employee.getUser().getUsername() %>"
@@ -176,8 +179,8 @@
                                                 </td>
                                             </tr>
                                             <%  } 
-                                    } else { %>
-                                            <tr><td colspan="11" class="text-center">Không có nhân viên nào.</td></tr>
+                                            } else { %>
+                                            <tr><td colspan="10" class="text-center">Không có nhân viên nào.</td></tr>
                                             <% } %>
                                         </tbody>
                                     </table>
@@ -186,8 +189,7 @@
                         </div>
                     </div>
 
-                    <!-- Add User Modal -->
-                                       <!-- Add Employee Modal -->
+                    <!-- Add Employee Modal -->
                     <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
@@ -199,58 +201,59 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
+                                        <!-- Username -->
                                         <div class="form-group">
                                             <label for="username">Tên Người Dùng</label>
-                                            <input type="text" name="username" id="username" class="form-control" required />
-                                            <div id="add-username-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <input type="text" name="username" id="employee-username" class="form-control" required />
+                                            <div id="add-employee-username-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Password -->
                                         <div class="form-group">
                                             <label for="password">Mật Khẩu</label>
-                                            <input type="password" name="password" id="password" class="form-control" required />
-                                            <div id="add-password-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <input type="password" name="password" id="employee-password" class="form-control" required />
+                                            <div id="add-employee-password-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Full Name -->
                                         <div class="form-group">
-                                            <label for="fullName">Họ Và Tên</label>
-                                            <input type="text" name="fullName" id="fullName" class="form-control" required />
-                                            <div id="add-fullName-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <label for="fullName">Họ và Tên</label>
+                                            <input type="text" name="fullName" id="employee-fullName" class="form-control" required />
+                                            <div id="add-employee-fullName-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Email -->
                                         <div class="form-group">
                                             <label for="email">Email</label>
-                                            <input type="email" name="email" id="email" class="form-control" required />
-                                            <div id="add-email-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <input type="email" name="email" id="employee-email" class="form-control" required />
+                                            <div id="add-employee-email-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Phone Number -->
                                         <div class="form-group">
                                             <label for="phoneNumber">Số Điện Thoại</label>
-                                            <input type="text" name="phoneNumber" id="phoneNumber" class="form-control" required />
-                                            <div id="add-phoneNumber-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <input type="text" name="phoneNumber" id="employee-phoneNumber" class="form-control" required />
+                                            <div id="add-employee-phoneNumber-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Address -->
                                         <div class="form-group">
                                             <label for="address">Địa Chỉ</label>
-                                            <input type="text" name="address" id="address" class="form-control" />
-                                            <div id="add-address-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <input type="text" name="address" id="employee-address" class="form-control" />
+                                            <div id="add-employee-address-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Profile Picture -->
                                         <div class="form-group">
                                             <label for="profilePictureURL">Avatar (URL)</label>
-                                            <input type="url" name="profilePictureURL" id="profilePictureURL" class="form-control" />
-                                            <div id="add-profilePictureURL-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <input type="url" name="profilePictureURL" id="employee-profilePictureURL" class="form-control" />
+                                            <div id="add-employee-profilePictureURL-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Employee Role -->
                                         <div class="form-group">
                                             <label for="employeeRole">Vai Trò Nhân Viên</label>
-                                            <select name="employeeRole" id="employeeRole" class="form-control" required>
+                                            <select name="employeeRole" id="employee-role" class="form-control" required>
+                                                <option value="Admin">Admin</option>
                                                 <option value="Manager">Manager</option>
                                                 <option value="Staff">Staff</option>
                                                 <option value="Receptionist">Receptionist</option>
                                             </select>
-                                            <div id="add-employeeRole-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="add-employee-role-error" class="text-danger"></div>
                                         </div>
-<!--                                        <div class="form-group">
-                                            <label for="status">Trạng Thái</label>
-                                            <select name="status" id="status" class="form-control">
-                                                <option value="Active">Active</option>
-                                                <option value="Inactive">Inactive</option>
-                                            </select>
-                                            <div id="add-status-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
-                                        </div>-->
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -260,7 +263,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- View Employee Modal -->
                     <div class="modal fade" id="viewEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="viewEmployeeModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -291,7 +294,6 @@
                         </div>
                     </div>
 
-
                     <!-- Edit Employee Modal -->
                     <div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -305,55 +307,61 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <div class="text-center mb-3">
-                                            <img id="edit-avatar-preview" src="" alt="Avatar" class="avatar-large">
-                                        </div>
+                                        <!-- Username -->
                                         <div class="form-group">
                                             <label for="edit-username">Tên Người Dùng</label>
                                             <input type="text" name="username" id="edit-username" class="form-control" required />
-                                            <div id="edit-username-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-username-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Full Name -->
                                         <div class="form-group">
                                             <label for="edit-fullName">Họ và Tên</label>
                                             <input type="text" name="fullName" id="edit-fullName" class="form-control" required />
-                                            <div id="edit-fullName-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-fullName-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Email -->
                                         <div class="form-group">
                                             <label for="edit-email">Email</label>
                                             <input type="email" name="email" id="edit-email" class="form-control" required />
-                                            <div id="edit-email-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-email-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Phone Number -->
                                         <div class="form-group">
                                             <label for="edit-phoneNumber">Số Điện Thoại</label>
                                             <input type="text" name="phoneNumber" id="edit-phoneNumber" class="form-control" />
-                                            <div id="edit-phoneNumber-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-phoneNumber-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Address -->
                                         <div class="form-group">
                                             <label for="edit-address">Địa Chỉ</label>
                                             <input type="text" name="address" id="edit-address" class="form-control" />
-                                            <div id="edit-address-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-address-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Profile Picture -->
                                         <div class="form-group">
                                             <label for="edit-profilePictureURL">Avatar (URL)</label>
                                             <input type="url" name="profilePictureURL" id="edit-profilePictureURL" class="form-control" />
-                                            <div id="edit-profilePictureURL-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-profilePictureURL-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Employee Role -->
                                         <div class="form-group">
                                             <label for="edit-employeeRole">Vai Trò Nhân Viên</label>
-                                            <select name="employeeRole" id="edit-employeeRole" class="form-control" required>
+                                            <select name="employeeRole" id="edit-role" class="form-control" required>
+                                                <option value="Admin">Admin</option>
                                                 <option value="Manager">Manager</option>
                                                 <option value="Staff">Staff</option>
                                                 <option value="Receptionist">Receptionist</option>
                                             </select>
-                                            <div id="edit-employeeRole-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-role-error" class="text-danger"></div>
                                         </div>
+                                        <!-- Status -->
                                         <div class="form-group">
                                             <label for="edit-status">Trạng Thái</label>
                                             <select name="status" id="edit-status" class="form-control">
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                             </select>
-                                            <div id="edit-status-error" class="text-danger" style="font-size:14px;margin-top:4px;"></div>
+                                            <div id="edit-status-error" class="text-danger"></div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -370,297 +378,285 @@
                     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
                     <script src="<%= request.getContextPath() %>/js/bootstrap.min.js"></script>
                     <script>
-                        $(document).ready(function () {
-                            // Initialize DataTable
-                            $('#employee-datatable').DataTable({
-                                responsive: true,
-                                paging: true,
-                                ordering: true,
-                                info: true,
-                                columnDefs: [
-                                    { orderable: false, targets: -1 } // Disable sort for last column (Action)
-                                ],
-                                language: {
-                                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
-                                }
-                            });
+                                                            $(document).ready(function () {
+                                                                // Initialize DataTable
+                                                                $('#employee-datatable').DataTable({
+                                                                    responsive: true,
+                                                                    paging: true,
+                                                                    ordering: true,
+                                                                    info: true,
+                                                                    columnDefs: [
+                                                                        {orderable: false, targets: -1} // Disable sort for action column
+                                                                    ],
+                                                                    language: {
+                                                                        url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+                                                                    }
+                                                                });
 
-                            // Lấy danh sách username, email, phone number hiện có
-                            var existingUsernames = [];
-                            var existingEmails = [];
-                            var existingPhoneNumbers = [];
-                            $("#employee-datatable tbody tr").each(function () {
-                                var username = $(this).find("td").eq(2).text().trim();
-                                var email = $(this).find("td").eq(4).text().trim();
-                                var phoneNumber = $(this).find("td").eq(5).text().trim();
+                                                                // Collect existing usernames, emails, and phone numbers
+                                                                const existingUsernames = [];
+                                                                const existingEmails = [];
+                                                                const existingPhoneNumbers = [];
 
-                                if (username) existingUsernames.push(username.toLowerCase());
-                                if (email) existingEmails.push(email.toLowerCase());
-                                if (phoneNumber) existingPhoneNumbers.push(phoneNumber);
-                            });
+                                                                $("#employee-datatable tbody tr").each(function () {
+                                                                    const username = $(this).find("td").eq(2).text().trim();
+                                                                    const email = $(this).find("td").eq(4).text().trim();
+                                                                    const phoneNumber = $(this).find("td").eq(5).text().trim();
 
-                            // Validate thêm nhân viên
-                            $("#addEmployeeForm").on("submit", function (e) {
-                                var username = $('#username').val();
-                                var password = $('#password').val();
-                                var fullName = $('#fullName').val();
-                                var email = $('#email').val();
-                                var phoneNumber = $('#phoneNumber').val();
-                                var address = $('#address').val();
-                                var employeeRole = $('#employeeRole').val();
-                                var avatarURL = $('#pictureProfileURL').val();
-                               
-                                var errorUsername = $('#add-username-error');
-                                var errorPassword = $('#add-password-error');
-                                var errorFullName = $('#add-fullName-error');
-                                var errorEmail = $('#add-email-error');
-                                var errorPhoneNumber = $('#add-phoneNumber-error');
-                                var errorAddress = $('#add-address-error');
-                                var errorEmployeeRole = $('#add-employeeRole-error');
-                                var errorAvatarURL = $('#add-pictureProfileURL-error').val();
+                                                                    if (username)
+                                                                        existingUsernames.push(username.toLowerCase());
+                                                                    if (email)
+                                                                        existingEmails.push(email.toLowerCase());
+                                                                    if (phoneNumber)
+                                                                        existingPhoneNumbers.push(phoneNumber);
+                                                                });
 
-                                var hasError = false;
+                                                                // Add Employee Form Validation
+                                                                $("#addEmployeeForm").on("submit", function (e) {
+                                                                    let hasError = false;
 
-                                // Clear all error messages
-                                errorUsername.text("");
-                                errorPassword.text("");
-                                errorFullName.text("");
-                                errorEmail.text("");
-                                errorPhoneNumber.text("");
-                                errorAddress.text("");
-                                errorEmployeeRole.text("");
-                                errorAvatarURL.text("");
+                                                                    const username = $('#employee-username').val();
+                                                                    const password = $('#employee-password').val();
+                                                                    const fullName = $('#employee-fullName').val();
+                                                                    const email = $('#employee-email').val();
+                                                                    const phoneNumber = $('#employee-phoneNumber').val();
+                                                                    const address = $('#employee-address').val();
+                                                                    const avatarURL = $('#employee-profilePictureURL').val();
+                                                                    const employeeRole = $('#employee-role').val();
 
-                                // Validate username
-                                if (!username || username.trim() === "") {
-                                    errorUsername.text("Tên người dùng không được để trống.");
-                                    hasError = true;
-                                } else if (username.trim() !== username) {
-                                    errorUsername.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
-                                    hasError = true;
-                                } else if (existingUsernames.includes(username.toLowerCase())) {
-                                    errorUsername.text("Tên người dùng đã tồn tại.");
-                                    hasError = true;
-                                }
+                                                                    const errorFields = {
+                                                                        username: $('#add-employee-username-error'),
+                                                                        password: $('#add-employee-password-error'),
+                                                                        fullName: $('#add-employee-fullName-error'),
+                                                                        email: $('#add-employee-email-error'),
+                                                                        phoneNumber: $('#add-employee-phoneNumber-error'),
+                                                                        address: $('#add-employee-address-error'),
+                                                                        avatarURL: $('#add-employee-profilePictureURL-error'),
+                                                                        employeeRole: $('#add-employee-role-error')
+                                                                    };
 
-                                // Validate password
-                                if (!password || password.trim() === "" || password.length < 6 || !/\d/.test(password)) {
-                                    errorPassword.text("Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
-                                    hasError = true;
-                                }
+                                                                    // Reset errors
+                                                                    Object.values(errorFields).forEach(field => field.text(""));
 
-                                // Validate full name
-                                if (!fullName || fullName.trim() === "" || fullName.length < 3) {
-                                    errorFullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
-                                    hasError = true;
-                                }
+                                                                    // Username validation
+                                                                    if (!username || username.trim() === "") {
+                                                                        errorFields.username.text("Tên người dùng không được để trống.");
+                                                                        hasError = true;
+                                                                    } else if (username.trim() !== username) {
+                                                                        errorFields.username.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
+                                                                        hasError = true;
+                                                                    } else if (existingUsernames.includes(username.toLowerCase())) {
+                                                                        errorFields.username.text("Tên người dùng đã tồn tại.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Validate email
-                                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
-                                if (!email || email.trim() === "" || !emailRegex.test(email)) {
-                                    errorEmail.text("Email không hợp lệ hoặc để trống.");
-                                    hasError = true;
-                                } else if (existingEmails.includes(email.toLowerCase())) {
-                                    errorEmail.text("Email đã tồn tại.");
-                                    hasError = true;
-                                }
+                                                                    // Password validation
+                                                                    if (!password || password.trim() === "" || password.length < 6 || !/\d/.test(password)) {
+                                                                        errorFields.password.text("Mật khẩu phải có ít nhất 6 ký tự và chứa ít nhất 1 chữ số.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Validate phone number
-                                const phoneRegex = /^[0-9]{10,11}$/;
-                                if (!phoneNumber || phoneNumber.trim() === "") {
-                                    errorPhoneNumber.text("Số điện thoại không được để trống.");
-                                    hasError = true;
-                                } else if (!phoneRegex.test(phoneNumber)) {
-                                    errorPhoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-                                    hasError = true;
-                                } else if (existingPhoneNumbers.includes(phoneNumber)) {
-                                    errorPhoneNumber.text("Số điện thoại đã tồn tại.");
-                                    hasError = true;
-                                }
-                                 
-                                //Validate address
-                                if (address && address.trim() === "" address.trim().length < 5) {
-                                    errorAddress.text("Địa chỉ phải có ít nhất 5 ký tự và không được để mỗi khoảng trắng.");
-                                    hasError = true;
-                                }
+                                                                    // Full name validation
+                                                                    if (!fullName || fullName.trim() === "" || fullName.length < 3) {
+                                                                        errorFields.fullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Validate employee role
-                                const validRoles = ['Manager', 'Staff', 'Receptionist'];
-                                if (!validRoles.includes(employeeRole)) {
-                                    errorEmployeeRole.text("Vai trò nhân viên không hợp lệ.");
-                                    hasError = true;
-                                }
-                                
-                                // Validate avatar URL
-                                if (avatarURL && avatarURL.trim() === "") {
-                                    errorAvatarURL.text("Avatar URL không dược chứa mỗi khoảng trắng.");
-                                    hasError = true;
-                                }
+                                                                    // Email validation
+                                                                    const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                                                                    if (!email || email.trim() === "" || !emailRegex.test(email)) {
+                                                                        errorFields.email.text("Email không hợp lệ hoặc để trống.");
+                                                                        hasError = true;
+                                                                    } else if (existingEmails.includes(email.toLowerCase())) {
+                                                                        errorFields.email.text("Email đã tồn tại.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Prevent form submission if errors exist
-                                if (hasError) {
-                                    e.preventDefault();
-                                }
-                            });
+                                                                    // Phone number validation
+                                                                    const phoneRegex = /^[0-9]{10,11}$/;
+                                                                    if (!phoneNumber || phoneNumber.trim() === "") {
+                                                                        errorFields.phoneNumber.text("Số điện thoại không được để trống.");
+                                                                        hasError = true;
+                                                                    } else if (!phoneRegex.test(phoneNumber)) {
+                                                                        errorFields.phoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
+                                                                        hasError = true;
+                                                                    } else if (existingPhoneNumbers.includes(phoneNumber)) {
+                                                                        errorFields.phoneNumber.text("Số điện thoại đã tồn tại.");
+                                                                        hasError = true;
+                                                                    }
 
-                            // Populate Edit Employee Modal
-                            $('.edit-btn').on('click', function () {
-                                $('#edit-employeeID').val($(this).data('employeeid'));
-                                $('#edit-username').val($(this).data('username'));
-                                $('#edit-username').data('old', $(this).data('username')); // Lưu giá trị cũ để kiểm tra trùng lặp
-                                $('#edit-fullName').val($(this).data('fullname'));
-                                $('#edit-email').val($(this).data('email'));
-                                $('#edit-email').data('old', $(this).data('email')); // Lưu giá trị cũ để kiểm tra trùng lặp
-                                $('#edit-phoneNumber').val($(this).data('phonenumber'));
-                                $('#edit-phoneNumber').data('old', $(this).data('phonenumber')); // Lưu giá trị cũ để kiểm tra trùng lặp
-                                $('#edit-address').val($(this).data('address'));
-                                $('#edit-profilePictureURL').val($(this).data('profilepictureurl'));
-                                $('#edit-employeeRole').val($(this).data('employeerole'));
-                                $('#edit-status').val($(this).data('status'));
-                                $('#edit-avatar-preview').attr('src', $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg');
+                                                                    // Address validation
+                                                                    if (address && (address.trim() === "" || address.trim().length < 5)) {
+                                                                        errorFields.address.text("Địa chỉ phải có ít nhất 5 ký tự và không được để mỗi khoảng trắng.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Xóa lỗi cũ
-                                $('.text-danger').text('');
-                            });
+                                                                    // Employee role validation
+                                                                    if (!employeeRole || employeeRole.trim() === "") {
+                                                                        errorFields.employeeRole.text("Vai trò nhân viên không được để trống.");
+                                                                        hasError = true;
+                                                                    }
 
-                            // Validate khi submit form edit
-                            $('#editEmployeeForm').on('submit', function (e) {
-                                var username = $('#edit-username').val();
-                                var oldUsername = $('#edit-username').data('old'); // Lấy giá trị cũ của username
-                                var fullName = $('#edit-fullName').val();
-                                var email = $('#edit-email').val();
-                                var oldEmail = $('#edit-email').data('old'); // Lấy giá trị cũ của email
-                                var phoneNumber = $('#edit-phoneNumber').val();
-                                var oldPhoneNumber = $('#edit-phoneNumber').data('old'); // Lấy giá trị cũ của phone number
-                                var address = $('#edit-address').val();
-                                var profilePictureURL = $('#edit-profilePictureURL').val();
-                                var employeeRole = $('#edit-employeeRole').val();
-                                var status = $('#edit-status').val();
+                                                                    // Avatar URL validation
+                                                                    if (avatarURL && avatarURL.trim() === "") {
+                                                                        errorFields.avatarURL.text("Avatar URL không được chứa mỗi khoảng trắng.");
+                                                                        hasError = true;
+                                                                    }
 
-                                var errorUsername = $('#edit-username-error');
-                                var errorFullName = $('#edit-fullName-error');
-                                var errorEmail = $('#edit-email-error');
-                                var errorPhoneNumber = $('#edit-phoneNumber-error');
-                                var errorAddress = $('#edit-address-error');
-                                var errorProfilePictureURL = $('#edit-profilePictureURL-error');
-                                var errorEmployeeRole = $('#edit-employeeRole-error');
-                                var errorStatus = $('#edit-status-error');
+                                                                    // Prevent form submission if there are errors
+                                                                    if (hasError)
+                                                                        e.preventDefault();
+                                                                });
 
-                                var hasError = false;
+                                                                // Populate Edit Employee Modal
+                                                                $('.edit-btn').on('click', function () {
+                                                                    $('#edit-employeeID').val($(this).data('employeeid'));
+                                                                    $('#edit-username').val($(this).data('username')).data('old', $(this).data('username'));
+                                                                    $('#edit-username').data('old', $(this).data('username')); // Store old username
+                                                                    $('#edit-fullName').val($(this).data('fullname'));
+                                                                    $('#edit-email').val($(this).data('email'));
+                                                                    $('#edit-email').data('old', $(this).data('email')); // Store old email
+                                                                    $('#edit-phoneNumber').val($(this).data('phonenumber'));
+                                                                    $('#edit-phoneNumber').data('old', $(this).data('phonenumber')); // Store old phone number
+                                                                    $('#edit-address').val($(this).data('address'));
+                                                                    $('#edit-profilePictureURL').val($(this).data('profilepictureurl'));
+                                                                    $('#edit-role').val($(this).data('employeerole'));
+                                                                    $('#edit-status').val($(this).data('status'));
+                                                                    $('#edit-avatar-preview').attr('src', $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg');
 
-                                // Reset lỗi trước khi kiểm tra
-                                errorUsername.text('');
-                                errorFullName.text('');
-                                errorEmail.text('');
-                                errorPhoneNumber.text('');
-                                errorAddress.text('');
-                                errorProfilePictureURL.text('');
-                                errorEmployeeRole.text('');
-                                errorStatus.text('');
+                                                                    // Clear previous errors
+                                                                    $('.text-danger').text('');
+                                                                });
 
-                                // Validate username
-                                if (!username || username.trim() === "") {
-                                    errorUsername.text("Tên người dùng không được để trống.");
-                                    hasError = true;
-                                } else if (username.trim() !== username) {
-                                    errorUsername.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
-                                    hasError = true;
-                                } else if (username.toLowerCase() !== oldUsername.toLowerCase() && existingUsernames.includes(username.toLowerCase())) {
-                                    errorUsername.text("Tên người dùng đã tồn tại.");
-                                    hasError = true;
-                                }
+                                                                // Edit Employee Form Validation
+                                                                $('#editEmployeeForm').on('submit', function (e) {
+                                                                    let hasError = false;
 
-                                // Validate full name
-                                if (!fullName || fullName.trim() === "" || fullName.length < 3) {
-                                    errorFullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
-                                    hasError = true;
-                                }
+                                                                    const username = $('#edit-username').val();
+                                                                    const oldUsername = $('#edit-username').data('old');
+                                                                    const fullName = $('#edit-fullName').val();
+                                                                    const email = $('#edit-email').val();
+                                                                    const oldEmail = $('#edit-email').data('old');
+                                                                    const phoneNumber = $('#edit-phoneNumber').val();
+                                                                    const oldPhoneNumber = $('#edit-phoneNumber').data('old');
+                                                                    const address = $('#edit-address').val();
+                                                                    const profilePictureURL = $('#edit-profilePictureURL').val();
+                                                                    const employeeRole = $('#edit-role').val();
+                                                                    const status = $('#edit-status').val();
 
-                                // Validate email
-                                const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
-                                if (!email || email.trim() === "" || !emailRegex.test(email)) {
-                                    errorEmail.text("Email không hợp lệ hoặc để trống.");
-                                    hasError = true;
-                                } else if (email.toLowerCase() !== oldEmail.toLowerCase() && existingEmails.includes(email.toLowerCase())) {
-                                    errorEmail.text("Email đã tồn tại.");
-                                    hasError = true;
-                                }
+                                                                    const errorFields = {
+                                                                        username: $('#edit-username-error'),
+                                                                        fullName: $('#edit-fullName-error'),
+                                                                        email: $('#edit-email-error'),
+                                                                        phoneNumber: $('#edit-phoneNumber-error'),
+                                                                        address: $('#edit-address-error'),
+                                                                        profilePictureURL: $('#edit-profilePictureURL-error'),
+                                                                        employeeRole: $('#edit-role-error'),
+                                                                        status: $('#edit-status-error')
+                                                                    };
 
-                                // Validate phone number
-                                const phoneRegex = /^[0-9]{10,11}$/;
-                                if (!phoneNumber || phoneNumber.trim() === "") {
-                                    errorPhoneNumber.text("Số điện thoại không được để trống.");
-                                    hasError = true;
-                                } else if (!phoneRegex.test(phoneNumber)) {
-                                    errorPhoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
-                                    hasError = true;
-                                } else if (phoneNumber !== oldPhoneNumber && existingPhoneNumbers.includes(phoneNumber)) {
-                                    errorPhoneNumber.text("Số điện thoại đã tồn tại.");
-                                    hasError = true;
-                                }
+                                                                    // Reset errors
+                                                                    Object.values(errorFields).forEach(field => field.text(""));
 
-                                // Validate địa chỉ
-                                if (address && address.trim().length < 5) {
-                                    errorAddress.text("Địa chỉ phải có ít nhất 5 ký tự.");
-                                    hasError = true;
-                                }
+                                                                    // Username validation
+                                                                    if (!username || username.trim() === "") {
+                                                                        errorFields.username.text("Tên người dùng không được để trống.");
+                                                                        hasError = true;
+                                                                    } else if (username.trim() !== username) {
+                                                                        errorFields.username.text("Tên người dùng không được chứa khoảng trắng ở đầu hoặc cuối.");
+                                                                        hasError = true;
+                                                                    } else if (username.toLowerCase() !== oldUsername.toLowerCase() && existingUsernames.includes(username.toLowerCase())) {
+                                                                        errorFields.username.text("Tên người dùng đã tồn tại.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Kiểm tra URL avatar
-                                if (profilePictureURL && profilePictureURL.trim().length > 0) {
-                                    errorAddress.text("URL Avatar không được chứa mỗi khoảng trắng");
-                                    hasError = true;
-                               }
+                                                                    // Full name validation
+                                                                    if (!fullName || fullName.trim() === "" || fullName.length < 3) {
+                                                                        errorFields.fullName.text("Họ và tên phải có ít nhất 3 ký tự và không được để trống.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Validate employee role
-                                const validRoles = ['Manager', 'Staff', 'Receptionist'];
-                                if (!validRoles.includes(employeeRole)) {
-                                    errorEmployeeRole.text("Vai trò nhân viên không hợp lệ.");
-                                    hasError = true;
-                                }
+                                                                    // Email validation
+                                                                    const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/;
+                                                                    if (!email || email.trim() === "" || !emailRegex.test(email)) {
+                                                                        errorFields.email.text("Email không hợp lệ hoặc để trống.");
+                                                                        hasError = true;
+                                                                    } else if (email.toLowerCase() !== oldEmail.toLowerCase() && existingEmails.includes(email.toLowerCase())) {
+                                                                        errorFields.email.text("Email đã tồn tại.");
+                                                                        hasError = true;
+                                                                    }
 
-                                // Validate status
-                                if (status !== 'Active' && status !== 'Inactive') {
-                                    errorStatus.text("Trạng thái phải là 'Active' hoặc 'Inactive'.");
-                                    hasError = true;
-                                }
+                                                                    // Phone number validation
+                                                                    const phoneRegex = /^[0-9]{10,11}$/;
+                                                                    if (phoneNumber && phoneNumber.trim() !== "") {
+                                                                        if (!phoneRegex.test(phoneNumber)) {
+                                                                            errorFields.phoneNumber.text("Số điện thoại phải chứa 10 hoặc 11 chữ số.");
+                                                                            hasError = true;
+                                                                        } else if (phoneNumber !== oldPhoneNumber && existingPhoneNumbers.includes(phoneNumber)) {
+                                                                            errorFields.phoneNumber.text("Số điện thoại đã tồn tại.");
+                                                                            hasError = true;
+                                                                        }
+                                                                    }
 
-                                // Ngăn gửi form nếu có lỗi
-                                if (hasError) {
-                                    e.preventDefault();
-                                }
-                            });
+                                                                    // Address validation
+                                                                    if (address && (address.trim() === "" || address.trim().length < 5)) {
+                                                                        errorFields.address.text("Địa chỉ phải có ít nhất 5 ký tự.");
+                                                                        hasError = true;
+                                                                    }
 
-                            // Reset form khi đóng modal Edit
-                            $('#editEmployeeModal').on('hidden.bs.modal', function () {
-                                var form = $(this).find('form');
-                                form[0].reset(); // Reset tất cả các trường trong form
-                                $('.text-danger').text(''); // Xóa tất cả lỗi
-                            });
+                                                                    // Avatar URL validation
+                                                                    if (profilePictureURL && profilePictureURL.trim() === "") {
+                                                                        errorFields.profilePictureURL.text("URL Avatar không được chứa mỗi khoảng trắng.");
+                                                                        hasError = true;
+                                                                    }
 
-                            // Populate View Employee Modal
-                            $('.view-btn').on('click', function () {
-                                $('#view-employeeID').text($(this).data('employeeid'));
-                                $('#view-username').text($(this).data('username'));
-                                $('#view-fullName').text($(this).data('fullname'));
-                                $('#view-email').text($(this).data('email'));
-                                $('#view-phoneNumber').text($(this).data('phonenumber'));
-                                $('#view-address').text($(this).data('address'));
-                                $('#view-employeeRole').text($(this).data('employeerole'));
+                                                                    // Employee role validation
+                                                                    if (!employeeRole || employeeRole.trim() === "") {
+                                                                        errorFields.employeeRole.text("Vai trò nhân viên không được để trống.");
+                                                                        hasError = true;
+                                                                    }
 
-                                var status = $(this).data('status');
-                                var statusHtml = status === 'Active' ? '<span class="status-active">Active</span>' : '<span class="status-inactive">Inactive</span>';
-                                $('#view-status').html(statusHtml);
+                                                                    // Status validation
+                                                                    if (status !== 'Active' && status !== 'Inactive') {
+                                                                        errorFields.status.text("Trạng thái phải là 'Active' hoặc 'Inactive'.");
+                                                                        hasError = true;
+                                                                    }
 
-                                var profilePictureUrl = $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg';
-                                $('#view-avatar').attr('src', profilePictureUrl);
-                            });
+                                                                    // Prevent form submission if there are errors
+                                                                    if (hasError)
+                                                                        e.preventDefault();
+                                                                });
+                                                                
+                                                                // Reset modal forms when closed
+                                                                $('#addEmployeeModal').on('hidden.bs.modal', function () {
+                                                                    $(this).find('form')[0].reset();
+                                                                    $('.text-danger').text('');
+                                                                });
 
-                            // Reset form when closing Add Employee Modal
-                            $('#addEmployeeModal').on('hidden.bs.modal', function () {
-                                $(this).find('form')[0].reset();
-                                $('.text-danger').text('');
-                            });
-                        });
+                                                                $('#editEmployeeModal').on('hidden.bs.modal', function () {
+                                                                    $(this).find('form')[0].reset();
+                                                                    $('.text-danger').text('');
+                                                                });
+
+                                                                // Populate View Employee Modal
+                                                                $('.view-btn').on('click', function () {
+                                                                    $('#view-username').text($(this).data('username'));
+                                                                    $('#view-fullName').text($(this).data('fullname'));
+                                                                    $('#view-email').text($(this).data('email'));
+                                                                    $('#view-phoneNumber').text($(this).data('phonenumber'));
+                                                                    $('#view-address').text($(this).data('address'));
+                                                                    $('#view-employeeRole').text($(this).data('employeerole'));
+
+                                                                    const status = $(this).data('status');
+                                                                    const statusHtml = status === 'Active'
+                                                                            ? '<span class="status-active">Active</span>'
+                                                                            : '<span class="status-inactive">Inactive</span>';
+                                                                    $('#view-status').html(statusHtml);
+
+                                                                    const profilePictureUrl = $(this).data('profilepictureurl') || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg';
+                                                                    $('#view-avatar').attr('src', profilePictureUrl);
+                                                                }); 
+                                                            });
                     </script>
                 </main>
                 <%@ include file="/View/Common/footer.jsp" %>
