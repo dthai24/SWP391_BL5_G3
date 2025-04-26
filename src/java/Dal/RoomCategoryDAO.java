@@ -35,7 +35,10 @@ public class RoomCategoryDAO {
                     rs.getString("CategoryName"),
                     rs.getString("Description"),
                     rs.getBigDecimal("BasePricePerNight"),
-                    rs.getBoolean("IsDeleted")
+                    rs.getInt("Capacity"),
+                    rs.getBoolean("IsDeleted"),
+                    new ArrayList<>(),
+                    new ArrayList<>()
                 );
             }
         } catch (SQLException e) {
@@ -55,7 +58,10 @@ public class RoomCategoryDAO {
                     rs.getString("CategoryName"),
                     rs.getString("Description"),
                     rs.getBigDecimal("BasePricePerNight"),
-                    rs.getBoolean("IsDeleted")
+                    rs.getInt("Capacity"),
+                    rs.getBoolean("IsDeleted"),
+                    new ArrayList<>(),
+                    new ArrayList<>()
                 );
                 list.add(cat);
             }
@@ -77,11 +83,12 @@ public class RoomCategoryDAO {
     }
 
     public boolean addRoomCategory(RoomCategory category) {
-        String sql = "INSERT INTO RoomCategories (CategoryName, Description, BasePricePerNight, IsDeleted) VALUES (?, ?, ?, 0)";
+        String sql = "INSERT INTO RoomCategories (CategoryName, Description, BasePricePerNight, Capacity, IsDeleted) VALUES (?, ?, ?, ?, 0)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, category.getCategoryName());
             statement.setString(2, category.getDescription());
             statement.setBigDecimal(3, category.getBasePricePerNight());
+            statement.setInt(4, category.getCapacity());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,12 +97,13 @@ public class RoomCategoryDAO {
     }
 
     public boolean updateRoomCategory(RoomCategory category) {
-        String sql = "UPDATE RoomCategories SET CategoryName = ?, Description = ?, BasePricePerNight = ? WHERE CategoryID = ?";
+        String sql = "UPDATE RoomCategories SET CategoryName = ?, Description = ?, BasePricePerNight = ?, Capacity = ? WHERE CategoryID = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, category.getCategoryName());
             statement.setString(2, category.getDescription());
             statement.setBigDecimal(3, category.getBasePricePerNight());
-            statement.setInt(4, category.getCategoryID());
+            statement.setInt(4, category.getCapacity());
+            statement.setInt(5, category.getCategoryID());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

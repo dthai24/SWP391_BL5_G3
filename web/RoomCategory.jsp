@@ -53,6 +53,10 @@
                         <label>Giá gốc/đêm</label>
                         <input type="number" name="basePricePerNight" class="form-control" required />
                       </div>
+                      <div class="form-group">
+                        <label>Sức chứa</label>
+                        <input type="number" name="capacity" class="form-control" min="1" required />
+                      </div>
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
@@ -90,6 +94,7 @@
                                         <th style="max-width:60px;">ID</th>
                                         <th style="max-width:120px;">Tên loại phòng</th>
                                         <th style="max-width:180px;">Mô tả</th>
+                                        <th style="max-width:100px;">Sức chứa<br>(người)</th>
                                         <th style="max-width:120px;">Giá gốc/đêm</th>
                                         <th style="max-width:120px;">Hành động</th>
                                     </tr>
@@ -101,6 +106,7 @@
                                         <td style="font-weight: 600; color: #007bff;"> <%= cat.getCategoryID() %> </td>
                                         <td> <%= cat.getCategoryName() %> </td>
                                         <td class="description-col"> <%= cat.getDescription() %> </td>
+                                        <td> <%= cat.getCapacity() %> </td>
                                         <td style="font-weight: 600; color: #28a745;"> <%= cat.getBasePricePerNight() %>$ </td>
                                         <td>
                                             <button type="button" class="btn btn-link p-0 view-btn" 
@@ -132,7 +138,7 @@
                                     </tr>
                                     <%  } 
                                     } else { %>
-                                    <tr><td colspan="5" class="text-center">Không có loại phòng nào.</td></tr>
+                                    <tr><td colspan="6" class="text-center">Không có loại phòng nào.</td></tr>
                                     <% } %>
                                 </tbody>
                             </table>
@@ -166,6 +172,10 @@
                       <div class="form-group">
                         <label>Giá gốc/đêm</label>
                         <input type="number" name="basePricePerNight" id="edit-basePrice" class="form-control" required />
+                      </div>
+                      <div class="form-group">
+                        <label>Sức chứa</label>
+                        <input type="number" name="capacity" id="edit-capacity" class="form-control" min="1" required />
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -207,6 +217,10 @@
                               <div class="row mb-2">
                                 <div class="col-md-4 font-weight-bold">Mô tả:</div>
                                 <div class="col-md-8"><span id="view-description"></span></div>
+                              </div>
+                              <div class="row mb-2">
+                                <div class="col-md-4 font-weight-bold">Sức chứa:</div>
+                                <div class="col-md-8"><span id="view-capacity"></span> người</div>
                               </div>
                               <div class="row mb-2">
                                 <div class="col-md-4 font-weight-bold">Giá gốc/đêm:</div>
@@ -261,6 +275,18 @@
                         return false;
                     }
                 });
+                // Khi mở modal xem chi tiết
+                $('.view-btn').click(function(){
+                    var row = $(this).closest('tr');
+                    $('#view-categoryID').text(row.find('td').eq(0).text());
+                    $('#view-categoryName').text(row.find('td').eq(1).text());
+                    $('#view-categoryName-info').text(row.find('td').eq(1).text());
+                    $('#view-description').text(row.find('td').eq(2).text());
+                    $('#view-capacity').text(row.find('td').eq(3).text());
+                    $('#view-basePrice').text(row.find('td').eq(4).text());
+                    var isDeleted = $(this).data('isdeleted');
+                    $('#view-isDeleted').text(isDeleted ? 'Đã xóa' : 'Đang sử dụng');
+                });
                 // Khi mở modal sửa
                 $('.edit-btn').click(function(){
                     $('#edit-categoryID').val($(this).data('categoryid'));
@@ -268,6 +294,7 @@
                     $('#edit-categoryName').data('old', $(this).data('categoryname'));
                     $('#edit-description').val($(this).data('description'));
                     $('#edit-basePrice').val($(this).data('baseprice'));
+                    $('#edit-capacity').val($(this).data('capacity'));
                     $('#edit-categoryName-error').text('');
                 });
                 // Validate khi submit form edit

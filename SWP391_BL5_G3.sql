@@ -190,6 +190,7 @@ CREATE TABLE [dbo].[RoomCategories](
 	[CategoryName] [nvarchar](100) NOT NULL, -- Tên loại phòng (Premium, Deluxe,...)
 	[Description] [nvarchar](max) NULL, -- Mô tả loại phòng
 	[BasePricePerNight] [decimal](10, 2) NOT NULL, -- Giá cơ bản mỗi đêm
+	[Capacity] [int] NOT NULL, -- Sức chứa tối đa
 	[IsDeleted] [bit] NOT NULL, -- Cờ đánh dấu xóa mềm
 PRIMARY KEY CLUSTERED
 (
@@ -425,17 +426,17 @@ GO
 -- (Dữ liệu mẫu cho RoomCategories)
 SET IDENTITY_INSERT [dbo].[RoomCategories] ON
 GO
-INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (1, N'Premium King Room', N'Phòng cao cấp với giường king size', CAST(200.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [Capacity], [IsDeleted]) VALUES (1, N'Phòng Cao Cấp', N'Phòng cao cấp với giường king size', CAST(200.00 AS Decimal(10, 2)), 2, 0)
 GO
-INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (2, N'Deluxe Room', N'Phòng deluxe tiện nghi', CAST(150.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [Capacity], [IsDeleted]) VALUES (2, N'Phòng Hạng Sang', N'Phòng hang sang tiện nghi', CAST(150.00 AS Decimal(10, 2)), 2, 0)
 GO
-INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (3, N'Double Room', N'Phòng đôi dành cho hai người', CAST(120.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [Capacity], [IsDeleted]) VALUES (3, N'Phòng Đôi', N'Phòng đôi dành cho hai người', CAST(120.00 AS Decimal(10, 2)), 2, 0)
 GO
-INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (4, N'Luxury Room', N'Phòng sang trọng với dịch vụ cao cấp', CAST(250.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [Capacity], [IsDeleted]) VALUES (4, N'Phòng Sang Trọng', N'Phòng sang trọng với dịch vụ cao cấp', CAST(250.00 AS Decimal(10, 2)), 4, 0)
 GO
-INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (5, N'Room With View', N'Phòng có tầm nhìn đẹp', CAST(180.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [Capacity], [IsDeleted]) VALUES (5, N'Phòng Ba Người ', N'Phòng dành cho ba người ', CAST(180.00 AS Decimal(10, 2)), 3, 0)
 GO
-INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [IsDeleted]) VALUES (6, N'Small View', N'Phòng nhỏ có cửa sổ nhìn ra cảnh quan', CAST(100.00 AS Decimal(10, 2)), 0)
+INSERT [dbo].[RoomCategories] ([CategoryID], [CategoryName], [Description], [BasePricePerNight], [Capacity], [IsDeleted]) VALUES (6, N'Phòng Nhỏ Có Cửa Sổ', N'Phòng nhỏ có cửa sổ nhìn ra cảnh quan', CAST(100.00 AS Decimal(10, 2)), 1, 0)
 GO
 SET IDENTITY_INSERT [dbo].[RoomCategories] OFF
 GO

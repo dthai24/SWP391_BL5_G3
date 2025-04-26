@@ -8,6 +8,7 @@ public class RoomCategory {
     private String categoryName;
     private String description;
     private BigDecimal basePricePerNight;
+    private int capacity;
     private boolean isDeleted;
     
     // For relationships
@@ -18,14 +19,18 @@ public class RoomCategory {
     public RoomCategory() {
     }
 
-    public RoomCategory(int categoryID, String categoryName, String description, 
-                        BigDecimal basePricePerNight, boolean isDeleted) {
+    public RoomCategory(int categoryID, String categoryName, String description, BigDecimal basePricePerNight, int capacity, boolean isDeleted, List<Room> rooms, List<RoomImage> images) {
         this.categoryID = categoryID;
         this.categoryName = categoryName;
         this.description = description;
         this.basePricePerNight = basePricePerNight;
+        this.capacity = capacity;
         this.isDeleted = isDeleted;
+        this.rooms = rooms;
+        this.images = images;
     }
+
+    
     
     // Getters and Setters
     public int getCategoryID() {
@@ -60,6 +65,14 @@ public class RoomCategory {
         this.basePricePerNight = basePricePerNight;
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
     public boolean getIsDeleted() {
         return isDeleted;
     }
@@ -90,7 +103,8 @@ public class RoomCategory {
                 "categoryID=" + categoryID +
                 ", categoryName='" + categoryName + '\'' +
                 ", description='" + description + '\'' +
-                ", basePricePerNight=" + basePricePerNight +
+                ", basePricePerNight=" + basePricePerNight + '\'' +
+                ", capacity=" + capacity +
                 ", isDeleted=" + isDeleted +
                 '}';
     }
