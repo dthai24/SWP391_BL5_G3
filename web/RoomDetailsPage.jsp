@@ -1,4 +1,3 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="Model.RoomCategory" %>
 <%@page import="Dal.RoomCategoryDAO" %>
 <%@include file="header.jsp" %>

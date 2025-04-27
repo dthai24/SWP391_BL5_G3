@@ -1,4 +1,41 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Sona Template">
+    <meta name="keywords" content="Sona, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ROSE MOTEL</title>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,500,600,700&display=swap" rel="stylesheet">
+    <!-- Css Styles -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/elegant-icons.css" type="text/css">
+    <link rel="stylesheet" href="css/flaticon.css" type="text/css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css" type="text/css">
+    <link rel="stylesheet" href="css/nice-select.css" type="text/css">
+    <link rel="stylesheet" href="css/jquery-ui.min.css" type="text/css">
+    <link rel="stylesheet" href="css/magnific-popup.css" type="text/css">
+    <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <style>
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        a:hover,
+        a:active,
+        a:focus,
+        a:visited {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
 <%@include file="header.jsp" %>
 <!-- Breadcrumb Section Begin -->
 <div class="breadcrumb-section">
@@ -222,3 +259,5 @@
 <script src="<%= request.getContextPath() %>/js/jquery.slicknav.js"></script>
 <script src ="<%= request.getContextPath() %>/js/owl.carousel.min.js"></script>
 <script src="<%= request.getContextPath() %>/js/main.js"></script>
+</body>
+</html>

@@ -236,15 +236,16 @@
                     <div class="col-lg-6">
                         <div class="about-text">
                             <div class="section-title">
-                                <span>About Us</span>
-                                <h2>Intercontinental LA <br />Westlake Hotel</h2>
+                                <span>Giới thiệu</span>
+                                <h2>Sona HaNoi <br />Westlake Hotel</h2>
                             </div>
-                            <p class="f-para">Sona.com is a leading online accommodation site. We’re passionate about
-                                travel. Every day, we inspire and reach millions of travelers across 90 local websites in 41
-                                languages.</p>
-                            <p class="s-para">So when it comes to booking the perfect hotel, vacation rental, resort,
-                                apartment, guest house, or tree house, we’ve got you covered.</p>
-                            <a href="#" class="primary-btn about-btn">Read More</a>
+                            <p class="f-para">
+Sona.com là nền tảng đặt phòng khách sạn uy tín, kết nối bạn với hàng ngàn lựa chọn lưu trú đa dạng trên toàn quốc và quốc tế.<br><br>
+Chúng tôi cam kết mang đến trải nghiệm đặt phòng nhanh chóng, giá cả minh bạch và dịch vụ hỗ trợ tận tâm.<br><br>
+Với giao diện thân thiện và quy trình đặt phòng đơn giản, Sona.com giúp bạn tiết kiệm thời gian và tận hưởng chuyến đi một cách trọn vẹn nhất.
+</p>
+ 
+                            <a href="#" class="primary-btn about-btn">Xem thêm</a>
                         </div>
                     </div>
                     <div class="col-lg-6">
