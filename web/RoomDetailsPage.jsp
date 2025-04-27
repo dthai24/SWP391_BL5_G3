@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@page import="Model.RoomCategory" %>
 <%@page import="Dal.RoomCategoryDAO" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@include file="header.jsp" %>
 <%
     String categoryIdParam = request.getParameter("categoryId");
@@ -51,7 +52,8 @@
                                     <i class="icon_star"></i>
                                     <i class="icon_star-half_alt"></i>
                                 </div>
-                                <a href="#">Đặt phòng</a>
+                                <!-- Link to booking-form.jsp with categoryId -->
+                                <a href="booking-form.jsp?categoryId=<%=category != null ? category.getCategoryID() : ""%>">Đặt phòng</a>
                             </div>
                         </div>
                         <h2><%=category != null ? category.getBasePricePerNight() : "-"%>$<span>/Pernight</span></h2>
