@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="zxx">
 <head>
@@ -62,19 +63,20 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="ap-title">
-                        <h2>Welcome To Sona.</h2>
-                        <p>Built in 1910 during the Belle Epoque period, this hotel is located in the center of
-                            Paris, with easy access to the city’s tourist attractions. It offers tastefully
-                            decorated rooms.</p>
+                        <h2>Chào mừng đến với Sona.</h2>
+                        <p>Tại Sona.com, chúng tôi tin rằng mỗi hành trình đều xứng đáng được khởi đầu bằng những trải nghiệm lưu trú hoàn hảo. Với sứ mệnh kết nối du khách với hàng ngàn khách sạn hàng đầu trong và ngoài nước, Sona.com mang đến nền tảng đặt phòng nhanh chóng, an toàn và ưu đãi vượt trội.
+
+Chúng tôi không ngừng cập nhật đa dạng lựa chọn phòng từ khách sạn boutique tinh tế, resort 5 sao đẳng cấp đến những homestay độc đáo, giúp bạn dễ dàng tìm thấy nơi nghỉ lý tưởng cho mỗi chuyến đi. Đội ngũ tư vấn tận tâm và dịch vụ chăm sóc khách hàng 24/7 luôn sẵn sàng hỗ trợ bạn từ những bước đầu tiên đến khi hoàn tất hành trình.
+
+Với Sona.com, mỗi chuyến đi không chỉ là hành trình khám phá mà còn là trải nghiệm đáng nhớ được chăm chút từ từng chi tiết nhỏ nhất.</p>
                     </div>
                 </div>
                 <div class="col-lg-5 offset-lg-1">
                     <ul class="ap-services">
-                        <li><i class="icon_check"></i> 20% Off On Accommodation.</li>
-                        <li><i class="icon_check"></i> Complimentary Daily Breakfast</li>
-                        <li><i class="icon_check"></i> 3 Pcs Laundry Per Day</li>
-                        <li><i class="icon_check"></i> Free Wifi.</li>
-                        <li><i class="icon_check"></i> Discount 20% On F&amp;B</li>
+                        <li><i class="icon_check"></i> Giảm giá 20% cho chỗ ở.</li>
+                        <li><i class="icon_check"></i> Bữa sáng miễn phí hàng ngàyt</li>
+                        <li><i class="icon_check"></i> Wifi miễn phí.</li>
+                      
                     </ul>
                 </div>
             </div>
@@ -131,8 +133,8 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="section-title">
-                    <span>Our Gallery</span>
-                    <h2>Discover Our Work</h2>
+                    <span>Phòng Trưng bày</span>
+                   
                 </div>
             </div>
         </div>
