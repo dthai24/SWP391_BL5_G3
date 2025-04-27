@@ -2,6 +2,7 @@ USE [master]
 GO
 CREATE DATABASE [SWP391_BL5_G3]
 GO
+
 USE [SWP391_BL5_G3]
 GO
 
@@ -56,8 +57,8 @@ GO
 CREATE TABLE [dbo].[Bookings](
 	[BookingID] [int] IDENTITY(1,1) NOT NULL,
 	[CustomerID] [int] NOT NULL, -- ID Khách hàng đặt phòng (FK -> Customers)
-	[CheckInDate] [date] NOT NULL, -- Ngày nhận phòng
-	[CheckOutDate] [date] NOT NULL, -- Ngày trả phòng
+	[CheckInDate] [datetime] NOT NULL, -- Ngày nhận phòng
+	[CheckOutDate] [datetime] NOT NULL, -- Ngày trả phòng
 	[NumberOfGuests] [int] NOT NULL, -- Số lượng khách
 	[Notes] [nvarchar](max) NULL, -- Ghi chú của khách hàng hoặc nhân viên
 	[TotalPrice] [decimal](12, 2) NULL, -- Tổng tiền dự kiến/thanh toán
@@ -355,29 +356,41 @@ GO
 -- (Dữ liệu mẫu cho Bookings)
 SET IDENTITY_INSERT [dbo].[Bookings] ON
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (1, 6, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-26' AS Date), 4, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T14:34:40.727' AS DateTime), CAST(N'2025-04-21T14:34:40.727' AS DateTime), 0, 6)
+INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) 
+VALUES (1, 6, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-26T12:00:00' AS DateTime), 4, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T14:34:40.727' AS DateTime), CAST(N'2025-04-21T14:34:40.727' AS DateTime), 0, 6)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (2, 6, CAST(N'2025-04-24' AS Date), CAST(N'2025-04-27' AS Date), 5, N'', CAST(0.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T14:40:52.270' AS DateTime), CAST(N'2025-04-21T14:40:52.270' AS DateTime), 0, 6)
+INSERT [dbo].[Bookings] 
+VALUES (2, 6, CAST(N'2025-04-24T14:00:00' AS DateTime), CAST(N'2025-04-27T12:00:00' AS DateTime), 5, N'', CAST(0.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T14:40:52.270' AS DateTime), CAST(N'2025-04-21T14:40:52.270' AS DateTime), 0, 6)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (3, 11, CAST(N'2025-04-22' AS Date), CAST(N'2025-04-24' AS Date), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T14:49:49.760' AS DateTime), CAST(N'2025-04-21T14:49:49.760' AS DateTime), 0, 11)
+INSERT [dbo].[Bookings] 
+VALUES (3, 11, CAST(N'2025-04-22T14:00:00' AS DateTime), CAST(N'2025-04-24T12:00:00' AS DateTime), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T14:49:49.760' AS DateTime), CAST(N'2025-04-21T14:49:49.760' AS DateTime), 0, 11)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (4, 10, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-30' AS Date), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Completed', CAST(N'2025-04-21T14:53:25.517' AS DateTime), CAST(N'2025-04-21T14:53:25.517' AS DateTime), 0, 10)
+INSERT [dbo].[Bookings] 
+VALUES (4, 10, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-30T12:00:00' AS DateTime), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Completed', CAST(N'2025-04-21T14:53:25.517' AS DateTime), CAST(N'2025-04-21T14:53:25.517' AS DateTime), 0, 10)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (5, 10, CAST(N'2025-04-22' AS Date), CAST(N'2025-04-23' AS Date), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T14:56:05.167' AS DateTime), CAST(N'2025-04-21T14:56:05.167' AS DateTime), 0, 10)
+INSERT [dbo].[Bookings] 
+VALUES (5, 10, CAST(N'2025-04-22T14:00:00' AS DateTime), CAST(N'2025-04-23T12:00:00' AS DateTime), 3, N'', CAST(0.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T14:56:05.167' AS DateTime), CAST(N'2025-04-21T14:56:05.167' AS DateTime), 0, 10)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (6, 6, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-25' AS Date), 1, N'', CAST(250.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T15:00:57.940' AS DateTime), CAST(N'2025-04-21T15:01:13.820' AS DateTime), 0, 6)
+INSERT [dbo].[Bookings] 
+VALUES (6, 6, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-25T12:00:00' AS DateTime), 1, N'', CAST(250.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T15:00:57.940' AS DateTime), CAST(N'2025-04-21T15:01:13.820' AS DateTime), 0, 6)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (7, 11, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-30' AS Date), 3, N'', CAST(1145.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T15:07:59.277' AS DateTime), CAST(N'2025-04-21T15:09:45.910' AS DateTime), 0, 11)
+INSERT [dbo].[Bookings] 
+VALUES (7, 11, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-30T12:00:00' AS DateTime), 3, N'', CAST(1145.00 AS Decimal(12, 2)), N'Confirmed', CAST(N'2025-04-21T15:07:59.277' AS DateTime), CAST(N'2025-04-21T15:09:45.910' AS DateTime), 0, 11)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (8, 6, CAST(N'2025-04-26' AS Date), CAST(N'2025-04-28' AS Date), 2, N'', CAST(375.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T15:10:13.087' AS DateTime), CAST(N'2025-04-21T15:10:39.097' AS DateTime), 0, 6)
+INSERT [dbo].[Bookings] 
+VALUES (8, 6, CAST(N'2025-04-26T14:00:00' AS DateTime), CAST(N'2025-04-28T12:00:00' AS DateTime), 2, N'', CAST(375.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T15:10:13.087' AS DateTime), CAST(N'2025-04-21T15:10:39.097' AS DateTime), 0, 6)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (9, 6, CAST(N'2025-04-21' AS Date), CAST(N'2025-04-22' AS Date), 1, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T15:14:16.723' AS DateTime), CAST(N'2025-04-21T15:14:17.653' AS DateTime), 0, 6)
+INSERT [dbo].[Bookings] 
+VALUES (9, 6, CAST(N'2025-04-21T14:00:00' AS DateTime), CAST(N'2025-04-22T12:00:00' AS DateTime), 1, N'', CAST(0.00 AS Decimal(12, 2)), N'Cancelled', CAST(N'2025-04-21T15:14:16.723' AS DateTime), CAST(N'2025-04-21T15:14:17.653' AS DateTime), 0, 6)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (10, 11, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-26' AS Date), 2, N'', CAST(0.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T15:14:35.950' AS DateTime), CAST(N'2025-04-21T15:14:37.003' AS DateTime), 0, 11)
+INSERT [dbo].[Bookings] 
+VALUES (10, 11, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-26T12:00:00' AS DateTime), 2, N'', CAST(0.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T15:14:35.950' AS DateTime), CAST(N'2025-04-21T15:14:37.003' AS DateTime), 0, 11)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (11, 11, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-27' AS Date), 2, N'', CAST(0.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T15:14:51.380' AS DateTime), CAST(N'2025-04-21T15:14:52.417' AS DateTime), 0, 11)
+INSERT [dbo].[Bookings] 
+VALUES (11, 11, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-27T12:00:00' AS DateTime), 2, N'', CAST(0.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T15:14:51.380' AS DateTime), CAST(N'2025-04-21T15:14:52.417' AS DateTime), 0, 11)
 GO
-INSERT [dbo].[Bookings] ([BookingID], [CustomerID], [CheckInDate], [CheckOutDate], [NumberOfGuests], [Notes], [TotalPrice], [Status], [BookingDate], [UpdatedAt], [IsDeleted], [CreatedByUserID]) VALUES (12, 6, CAST(N'2025-04-23' AS Date), CAST(N'2025-04-26' AS Date), 2, N'', CAST(0.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T16:22:22.223' AS DateTime), CAST(N'2025-04-21T16:22:22.223' AS DateTime), 0, 6)
+INSERT [dbo].[Bookings] 
+VALUES (12, 6, CAST(N'2025-04-23T14:00:00' AS DateTime), CAST(N'2025-04-26T12:00:00' AS DateTime), 2, N'', CAST(0.00 AS Decimal(12, 2)), N'Pending', CAST(N'2025-04-21T16:22:22.223' AS DateTime), CAST(N'2025-04-21T16:22:22.223' AS DateTime), 0, 6)
 GO
 SET IDENTITY_INSERT [dbo].[Bookings] OFF
 GO
