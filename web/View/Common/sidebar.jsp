@@ -25,12 +25,6 @@
                 </a>
             </li>
             <li class="sidebar-item">
-                <a class="sidebar-link" href="service-management.jsp">
-                    <i class="align-middle" data-feather="settings"></i>
-                    <span class="align-middle">Quản lý dịch vụ</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
                 <a class="sidebar-link" href="<%= request.getContextPath() %>/room">
                     <i class="align-middle fas fa-door-open"></i> 
                     <span class="align-middle">Quản lý phòng</span>

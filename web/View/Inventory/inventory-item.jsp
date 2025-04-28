@@ -47,7 +47,7 @@
                     %>   
                     
                     <!-- Table Section -->
-                    <div class="container mt-5">
+                    <div class="container mt-0">
                         <div class="card shadow-lg">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h3 class="mb-0">Danh Sách Đồ Vật</h3>

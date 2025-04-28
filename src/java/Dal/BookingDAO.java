@@ -235,45 +235,45 @@ public class BookingDAO {
      * @param booking The booking to add
      * @return ID of the newly created booking, or -1 if failed
      */
-    public int addBooking(Booking booking) {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        int newBookingId = -1;
-        
-        try {
-            String sql = "INSERT INTO Bookings (CustomerID, CheckInDate, CheckOutDate, "
-                       + "NumberOfGuests, Notes, TotalPrice, Status, BookingDate, UpdatedAt, IsDeleted) "
-                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, booking.getCustomerID());
-            ps.setDate(2, new java.sql.Date(booking.getCheckInDate().getTime()));
-            ps.setDate(3, new java.sql.Date(booking.getCheckOutDate().getTime()));
-            ps.setInt(4, booking.getNumberOfGuests());
-            ps.setString(5, booking.getNotes());
-            ps.setBigDecimal(6, booking.getTotalPrice());
-            ps.setString(7, booking.getStatus());
-            ps.setTimestamp(8, new Timestamp(booking.getBookingDate().getTime()));
-            ps.setTimestamp(9, new Timestamp(booking.getUpdatedAt().getTime()));
-            ps.setBoolean(10, booking.getIsDeleted());
-            
-            int affectedRows = ps.executeUpdate();
-            
-            if (affectedRows > 0) {
-                rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    newBookingId = rs.getInt(1);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error in BookingDAO.addBooking: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            closeResources(ps, rs);
-        }
-        
-        return newBookingId;
-    }
+//    public int addBooking(Booking booking) {
+//        PreparedStatement ps = null;
+//        ResultSet rs = null;
+//        int newBookingId = -1;
+//        
+//        try {
+//            String sql = "INSERT INTO Bookings (CustomerID, CheckInDate, CheckOutDate, "
+//                       + "NumberOfGuests, Notes, TotalPrice, Status, BookingDate, UpdatedAt, IsDeleted) "
+//                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//            
+//            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+//            ps.setInt(1, booking.getCustomerID());
+//            ps.setDate(2, new java.sql.Date(booking.getCheckInDate().getTime()));
+//            ps.setDate(3, new java.sql.Date(booking.getCheckOutDate().getTime()));
+//            ps.setInt(4, booking.getNumberOfGuests());
+//            ps.setString(5, booking.getNotes());
+//            ps.setBigDecimal(6, booking.getTotalPrice());
+//            ps.setString(7, booking.getStatus());
+//            ps.setTimestamp(8, new Timestamp(booking.getBookingDate().getTime()));
+//            ps.setTimestamp(9, new Timestamp(booking.getUpdatedAt().getTime()));
+//            ps.setBoolean(10, booking.getIsDeleted());
+//            
+//            int affectedRows = ps.executeUpdate();
+//            
+//            if (affectedRows > 0) {
+//                rs = ps.getGeneratedKeys();
+//                if (rs.next()) {
+//                    newBookingId = rs.getInt(1);
+//                }
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error in BookingDAO.addBooking: " + e.getMessage());
+//            e.printStackTrace();
+//        } finally {
+//            closeResources(ps, rs);
+//        }
+//        
+//        return newBookingId;
+//    }
     
     /**
      * Updates an existing booking
@@ -795,4 +795,42 @@ public class BookingDAO {
             }
         }
     }
+    
+    // Method to add a booking and return the generated booking ID
+    public int addBooking(Booking booking) throws Exception {
+        String sql = "INSERT INTO Booking (customerID, checkInDate, checkOutDate, numberOfGuests, notes, totalPrice, status, bookingDate) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, booking.getCustomerID());
+            ps.setTimestamp(2, new java.sql.Timestamp(booking.getCheckInDate().getTime()));
+            ps.setTimestamp(3, new java.sql.Timestamp(booking.getCheckOutDate().getTime()));
+            ps.setInt(4, booking.getNumberOfGuests());
+            ps.setString(5, booking.getNotes());
+            ps.setBigDecimal(6, booking.getTotalPrice());
+            ps.setString(7, booking.getStatus());
+            ps.setTimestamp(8, new java.sql.Timestamp(booking.getBookingDate().getTime()));
+
+            ps.executeUpdate();
+
+            // Retrieve the generated booking ID
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // Return the booking ID
+                }
+            }
+        }
+        throw new Exception("Failed to insert booking");
+    }
+
+    // Method to add a booking room
+    public void addBookingRoom(BookingRoom bookingRoom) throws Exception {
+        String sql = "INSERT INTO BookingRoom (bookingID, roomID, priceAtBooking) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, bookingRoom.getBookingID());
+            ps.setInt(2, bookingRoom.getRoomID());
+            ps.setBigDecimal(3, bookingRoom.getPriceAtBooking());
+            ps.executeUpdate();
+        }
+    }
+    
 }

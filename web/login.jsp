@@ -147,31 +147,33 @@
                             <a href="#" class="primary-btn">Discover Now</a>
                         </div>
                     </div>
-                    <div id="bookingFormContainer" class="booking-form">
-                        <h3 class="text-center mb-4">Đăng Nhập</h3>
+                    <div class="col-xl-4 col-lg-5 offset-xl-2 offset-lg-1">
+                        <div id="bookingFormContainer" class="booking-form">
+                            <h3 class="text-center mb-4">Đăng Nhập</h3>
 
-                        <% String error = (String) request.getAttribute("error");
-       if (error != null) { %>
-                        <div class="alert alert-danger"><%= error %></div>
-                        <% } %>
+                            <% String error = (String) request.getAttribute("error");
+           if (error != null) { %>
+                            <div class="alert alert-danger"><%= error %></div>
+                            <% } %>
 
-                        <form action="login" method="post">
-                            <div class="check-date">
-                                <label for="username">Tên đăng nhập:</label>
-                                <input type="text" id="username" name="username" required>
-                                <i class="icon_profile"></i>
-                            </div>
+                            <form action="login" method="post">
+                                <div class="check-date">
+                                    <label for="username">Tên đăng nhập:</label>
+                                    <input type="text" id="username" name="username" required>
+                                    <i class="icon_profile"></i>
+                                </div>
 
-                            <div class="check-date">
-                                <label for="password">Mật khẩu:</label>
-                                <input type="password" id="password" name="password" required>
-                                <i class="icon_lock"></i>
-                            </div>
+                                <div class="check-date">
+                                    <label for="password">Mật khẩu:</label>
+                                    <input type="password" id="password" name="password" required>
+                                    <i class="icon_lock"></i>
+                                </div>
 
-                            <button type="submit" class="site-btn btn-block mt-3">Đăng nhập</button>
+                                <button type="submit" class="site-btn btn-block mt-3">Đăng nhập</button>
 
-                            <p class="text-center mt-3">Chưa có tài khoản? <a href="register.jsp">Đăng ký ngay</a></p>
-                        </form>
+                                <p class="text-center mt-3">Chưa có tài khoản? <a href="register.jsp">Đăng ký ngay</a></p>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

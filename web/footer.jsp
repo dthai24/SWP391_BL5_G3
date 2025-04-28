@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <!DOCTYPE html>
 <!-- Footer Section Begin -->
 <footer class="footer-section">
@@ -23,7 +24,7 @@
                 </div>
                 <div class="col-lg-3 offset-lg-1">
                     <div class="ft-contact">
-                        <h6>Contact Us</h6>
+                        <h6>Liên hệ với chúng tôi</h6>
                         <ul>
                             <li>(12) 345 67890</li>
                             <li>info.colorlib@gmail.com</li>
@@ -31,38 +32,15 @@
                         </ul>
                     </div>
                 </div>
-                <div class="col-lg-3 offset-lg-1">
-                    <div class="ft-newslatter">
-                        <h6>New latest</h6>
-                        <p>Get the latest updates and offers.</p>
-                        <form action="#" class="fn-form">
-                            <input type="text" placeholder="Email">
-                            <button type="submit"><i class="fa fa-send"></i></button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="copyright-option">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <ul>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Terms of use</a></li>
-                        <li><a href="#">Privacy</a></li>
-                        <li><a href="#">Environmental Policy</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-5">
-                    <div class="co-text">
+                <div class="col offset-lg-1">
+                    <div class="ft-contact">
                         <p>Copyright &copy;<script>document.write(new Date().getFullYear());</script> Made by Group 3</p>
                     </div>
+
                 </div>
             </div>
         </div>
-    </div>
+    </div> 
 </footer>
 <!-- Footer Section End -->
 
