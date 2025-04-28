@@ -14,11 +14,13 @@ public class RoomCategoryInventory {
     public RoomCategoryInventory() {
     }
 
-    public RoomCategoryInventory(int roomCategoryInventoryID, int categoryID, int itemID, int defaultQuantity) {
+    public RoomCategoryInventory(int roomCategoryInventoryID, int categoryID, int itemID, int defaultQuantity, RoomCategory category, InventoryItem item) {
         this.roomCategoryInventoryID = roomCategoryInventoryID;
         this.categoryID = categoryID;
         this.itemID = itemID;
         this.defaultQuantity = defaultQuantity;
+        this.category = category;
+        this.item = item;
     }
     
     // Getters and Setters

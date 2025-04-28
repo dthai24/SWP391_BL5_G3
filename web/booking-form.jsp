@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@page import="Model.RoomCategory" %>
 <%@page import="Dal.RoomCategoryDAO" %>
 <%@include file="header.jsp" %>
@@ -12,14 +13,14 @@
             // handle error
         }
     }
-    // Gi? s? th�ng tin ng??i d�ng ???c l?y t? session ho?c m?t ngu?n kh�c
-    String userFullName = "Nguy?n V?n A"; // Thay th? b?ng session ho?c d? li?u th?c t?
-    String userEmail = "nguyenvana@example.com"; // Thay th? b?ng session ho?c d? li?u th?c t?
+    // Giả sử thông tin người dùng được lấy từ session hoặc một nguồn khác
+    String userFullName = "Nguyễn Văn A"; // Thay thế bằng session hoặc dữ liệu thực tế
+    String userEmail = "nguyenvana@example.com"; // Thay thế bằng session hoặc dữ liệu thực tế
 %>
 <div class="container mt-5">
-    <!-- N�t Quay l?i -->
+    <!-- Nút Quay lại -->
     <div class="text-left mb-3">
-        <a href="RoomDetailPage.jsp?categoryId=<%=categoryIdParam%>" class="btn btn-secondary">Quay l?i</a>
+        <a href="RoomDetailsPage.jsp?categoryId=<%=categoryIdParam%>" class="btn btn-secondary">Quay lại</a>
     </div>
 
     <!-- Form Booking -->
@@ -29,10 +30,10 @@
             <!-- Hidden field to pass the category ID -->
             <input type="hidden" name="categoryId" value="<%=category != null ? category.getCategoryID() : ""%>">
 
-            <!-- H? v� T�n kh�ch h�ng + Email -->
+            <!-- Họ và Tên khách hàng + Email -->
             <div class="form-row mb-3">
                 <div class="col">
-                    <label for="customerName">H? v� T�n kh�ch h�ng:</label>
+                    <label for="customerName">Họ và Tên khách hàng:</label>
                     <input type="text" id="customerName" class="form-control" value="<%=userFullName%>" readonly>
                 </div>
                 <div class="col">
@@ -41,59 +42,45 @@
                 </div>
             </div>
 
-            <!-- Th?i gian Check-in v� Check-out (24 gi?) -->
+            <!-- Thời gian Check-in và Check-out (24 giờ) -->
             <div class="form-row mb-3">
                 <div class="col">
-                    <label for="date-in">Th?i gian Check-in:</label>
+                    <label for="date-in">Thời gian Check-in:</label>
                     <input type="datetime-local" class="form-control" id="date-in" name="checkIn" required>
                 </div>
                 <div class="col">
-                    <label for="date-out">Th?i gian Check-out:</label>
+                    <label for="date-out">Thời gian Check-out:</label>
                     <input type="datetime-local" class="form-control" id="date-out" name="checkOut" required>
                 </div>
             </div>
 
-            <!-- T�n ph�ng -->
+            <!-- Tên phòng -->
             <div class="form-row mb-3">
                 <div class="col">
-                    <label for="roomName">T�n ph�ng:</label>
+                    <label for="roomName">Tên phòng:</label>
                     <input type="text" id="roomName" class="form-control" value="<%=category != null ? category.getCategoryName() : "Unknown"%>" readonly>
                 </div>
             </div>
 
-            <!-- S? l??ng ng??i l?n + Tr? em -->
+            <!-- Số lượng người lớn + Trẻ em -->
             <div class="form-row mb-3">
                 <div class="col">
-                    <label for="adults">S? l??ng ng??i l?n:</label>
-                    <select id="adults" name="adults" class="form-control">
-                        <option value="1">1 Ng??i l?n</option>
-                        <option value="2">2 Ng??i l?n</option>
-                        <option value="3">3 Ng??i l?n</option>
-                        <option value="4">4 Ng??i l?n</option>
-                    </select>
-                </div>
-                <div class="col">
-                    <label for="children">S? l??ng tr? em:</label>
-                    <select id="children" name="children" class="form-control">
-                        <option value="0">0 Tr? em</option>
-                        <option value="1">1 Tr? em</option>
-                        <option value="2">2 Tr? em</option>
-                        <option value="3">3 Tr? em</option>
-                    </select>
+                    <label for="numberOfGuests">Số lượng người:</label>
+                    <input type="number" id="numberOfGuests" class="form-control" required>                
                 </div>
             </div>
 
-            <!-- Ghi ch� -->
+            <!-- Ghi chú -->
             <div class="form-row mb-3">
                 <div class="col">
-                    <label for="requests">Ghi ch�:</label>
-                    <textarea id="requests" name="requests" class="form-control" placeholder="Nh?p ghi ch� (n?u c�)"></textarea>
+                    <label for="requests">Ghi chú:</label>
+                    <textarea id="requests" name="requests" class="form-control" placeholder="Nhập ghi chú (nếu có)"></textarea>
                 </div>
             </div>
 
-            <!-- N�t ??t -->
+            <!-- Nút Đặt -->
             <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary px-4">??t</button>
+                <button type="submit" class="btn btn-primary px-4">Đặt</button>
             </div>
         </form>
     </div>

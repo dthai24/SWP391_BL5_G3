@@ -72,6 +72,19 @@
                             </div>
 
                             <div class="card-body">
+                                <!-- Filter Form -->
+                                <form method="get" action="employee" class="form-inline mb-3">
+                                    <div class="form-group mr-2">
+                                        <label for="filterStatus" class="mr-2">Trạng thái</label>
+                                        <select name="filterStatus" id="filterStatus" class="form-control">
+                                            <option value="">Tất cả</option>
+                                            <option value="Active" <%= "Active".equals(request.getParameter("filterStatus")) ? "selected" : "" %>>Active</option>
+                                            <option value="Inactive" <%= "Inactive".equals(request.getParameter("filterStatus")) ? "selected" : "" %>>Inactive</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mr-2">Lọc</button>
+                                    <a href="employee" class="btn btn-secondary">Hủy</a>
+                                </form>
                                 <div class="table-responsive">
                                     <table id="customer-datatable" class="table table-hover table-striped align-middle">
                                         <thead class="thead-dark">

@@ -49,6 +49,13 @@
                     <span class="align-middle">Quản lý đồ vật</span>
                 </a>
             </li>
+            
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="<%= request.getContextPath() %>/inventory-room">
+                    <i class="align-middle fas fa-door-closed"></i>
+                    <span class="align-middle">Quản lý đồ vật theo phòng</span>
+                </a>
+            </li>
         </ul>
     </div>
 </nav>
